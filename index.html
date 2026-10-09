@@ -391,6 +391,15 @@ details.sec[open]{padding-bottom:12px}
 .pr .st{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-size:13px}.pr .st b{font-size:16px}
 .pr p,.pr li{white-space:pre-wrap;font-size:13px;line-height:1.5;margin:0 0 4px}.pr table{border-collapse:collapse;width:100%;font-size:12.5px}.pr td,.pr th{border:1px solid #ccc;padding:6px;text-align:left;vertical-align:top;white-space:pre-wrap}
 
+/* keyboard */
+.kb-list{display:grid;gap:4px}
+.kb-row{display:flex;align-items:center;gap:8px;padding:4px 0;border-top:1px solid var(--line)}
+.kb-row:first-child{border-top:0}
+.kb-l{flex:1;min-width:0;font-size:13.5px}
+.kb-key{min-width:96px;border:1px solid var(--line2);background:var(--btn);border-radius:7px;padding:4px 10px;font-size:12.5px;font-weight:700;color:var(--ink);text-align:center;white-space:nowrap}
+.kb-key.empty{color:var(--faint);font-weight:600;font-style:italic}
+.kb-key.rec{border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 25%,transparent)}
+
 /* sync chip */
 .sync{border:1px solid var(--line2);background:var(--btn);border-radius:999px;padding:4px 11px;font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap}
 .sync.ok{color:var(--ok)}.sync.busy{color:var(--amber)}.sync.bad{color:var(--over)}
@@ -503,8 +512,29 @@ const LIFE_ORDER=[1,7,2,11,10,5,8,6,12,9,4,3]; /* October 2026 reorder: new slot
 const STATUSES=[["Not Started","--faint"],["In Progress","--accent"],["Submitted","--amber"],["Feedback Received","--p7"],["Revising","--act"],["Done","--ok"]];
 const SC=Object.fromEntries(STATUSES);
 
+/* ===================== keyboard shortcuts ===================== */
+const IS_APPLE=/Mac|iPhone|iPad|iPod/.test(navigator.platform||"")||/Macintosh/.test(navigator.userAgent);
+const KEY_ACTIONS=[
+  ["viewBoard","Go to Board"],["viewMonth","Go to Month"],["viewWeek","Go to Week"],["viewDay","Go to Day"],["viewReview","Go to Review"],
+  ["prev","Previous Week, Month or Day"],["next","Next Week, Month or Day"],["today","This Week, This Month or Today"],["newBlock","New Block (Day and Week)"],
+  ["timerPause","Pause / Resume the Timer"],["timerStop","Stop the Timer"],["undo","Undo the Last Change"],["projects","Projects & Templates"],["settings","Settings"],
+  ["theme","Light / Dark Theme"],["sync","Sync Now"],["help","Show Keyboard Shortcuts"],
+  ["weeklyReview","Open This Week's Review"],["monthlyReview","Open This Month's Review"],["editProject","Edit Project"],["projectNotes","Project Notes"],["backup","Export Everything (Backup)"]];
+const KEY_EXTRA=new Set(["weeklyReview","monthlyReview","editProject","projectNotes","backup"]);
+const KEY_DEF={viewBoard:"1",viewMonth:"2",viewWeek:"3",viewDay:"4",viewReview:"5",prev:"ArrowLeft",next:"ArrowRight",today:"T",newBlock:"N",timerPause:"Space",timerStop:"Shift+T",undo:"Mod+Z",projects:"P",settings:"Mod+,",theme:"Shift+D",sync:"Shift+S",help:"?",weeklyReview:"",monthlyReview:"",editProject:"",projectNotes:"",backup:""};
+const KEY_RESERVED=["Mod+T","Mod+W","Mod+N","Mod+Q","Mod+R","Mod+L","Mod+Tab","Mod+Shift+T","Mod+Shift+N","Mod+Shift+W","Alt+F4","Alt+ArrowLeft","Alt+ArrowRight","Mod+[","Mod+]","Tab","Shift+Tab","Enter","Escape","Backspace","Delete","Mod+C","Mod+V","Mod+X","Mod+A","Mod+P","Mod+F"];
+function comboOf(e){
+  if(["Shift","Control","Alt","Meta","CapsLock","Dead","Unidentified"].includes(e.key))return null;
+  let k=e.key===" "?"Space":e.key;const sym=k.length===1&&!/[a-z0-9]/i.test(k);
+  if(k.length===1)k=k.toUpperCase();
+  const m=[];if(IS_APPLE?e.metaKey:e.ctrlKey)m.push("Mod");if(e.altKey)m.push("Alt");if(e.shiftKey&&!sym)m.push("Shift");
+  return [...m,k].join("+");
+}
+const keyLabel=c=>!c?"Empty":c.split("+").map(p=>p==="Mod"?(IS_APPLE?"⌘":"Ctrl"):p==="Alt"?(IS_APPLE?"⌥":"Alt"):p==="Shift"?"Shift":p==="ArrowLeft"?"←":p==="ArrowRight"?"→":p==="ArrowUp"?"↑":p==="ArrowDown"?"↓":p).join(IS_APPLE?" ":"+");
+const isField=t=>t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
+
 /* ===================== advanced settings ===================== */
-const ADV_DEF={linkNames:true,weekStart:0,clock24:false,warnAt:80,showPct:true,weekWarn:true,reviewAlerts:true,itemPhaseColors:true,phaseBarColors:false,includeBonus:false,textSize:"m",
+const ADV_DEF={kbEnter:true,kbDelete:true,kbShiftEnter:true,kbShiftClick:true,notify:false,linkNames:true,weekStart:0,clock24:false,warnAt:80,showPct:true,weekWarn:true,reviewAlerts:true,itemPhaseColors:true,phaseBarColors:false,includeBonus:false,textSize:"m",
   sound:true,volume:70,idlePrompt:true,idleMin:30,sprints:[{w:25,b:5},{w:30,b:5}],breaks:{short:5,mid:10,long:15,afterMin:180,longMin:30},colors:{}};
 const CKEYS=[
   {k:"page",l:"Page Background",sub:"Behind Month, Week, Day and Review. The Board has its own.",v:"--bg",d:["#D7D7DB","#19212F"],bg:1,grp:"ap"},
@@ -540,7 +570,7 @@ function applyAdv(st){st=st||S.settings;
     if(all)css+=`${mq}{${all}}}${at}{${all}}`;
     if(mm)css+=`${mq} body.pg-board{${mm}}}${at} body.pg-board{${mm}}`});
   let el=document.getElementById("adv");if(!el){el=document.createElement("style");el.id="adv";document.body.appendChild(el)}el.textContent=css}
-function ensureSettings(){const d=JSON.parse(JSON.stringify(ADV_DEF));for(const k in d)if(S.settings[k]===undefined)S.settings[k]=d[k];S.itemTemplates=S.itemTemplates||{};S.phaseTemplates=S.phaseTemplates||{}}
+function ensureSettings(){const d=JSON.parse(JSON.stringify(ADV_DEF));for(const k in d)if(S.settings[k]===undefined)S.settings[k]=d[k];S.itemTemplates=S.itemTemplates||{};S.sounds=S.sounds||{};S.settings.keys={...KEY_DEF,...(S.settings.keys||{})};S.phaseTemplates=S.phaseTemplates||{}}
 
 /* ===================== color slot moves ===================== */
 /* Blocks and phases remember a color by slot (p1…p12, lf1…lf12). When colors move to new slots,
@@ -582,14 +612,14 @@ function seed(){
   const tdata=chapterTemplate();
   const P=fromStructure(tdata,"Anáuac");
   const st={projects:[P],templates:[{id:"tpl1",name:"Stylized Character · Notable Characters",note:"3 archetypes × 4 variations + Sidekick, 210h + 20h bonus",archived:false,data:tdata}],
-    sessions:[],plans:[],settings:defaultSettings(),routineSkip:{},notes:{},weekly:{},weekMeta:{},monthly:{},itemTemplates:{},phaseTemplates:{}};
+    sessions:[],plans:[],settings:defaultSettings(),routineSkip:{},notes:{},weekly:{},weekMeta:{},monthly:{},itemTemplates:{},phaseTemplates:{},sounds:{}};
   st.ui=defaultUI(st);if(P.phases[1])st.ui.open[P.phases[1].id]=true;return st;
 }
 
 /* ===================== state ===================== */
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
 const K_CONN="bbst-conn",K_CACHE="bbst-cache",K_SNAP="bbst-snap",K_OUT="bbst-outbox",K_UI="bbst-ui",K_T="bbst-timer";
-const COLS=["projects","templates","sessions","plans","kv"],KVP={note:"notes",weekly:"weekly",wm:"weekMeta",mo:"monthly",itpl:"itemTemplates",ptpl:"phaseTemplates"};
+const COLS=["projects","templates","sessions","plans","kv"],KVP={note:"notes",weekly:"weekly",wm:"weekMeta",mo:"monthly",itpl:"itemTemplates",ptpl:"phaseTemplates",snd:"sounds"};
 function docsOf(st){
   const d={projects:{},templates:{},sessions:{},plans:{},kv:{}};
   st.projects.forEach((p,i)=>d.projects[p.id]={...p,_o:i});
@@ -601,12 +631,20 @@ function docsOf(st){
 }
 function stateFrom(d,ui){
   const ord=o=>Object.values(o||{}).sort((a,b)=>(a._o??0)-(b._o??0)).map(x=>{const y={...x};delete y._o;return y});
-  const st={projects:ord(d.projects),templates:ord(d.templates),sessions:Object.values(d.sessions||{}),plans:Object.values(d.plans||{}),settings:null,routineSkip:{},notes:{},weekly:{},weekMeta:{},itemTemplates:{},phaseTemplates:{},monthly:{}};
+  const st={projects:ord(d.projects),templates:ord(d.templates),sessions:Object.values(d.sessions||{}),plans:Object.values(d.plans||{}),settings:null,routineSkip:{},notes:{},weekly:{},weekMeta:{},itemTemplates:{},phaseTemplates:{},sounds:{},monthly:{}};
   Object.entries(d.kv||{}).forEach(([k,v])=>{if(k==="settings")st.settings=v;else if(k==="routineSkip")st.routineSkip=v||{};else{const i=k.indexOf(":"),f=KVP[k.slice(0,i)];if(f)st[f][k.slice(i+1)]=v}});
   if(!st.settings)st.settings=defaultSettings();
   st.ui=ui||defaultUI(st);return st;
 }
-const strs=d=>{const m={};COLS.forEach(c=>Object.keys(d[c]||{}).forEach(id=>m[c+"|"+id]=JSON.stringify(d[c][id])));return m};
+/* Custom sounds are large, so this device keeps them in IndexedDB (not localStorage), and the change tracker compares a short fingerprint instead of the whole file. */
+const isSnd=(c,id)=>c==="kv"&&id.startsWith("snd:");
+const hashStr=t=>{let h=5381;for(let i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return "h:"+t.length+":"+(h>>>0).toString(36)};
+const strs=d=>{const m={};COLS.forEach(c=>Object.keys(d[c]||{}).forEach(id=>{const j=JSON.stringify(d[c][id]);m[c+"|"+id]=isSnd(c,id)?hashStr(j):j}));return m};
+const lean=d=>{const o={...d,kv:{}};Object.keys(d.kv||{}).forEach(k=>{if(!k.startsWith("snd:"))o.kv[k]=d.kv[k]});return o};
+const IDB=(()=>{let p;const db=()=>p=p||new Promise((res,rej)=>{try{const r=indexedDB.open("bbst",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}catch(e){rej(e)}});
+  return{get:k=>db().then(d=>new Promise(res=>{const q=d.transaction("kv").objectStore("kv").get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>res(undefined)})).catch(()=>undefined),
+    set:(k,v)=>db().then(d=>new Promise(res=>{const tx=d.transaction("kv","readwrite");tx.objectStore("kv").put(v,k);tx.oncomplete=()=>res();tx.onerror=()=>res()})).catch(()=>{})}})();
+const sndRemoved=new Set();let lastSndSig=null,sndReady=false;
 let S=(()=>{const c=LS.get(K_CACHE,null);return c?stateFrom(c,null):seed()})();
 S.ui={...defaultUI(S),...S.ui,...(LS.get(K_UI,null)||{})};
 ensureSettings();
@@ -634,11 +672,14 @@ const Sync=(()=>{
   }
   function queue(k,op,json){const i=k.indexOf("|"),col=k.slice(0,i),id=k.slice(i+1);out=out.filter(o=>!(o.col===col&&o.id===id));out.push(op==="remove"?{op,col,id}:{op,col,id,data:json})}
   function track(){
-    const d=docsOf(S);LS.set(K_CACHE,d);
+    const d=docsOf(S);LS.set(K_CACHE,lean(d));
+    const now=strs(d),sig=Object.keys(now).filter(k=>k.startsWith("kv|snd:")).sort().map(k=>k+now[k]).join();
+    if(sndReady&&sig!==lastSndSig){lastSndSig=sig;IDB.set("sounds",S.sounds||{})}
     if(!snap)return status();
-    const now=strs(d);
-    Object.keys(now).forEach(k=>{if(now[k]!==snap[k])queue(k,"upsert",now[k])});
-    Object.keys(snap).forEach(k=>{if(!(k in now))queue(k,"remove")});
+    const real=k=>{const i=k.indexOf("|");return JSON.stringify(d[k.slice(0,i)][k.slice(i+1)])};
+    Object.keys(now).forEach(k=>{if(now[k]!==snap[k])queue(k,"upsert",now[k].startsWith("h:")&&k.startsWith("kv|snd:")?real(k):now[k])});
+    Object.keys(snap).forEach(k=>{if(!(k in now)){if(k.startsWith("kv|snd:")&&!sndRemoved.has(k.slice(7))){now[k]=snap[k];return}queue(k,"remove")}});
+    sndRemoved.clear();
     snap=now;LS.set(K_SNAP,snap);LS.set(K_OUT,out);status();flush();
   }
   async function flush(){
@@ -669,7 +710,7 @@ const Sync=(()=>{
         const same=snap&&ks.length===Object.keys(snap).length&&ks.every(k=>ns[k]===snap[k]);
         if(!same){
           if(modalOpen()){pullWanted=true;return}
-          const ui=S.ui;S=stateFrom(d,ui);ensureSettings();IX=indexAll();applyPalette();applyAdv();LS.set(K_CACHE,d);render();
+          const ui=S.ui;S=stateFrom(d,ui);ensureSettings();IX=indexAll();applyPalette();applyAdv();LS.set(K_CACHE,lean(d));IDB.set("sounds",S.sounds||{});sndReady=true;render();
         }
         snap=ns;
       }
@@ -707,6 +748,7 @@ const Sync=(()=>{
   }
   return{
     track,pull,status,connectScreen,connected:()=>!!conn,
+    call:(action,payload)=>conn?api(action,payload):Promise.reject(new Error("NOT_CONNECTED")),
     init(){
       const fromLink=decodeLink(location.hash);
       if(fromLink){conn=fromLink;LS.set(K_CONN,fromLink);history.replaceState(null,"",location.pathname)}
@@ -915,6 +957,7 @@ function itemModal(id){
     root.querySelector("#it-week").onchange=e=>{it.week=e.target.value;commit()};
     root.querySelector("#it-links").oninput=e=>{it.links=e.target.value;save()};
     root.querySelectorAll("[data-chk]").forEach(c=>c.onchange=()=>{const x=it.checklist.find(k=>k.id===c.dataset.chk);x.d=c.checked;c.parentElement.classList.toggle("done",c.checked);save()});
+    [["#chk-new","#chk-add"],["#fb-new","#fb-add"]].forEach(([i,b])=>root.querySelector(i).onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();root.querySelector(b).click()}});
     root.querySelector("#chk-add").onclick=()=>{const v=root.querySelector("#chk-new").value.trim();if(v){it.checklist.push({id:uid(),t:v,d:false});commit();itemModal(id)}};
     root.querySelector("#fb-add").onclick=()=>{const v=root.querySelector("#fb-new").value.trim();if(v){it.feedback.push({d:TODAY(),t:v});commit();itemModal(id)}};
     root.querySelectorAll("[data-start]").forEach(b=>b.onclick=()=>startSheet(b.dataset.start));
@@ -1051,7 +1094,7 @@ function askText(title,label,value,ok,back,btn="Save"){
     <div class="m-actions"><button class="btn" id="ask-c">Cancel</button><button class="btn primary" id="ask-ok">${btn}</button></div>`,root=>{
     const i=root.querySelector("#ask-v");setTimeout(()=>{i.focus();i.select()},30);
     const go=()=>{const v=i.value.trim();if(!v)return i.focus();ok(v)};
-    root.querySelector("#ask-ok").onclick=go;i.onkeydown=e=>{if(e.key==="Enter")go()};
+    root.querySelector("#ask-ok").onclick=go;i.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();go()}};
     root.querySelector("#ask-c").onclick=()=>back?back():closeModal()});
 }
 function tplPicker(kind,onLoad,back){
@@ -1196,7 +1239,28 @@ function addItemModal(phId){
 let T=null,audio=null,tickT=null;
 const breakFor=m=>{const b=S.settings.breaks;return m>=90?b.long:m>=45?b.mid:b.short};
 let lastInput=Date.now();["pointerdown","keydown","wheel","touchstart"].forEach(ev=>document.addEventListener(ev,()=>{lastInput=Date.now()},{passive:true,capture:true}));
-function chime(hi,force,vv){if(!S.settings.sound&&!force)return;const vol=Math.max(.0002,.35*(vv??S.settings.volume??70)/100);try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();const o=audio.createOscillator(),g=audio.createGain();o.frequency.value=hi?880:660;o.connect(g);g.connect(audio.destination);g.gain.setValueAtTime(.0001,audio.currentTime);g.gain.exponentialRampToValueAtTime(vol,audio.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,audio.currentTime+.9);o.start();o.stop(audio.currentTime+1)}catch(e){}}
+const SOUND_KINDS=[["stage","Stage End",880],["break","Break End",660],["idle","Still Working?",520]];
+const sndBuf={};
+function playSound(kind,force,vv){
+  if(!S.settings.sound&&!force)return;const vol=Math.max(.0002,.35*(vv??S.settings.volume??70)/100);
+  try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();if(audio.state==="suspended")audio.resume();
+    const custom=S.sounds&&S.sounds[kind];
+    if(custom&&custom.data){const key=kind+custom.data.length;
+      const go=buf=>{const src=audio.createBufferSource(),g=audio.createGain();g.gain.value=Math.min(1,vol*2.6);src.buffer=buf;src.connect(g);g.connect(audio.destination);src.start()};
+      if(sndBuf[key])return go(sndBuf[key]);
+      const bin=atob(custom.data.split(",")[1]),arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
+      audio.decodeAudioData(arr.buffer,buf=>{sndBuf[key]=buf;go(buf)},()=>beep());return}
+    beep();
+    function beep(){const f=(SOUND_KINDS.find(x=>x[0]===kind)||[0,0,660])[2],o=audio.createOscillator(),g=audio.createGain();o.frequency.value=f;o.connect(g);g.connect(audio.destination);g.gain.setValueAtTime(.0001,audio.currentTime);g.gain.exponentialRampToValueAtTime(vol,audio.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,audio.currentTime+.9);o.start();o.stop(audio.currentTime+1)}
+  }catch(e){}
+}
+const chime=(hi,force,vv)=>playSound(hi?"stage":"break",force,vv);
+async function notifyUser(title,body){
+  if(!S.settings.notify||!("Notification" in window)||Notification.permission!=="granted"||document.visibilityState==="visible")return;
+  try{const reg=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();
+    if(reg&&reg.showNotification)return reg.showNotification(title,{body,icon:"icons/icon-192.png",badge:"icons/icon-192.png",tag:"bbst-timer",renotify:true});
+    new Notification(title,{body,icon:"icons/icon-192.png",tag:"bbst-timer"})}catch(e){}
+}
 function startSheet(stepId){
   const {st,it}=IX.idx.step[stepId];
   modal(`<h2>Start: ${esc(it.name)} · ${esc(st.name)}</h2>
@@ -1223,20 +1287,50 @@ let lastP=0;function persistT(force){if(!force&&Date.now()-lastP<2000)return;las
 function tick(){
   if(!T||!T.running)return;
   const n=Date.now();T.elapsed+=(n-T.last)*T.speed;T.last=n;
-  if(T.kind==="work"&&!T.idle&&S.settings.idlePrompt&&n-lastInput>=S.settings.idleMin*60000){T.idle=true;T.idleFrom=lastInput;chime(false)}
+  if(T.kind==="work"&&!T.idle&&S.settings.idlePrompt&&n-lastInput>=S.settings.idleMin*60000){T.idle=true;T.idleFrom=lastInput;playSound("idle");notifyUser("Still Working?","The timer is still running. Open the tracker to keep going or remove idle time.")}
   if(T.elapsed>=T.dur){
     if(T.kind==="work"){
-      const endTs=n-(T.elapsed-T.dur);T.elapsed=T.dur;T.idle=false;logWork(endTs);chime(true);
+      const endTs=n-(T.elapsed-T.dur);T.elapsed=T.dur;T.idle=false;logWork(endTs);playSound("stage");
       const B=S.settings.breaks;let br=T.stages[T.idx].b??breakFor(T.stages[T.idx].m),long=false;
       if(T.since>=B.afterMin){br=B.longMin;long=true;T.since=0}
       T.kind="break";T.long=long;T.dur=br*60000;T.elapsed=0;
-    }else{chime(false);T.kind="wait";T.running=false}
+      notifyUser(T.long?"Long Break":"Stage Done",`${T.stages[T.idx].n} is done. Take a ${Math.round(T.dur/60000)}-minute break.`);
+    }else{playSound("break");notifyUser("Break Over","Ready when you are. Open the tracker to start the next stage.");T.kind="wait";T.running=false}
   }
   drawTimer();renderHeader();
 }
+/* ===================== calendar alerts (per device) ===================== */
+const K_CAL="bbst-calalerts",K_DEV="bbst-device";
+const calOn=()=>LS.get(K_CAL,false)===true;
+const devId=(()=>{let d=LS.get(K_DEV,null);if(!d){d=uid()+uid();LS.set(K_DEV,d)}return d})();
+let lastCalSig=null,calT=null,calPending=null;
+function calPlan(){
+  if(!T||!T.running)return{set:[],clear:[devId+":stage",devId+":break"]};
+  const now=Date.now(),left=Math.max(0,T.dur-T.elapsed),r=IX.idx.step[T.stepId],stage=T.stages[T.idx]||{};
+  const ceilMin=t=>Math.ceil(t/60000)*60000;
+  if(T.kind==="work"){const B=S.settings.breaks,mins=Math.round(T.dur/60000);let br=stage.b??breakFor(stage.m||25),long=false;if((T.since||0)+mins>=B.afterMin){br=B.longMin;long=true}
+    const end=ceilMin(now+left),what=r?`${r.it.name} · ${r.st.name}`:"";
+    return{set:[{key:devId+":stage",at:end,title:`Stage Done · ${stage.n||"Timer"}`,body:`${what}. Take a ${br}-minute ${long?"long ":""}break.`},{key:devId+":break",at:end+br*60000,title:"Break Over",body:"Open the tracker to start the next stage."}],clear:[]}}
+  if(T.kind==="break")return{set:[{key:devId+":break",at:ceilMin(now+left),title:"Break Over",body:"Open the tracker to start the next stage."}],clear:[devId+":stage"]};
+  return{set:[],clear:[devId+":stage",devId+":break"]};
+}
+function calSync(force){
+  if(!calOn()&&!force)return;
+  const plan=calOn()?calPlan():{set:[],clear:[devId+":stage",devId+":break"]};
+  const sig=JSON.stringify(plan.set.map(a=>[a.key,a.at]))+"|"+plan.clear.join();
+  if(sig===lastCalSig&&!force)return;lastCalSig=sig;calPending=plan;
+  clearTimeout(calT);calT=setTimeout(sendCal,1200);
+}
+async function sendCal(){
+  const plan=calPending;if(!plan||!Sync.connected())return;
+  try{await Sync.call("alerts",plan);if(calPending===plan)calPending=null}
+  catch(x){clearTimeout(calT);calT=setTimeout(sendCal,30000)}
+}
+addEventListener("online",()=>{if(calPending)sendCal()});
+
 function drawTimer(){
   const root=document.getElementById("timer-root");
-  persistT();
+  persistT();calSync();
   if(!T){root.innerHTML="";document.body.classList.remove("timing");persistT(true);return}
   const r=IX.idx.step[T.stepId],stage=T.stages[T.idx],left=Math.max(0,T.dur-T.elapsed),mm=Math.floor(left/60000),ss=Math.floor(left%60000/1000);
   const nextIdx=T.sprint?0:T.idx+1,hasNext=T.sprint||nextIdx<T.stages.length;
@@ -1715,8 +1809,8 @@ function settingsModal(tab="general",D){
       ${tgl("weekWarn","Week View Warnings","Percentages in Hours by Phase and This Week's Items.")}
       ${tgl("reviewAlerts","Budget Alerts on Review Pages","One line listing phases past the threshold.")}</section>
     <section><h3>Board</h3>
-      ${tgl("itemPhaseColors","Phase Colors on Items","Off: every item bar is teal.")}
       ${tgl("phaseBarColors","Phase Colors on Phase Bars","Off: phase bars are teal, like the project meter.")}
+      ${tgl("itemPhaseColors","Phase Colors on Items","Off: every item bar is teal.")}
       ${tgl("includeBonus","Include Bonus Hours in Project Totals","Off: the project meter shows the main budget only.")}
       ${tgl("linkNames","Linked Character Names","Items sent to another phase share one name. Renaming one renames them all. Copies made while this is off stay independent.")}</section>
     <section><h3>Calendar</h3>
@@ -1727,7 +1821,7 @@ function settingsModal(tab="general",D){
     <section><h3>Timer</h3>
       <span class="lbl">SPRINT PRESETS</span>
       ${D.sprints.map((x,i)=>`<div class="inl"><span class="sub">Work</span>${num(`sprints.${i}.w`,x.w,5,90)}<span class="sub">min + Break</span>${num(`sprints.${i}.b`,x.b,1,30,1)}<span class="sub">min</span>${D.sprints.length>1?`<button class="btn sm ghost" data-spx="${i}" aria-label="Remove preset">✕</button>`:""}</div>`).join("")}
-      ${D.sprints.length<4?`<button class="btn sm ghost" style="justify-self:start" id="sp-add">+ Preset</button>`:""}
+      ${D.sprints.length<5?`<button class="btn sm ghost" style="justify-self:start" id="sp-add">+ Preset</button>`:""}
       <span class="lbl">BREAK RULES FOR STAGES</span>
       <div class="inl"><span class="sub">Under 45 Min of Work</span>${num("breaks.short",D.breaks.short,1,30,1)}<span class="sub">min Break</span></div>
       <div class="inl"><span class="sub">45 to 89 Min</span>${num("breaks.mid",D.breaks.mid,1,30,1)}<span class="sub">min Break</span></div>
@@ -1735,6 +1829,9 @@ function settingsModal(tab="general",D){
       <div class="inl"><span class="sub">After</span>${num("breaks.afterMin",D.breaks.afterMin,60,360,15)}<span class="sub">min of Staged Work, a</span>${num("breaks.longMin",D.breaks.longMin,10,90,5)}<span class="sub">min Break</span></div>
       ${tgl("sound","Timer Sound")}
       <div class="tgl"><span>Volume</span><input type="range" class="hr" data-n="volume" min="0" max="100" value="${D.volume}" style="max-width:220px;background:var(--stat)" aria-label="Volume"></div>
+      <div id="snd-box" style="display:grid;gap:8px"></div>
+      <div class="tgl"><span>Timer Notifications<small>When a stage or break ends while the tracker is in the background. Allow notifications once on each device.</small></span><input type="checkbox" id="st-notify" ${D.notify?"checked":""}></div>
+      <div class="tgl"><span>Calendar Alerts (This Device)<small>Timers started on this device add stage-end and break-end alerts to a "Project Tracker Timer" calendar in your Google Calendar, so they pop up even when another app is full screen. Needs the Google Calendar app with notifications on.</small></span><input type="checkbox" id="st-cal" ${calOn()?"checked":""}></div>
       ${tgl("idlePrompt","Still Working? Prompt","Asks when the tracker has had no taps or keys for a while. The timer keeps running until you answer.")}
       <div class="inl"><span class="sub">Ask After</span>${num("idleMin",D.idleMin,5,120,5)}<span class="sub">Minutes Without Activity</span></div></section>
     <section><h3>Data</h3>
@@ -1746,7 +1843,7 @@ function settingsModal(tab="general",D){
   modal(`<h2>Settings</h2>
     <div class="seg-ctl" id="st-tabs"><button data-tab="general" aria-pressed="${tab==="general"}">General</button><button data-tab="advanced" aria-pressed="${tab==="advanced"}">Advanced</button></div>
     <div id="st-body" style="display:grid;gap:14px"></div>
-    <div class="m-actions"><button class="btn" id="st-cancel">Cancel</button><button class="btn primary" id="st-save">Save</button></div>`,
+    <div class="m-actions"><button class="btn left" id="st-keys" ${tab==="advanced"?"":"hidden"}>Keyboard Shortcuts</button><button class="btn" id="st-cancel">Cancel</button><button class="btn primary" id="st-save">Save</button></div>`,
   root=>{
     const body=root.querySelector("#st-body");
     const setPath=(path,val)=>{const k=path.split(".");let o=D;for(let i=0;i<k.length-1;i++)o=o[k[i]];o[k[k.length-1]]=val};
@@ -1754,7 +1851,19 @@ function settingsModal(tab="general",D){
     const bind=()=>{
       body.querySelectorAll("[data-t]").forEach(c=>c.onchange=()=>{D[c.dataset.t]=c.checked});
       body.querySelectorAll("[data-n]").forEach(i=>i.oninput=()=>{const v=Number(i.value);if(i.value!==""&&!isNaN(v))setPath(i.dataset.n,v)});
-      const vs=body.querySelector('[data-n="volume"]');if(vs)vs.onchange=()=>chime(true,true,+vs.value);
+      const vs=body.querySelector('[data-n="volume"]');if(vs)vs.onchange=()=>playSound("stage",true,+vs.value);
+      const sb=body.querySelector("#snd-box");if(sb)soundRows(sb,()=>+(body.querySelector('[data-n="volume"]')||{}).value||D.volume);
+      const ca=body.querySelector("#st-cal");if(ca)ca.onchange=async()=>{
+        if(!ca.checked){LS.set(K_CAL,false);calSync(true);return toast("Calendar Alerts off on this device")}
+        if(!Sync.connected()){ca.checked=false;return toast("Connect this device to your Google Sheet first.")}
+        ca.disabled=true;
+        try{await Sync.call("alerts",{test:true});LS.set(K_CAL,true);lastCalSig=null;calSync(true);toast("Calendar Alerts on for this device")}
+        catch(x){ca.checked=false;toast(/Unknown action/i.test(x.message)?"Update your Google Sheet script first: paste the new Code.gs, run setupCalendar, then deploy a new version.":x.message==="NO_CALENDAR"?"Calendar access isn't allowed yet. In Apps Script, run setupCalendar once and approve it.":"Couldn't reach your Google Sheet. Check your connection (VPN in China) and try again.",6000)}
+        finally{ca.disabled=false}};
+      const nt=body.querySelector("#st-notify");if(nt)nt.onchange=async()=>{if(!nt.checked){D.notify=false;return}
+        if(!("Notification" in window)){nt.checked=false;return toast("This device doesn't support notifications. On iPad, install the tracker to the Home Screen first.",4500)}
+        let p=Notification.permission;if(p==="default"){try{p=await Notification.requestPermission()}catch(x){}}
+        if(p!=="granted"){nt.checked=false;D.notify=false;return toast("Notifications are blocked for this app. Allow them in your browser or device settings.",4500)}D.notify=true;toast("Notifications on for this device")};
       body.querySelectorAll("[data-sel]").forEach(x=>x.onchange=()=>{D[x.dataset.sel]=+x.value});
       body.querySelectorAll("[data-seg]").forEach(b=>b.onclick=()=>{const k=b.dataset.seg,v=b.dataset.v;D[k]=v==="true"?true:v==="false"?false:v;if(k==="textSize")applyAdv(D);draw()});
       body.querySelectorAll("[data-cs]").forEach(b=>b.onclick=()=>{open=open===b.dataset.cs?null:b.dataset.cs;draw();
@@ -1774,10 +1883,11 @@ function settingsModal(tab="general",D){
       const cb=body.querySelector("#st-conn");if(cb)Sync.extras(cb);
       armDelete(body.querySelector("#st-reset"),()=>{closeModal();T=null;persistT(true);drawTimer();undoable(()=>{S.projects=[];S.sessions=[];S.plans=[];S.notes={};S.weekly={};S.weekMeta={};S.monthly={};S.routineSkip={}},"All data cleared")},"Tap Again to Clear Everything");
     };
-    root.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;open=null;root.querySelectorAll("[data-tab]").forEach(x=>x.setAttribute("aria-pressed",x===b));draw()});
+    root.querySelector("#st-keys").onclick=()=>kbModal(()=>settingsModal("advanced",D),D);
+    root.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;open=null;root.querySelector("#st-keys").hidden=tab!=="advanced";root.querySelectorAll("[data-tab]").forEach(x=>x.setAttribute("aria-pressed",x===b));draw()});
     root.querySelector("#st-cancel").onclick=()=>closeModal();
     root.querySelector("#st-save").onclick=()=>{
-      ["routine","palette","lifePalette","palDefault"].forEach(k=>{if(S.settings[k]!==undefined)D[k]=S.settings[k]});
+      ["routine","palette","lifePalette","palDefault","keys","kbEnter","kbDelete","kbShiftEnter","kbShiftClick"].forEach(k=>{if(S.settings[k]!==undefined)D[k]=S.settings[k]});
       D.target=D.target||6;D.days=Math.min(7,Math.max(1,D.days||6));if(D.dayEnd<=D.dayStart)D.dayEnd=22;
       const wsChanged=D.weekStart!==S.settings.weekStart;
       const other=effTheme()==="light"?"dark":"light",chg=CKEYS.some(K=>((D.colors[K.k]||{})[other]||null)!==(((S.settings.colors||{})[K.k]||{})[other]||null));
@@ -1802,7 +1912,7 @@ function importProject(f){
 document.getElementById("upload-bk").addEventListener("change",async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;
   let d;try{d=JSON.parse(await f.text())}catch(x){return toast("That file isn't a tracker backup.")}
   if(d.kind!=="bbst-backup"||!d.data)return toast("That file isn't a full tracker backup.");
-  closeModal();undoable(()=>{const n=stateFrom(d.data,S.ui);["projects","templates","sessions","plans","settings","routineSkip","notes","weekly","weekMeta","monthly","itemTemplates","phaseTemplates"].forEach(k=>S[k]=n[k]);ensureSettings();applyPalette();applyAdv()},"Backup restored");
+  closeModal();undoable(()=>{const n=stateFrom(d.data,S.ui);["projects","templates","sessions","plans","settings","routineSkip","notes","weekly","weekMeta","monthly","itemTemplates","phaseTemplates","sounds"].forEach(k=>S[k]=n[k]);ensureSettings();applyPalette();applyAdv()},"Backup restored");
 });
 
 /* ===================== excel report ===================== */
@@ -1866,6 +1976,84 @@ function exportModal(pid){
   },"wide");
 }
 
+/* ===================== timer sounds ===================== */
+function soundRows(box,vol){
+  const draw=()=>{box.innerHTML=SOUND_KINDS.map(([k,l])=>{const c=S.sounds[k];return `<div class="tgl"><span>${l} Sound<small>${c?esc(c.name):"Built-In Chime"}</small></span><span class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn sm ghost" data-sp="${k}">Preview</button><button class="btn sm" data-su="${k}">Upload</button>${c?`<button class="btn sm ghost" data-sr="${k}">Reset</button>`:""}</span></div>`}).join("")+`<input type="file" id="snd-file" accept=".mp3,.wav,audio/mpeg,audio/wav,audio/x-wav" hidden><span class="sub">Your own .wav or .mp3, up to 1 MB (about a 10-second clip). Saved in your Google Sheet, so every device uses it.</span>`;
+    let target=null;const f=box.querySelector("#snd-file");
+    box.querySelectorAll("[data-sp]").forEach(b=>b.onclick=()=>playSound(b.dataset.sp,true,vol()));
+    box.querySelectorAll("[data-su]").forEach(b=>b.onclick=()=>{target=b.dataset.su;f.click()});
+    box.querySelectorAll("[data-sr]").forEach(b=>b.onclick=()=>{delete S.sounds[b.dataset.sr];sndRemoved.add(b.dataset.sr);commit();draw();toast("Built-in chime restored")});
+    f.onchange=()=>{const file=f.files[0];f.value="";if(!file||!target)return;
+      if(!/\.(mp3|wav)$/i.test(file.name)&&!/audio\/(mpeg|wav|x-wav|wave)/.test(file.type))return toast("Choose a .mp3 or .wav file");
+      if(file.size>1048576)return toast(`That file is ${(file.size/1048576).toFixed(1)} MB. The limit is 1 MB; try a shorter clip.`,4500);
+      const rd=new FileReader();rd.onload=()=>{S.sounds[target]={name:file.name,data:rd.result};commit();draw();playSound(target,true,vol());toast("Sound saved")};rd.readAsDataURL(file)};
+  };draw();
+}
+
+/* ===================== keyboard shortcuts editor + help ===================== */
+let kbRecording=false;
+function kbModal(back,D){
+  const st=S.settings,dk={...KEY_DEF,...st.keys},sw={kbEnter:st.kbEnter,kbDelete:st.kbDelete,kbShiftEnter:st.kbShiftEnter,kbShiftClick:st.kbShiftClick};
+  let rec=null,note="";
+  const SW=[["kbEnter","Enter Confirms Pop-Ups","In writing boxes, use "+(IS_APPLE?"⌘":"Ctrl")+"+Enter."],["kbDelete","Backspace / Delete Deletes","Press once to arm a pop-up's Delete button, again to confirm. Resets after 3 seconds."],["kbShiftEnter","Shift+Enter Adds a Phase","On the Board."],["kbShiftClick","Shift+Click Expands or Collapses All Phases","On a phase bar on the Board."]];
+  const row=([id,l])=>`<div class="kb-row"><span class="kb-l">${l}</span><button class="kb-key ${dk[id]?"":"empty"} ${rec===id?"rec":""}" data-kb="${id}">${rec===id?"Press Keys…":keyLabel(dk[id])}</button><button class="ar" data-kx="${id}" aria-label="Clear ${l}" ${dk[id]?"":"disabled"}>✕</button></div>`;
+  const draw=root=>{
+    root.querySelector("#kb-body").innerHTML=`<div style="display:grid;gap:8px">${SW.map(([k,l,sub])=>`<label class="tgl"><span>${l}<small>${sub}</small></span><input type="checkbox" data-ksw="${k}" ${sw[k]?"checked":""}></label>`).join("")}</div>
+      <span class="lbl">SHORTCUTS</span><div class="kb-list">${KEY_ACTIONS.filter(a=>!KEY_EXTRA.has(a[0])).map(row).join("")}</div>
+      <span class="lbl">EXTRA ACTIONS</span><div class="kb-list">${KEY_ACTIONS.filter(a=>KEY_EXTRA.has(a[0])).map(row).join("")}</div>
+      ${note?`<p class="sub" style="margin:0;color:var(--amber);font-weight:700">${esc(note)}</p>`:""}
+      <span class="sub">Tap a key to record a new one. ✕ clears it to Empty. Esc always closes a pop-up. Shortcuts need a keyboard; on touch alone nothing changes.</span>`;
+    root.querySelectorAll("[data-ksw]").forEach(c=>c.onchange=()=>{sw[c.dataset.ksw]=c.checked});
+    root.querySelectorAll("[data-kb]").forEach(b=>b.onclick=()=>{rec=rec===b.dataset.kb?null:b.dataset.kb;kbRecording=!!rec;note="";draw(root)});
+    root.querySelectorAll("[data-kx]").forEach(b=>b.onclick=()=>{dk[b.dataset.kx]="";note="";draw(root)});
+  };
+  modal(`<h2>Keyboard Shortcuts</h2><div id="kb-body" style="display:grid;gap:12px"></div>
+    <div class="m-actions"><button class="btn left" id="kb-def">Revert to Defaults</button><button class="btn" id="kb-cancel">Cancel</button><button class="btn primary" id="kb-save">Save</button></div>`,root=>{
+    draw(root);
+    const onKey=e=>{if(!rec)return;e.preventDefault();e.stopImmediatePropagation();
+      if(e.key==="Escape"){rec=null;kbRecording=false;draw(root);return}
+      const c=comboOf(e);if(!c)return;
+      if(KEY_RESERVED.includes(c)){note=`${keyLabel(c)} is reserved by your browser or the app. Try another.`;rec=null;kbRecording=false;return draw(root)}
+      const other=Object.keys(dk).find(k=>k!==rec&&dk[k]===c);
+      if(other){dk[other]="";note=`${keyLabel(c)} moved from "${KEY_ACTIONS.find(a=>a[0]===other)[1]}", which is now Empty.`}else note="";
+      dk[rec]=c;rec=null;kbRecording=false;draw(root)};
+    document.addEventListener("keydown",onKey,true);
+    const done=()=>{document.removeEventListener("keydown",onKey,true);kbRecording=false};
+    root.querySelector("#kb-def").onclick=()=>{Object.assign(dk,KEY_DEF);Object.keys(sw).forEach(k=>sw[k]=true);note="Defaults restored. Tap Save to keep them.";rec=null;kbRecording=false;draw(root)};
+    root.querySelector("#kb-cancel").onclick=()=>{done();back?back():closeModal()};
+    root.querySelector("#kb-save").onclick=()=>{done();st.keys={...dk};Object.assign(st,sw);if(D){D.keys={...dk};Object.assign(D,sw)}commit();toast("Shortcuts saved");back?back():closeModal()};
+    const ov=root.querySelector("#ov");new MutationObserver((m,o)=>{if(!ov.isConnected){done();o.disconnect()}}).observe(document.getElementById("modal-root"),{childList:true});
+  },"wide");
+}
+function kbHelp(){
+  const k=S.settings.keys,list=KEY_ACTIONS.filter(a=>k[a[0]]);
+  modal(`<h2>Keyboard Shortcuts</h2><div class="kb-list">${list.map(([id,l])=>`<div class="kb-row"><span class="kb-l">${l}</span><span class="kb-key">${keyLabel(k[id])}</span></div>`).join("")}
+    ${S.settings.kbEnter?`<div class="kb-row"><span class="kb-l">Confirm a Pop-Up</span><span class="kb-key">Enter</span></div>`:""}
+    ${S.settings.kbDelete?`<div class="kb-row"><span class="kb-l">Delete in a Pop-Up (Press Twice)</span><span class="kb-key">Backspace</span></div>`:""}
+    ${S.settings.kbShiftEnter?`<div class="kb-row"><span class="kb-l">New Phase (Board)</span><span class="kb-key">Shift+Enter</span></div>`:""}
+    <div class="kb-row"><span class="kb-l">Close a Pop-Up</span><span class="kb-key">Esc</span></div></div>
+    <div class="m-actions"><button class="btn left" id="kh-edit">Edit Shortcuts</button><button class="btn primary" data-close>Close</button></div>`,root=>{root.querySelector("#kh-edit").onclick=()=>kbModal(()=>kbHelp())},"wide");
+}
+function runAction(id){
+  const go=v=>{S.ui.view=v;commit()},nav=i=>{const b=document.querySelectorAll("#view .navg button")[i];if(b)b.click()};
+  switch(id){
+    case"viewBoard":return go("board");case"viewMonth":return go("month");case"viewWeek":return go("week");case"viewDay":return go("day");case"viewReview":return go("review");
+    case"prev":return nav(0);case"today":return nav(1);case"next":return nav(2);
+    case"newBlock":{if(S.ui.view==="day"){const b=document.querySelector("[data-addblock]");if(b)b.click()}else if(S.ui.view==="week"){const d=S.ui.day>=S.ui.week&&S.ui.day<=iso(addDays(parse(S.ui.week),6))?S.ui.day:S.ui.week;blockModal(null,d,540)}return}
+    case"timerPause":{const b=document.getElementById("tm-pause");if(b)b.click();return}
+    case"timerStop":{const b=document.getElementById("tm-stop");if(b)b.click();return}
+    case"undo":return undoLast();case"projects":return libModal();case"settings":return settingsModal();
+    case"theme":{const b=document.getElementById("btn-theme");if(b)b.click();return}
+    case"sync":{if(Sync.connected()){toast("Syncing…");Sync.pull()}else Sync.connectScreen();return}
+    case"help":return kbHelp();
+    case"weeklyReview":S.ui.view="review";S.ui.rtab="weekly";S.ui.rweek=iso(weekOf(new Date()));return commit();
+    case"monthlyReview":S.ui.view="review";S.ui.rtab="monthly";S.ui.month=TODAY().slice(0,7);return commit();
+    case"editProject":return projectModal(proj().id,false);
+    case"projectNotes":{const p=proj();return notesModal("project",p,p.name)}
+    case"backup":return backupNow();
+  }
+}
+
 /* ===================== modal + toast ===================== */
 const effTheme=()=>S.ui.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
 function restoreTheme(){if(S.ui.theme)document.documentElement.setAttribute("data-theme",S.ui.theme);else document.documentElement.removeAttribute("data-theme")}
@@ -1887,12 +2075,22 @@ function modal(html,bind,cls=""){
   if(!histArmed){try{history.pushState({bbm:1},"");histArmed=true}catch(x){}}
   growAll(root);
 }
-function armDelete(btn,fn,armedText="Tap Again to Delete"){if(!btn)return;btn.addEventListener("click",()=>{if(btn.classList.contains("armed"))fn();else{btn.classList.add("armed");btn.textContent=armedText}})}
+function armDelete(btn,fn,armedText="Tap Again to Delete"){if(!btn)return;const orig=btn.textContent;let tm;
+  btn.addEventListener("click",()=>{if(btn.classList.contains("armed")){clearTimeout(tm);fn()}else{btn.classList.add("armed");btn.textContent=armedText;clearTimeout(tm);tm=setTimeout(()=>{if(btn.isConnected&&btn.classList.contains("armed")){btn.classList.remove("armed");btn.textContent=orig}},3000)}})}
+const undoSnap=()=>JSON.stringify({projects:S.projects,templates:S.templates,sessions:S.sessions,plans:S.plans,routineSkip:S.routineSkip,settings:S.settings,notes:S.notes,weekly:S.weekly,weekMeta:S.weekMeta,monthly:S.monthly,itemTemplates:S.itemTemplates,phaseTemplates:S.phaseTemplates});
+let lastUndo=null;
 function undoable(fn,msg){
-  const before=JSON.stringify({projects:S.projects,templates:S.templates,sessions:S.sessions,plans:S.plans,routineSkip:S.routineSkip,settings:S.settings,notes:S.notes,weekly:S.weekly,weekMeta:S.weekMeta,monthly:S.monthly,itemTemplates:S.itemTemplates,phaseTemplates:S.phaseTemplates});
+  const before=undoSnap();
   fn();commit();
-  const t=toast(typeof msg==="function"?msg():msg,6000);
-  const u=document.createElement("button");u.className="undo";u.textContent="Undo";u.onclick=()=>{Object.assign(S,JSON.parse(before));t.remove();applyPalette();applyAdv();commit();toast("Undone")};t.appendChild(u);
+  const label=typeof msg==="function"?msg():msg,t=toast(label,6000);
+  const run=()=>{if(lastUndo!==rec)return;lastUndo=null;Object.assign(S,JSON.parse(before));t.remove();applyPalette();applyAdv();commit();toast("Undone")};
+  const rec={run,after:undoSnap(),label};lastUndo=rec;
+  const u=document.createElement("button");u.className="undo";u.textContent="Undo";u.onclick=run;t.appendChild(u);
+}
+function undoLast(){
+  if(!lastUndo)return toast("Nothing to undo");
+  if(undoSnap()!==lastUndo.after){lastUndo=null;return toast("Can't undo: other changes were made since")}
+  lastUndo.run();
 }
 let toastT;function toast(m,ms=2400){document.querySelector(".toast")?.remove();const t=document.createElement("div");t.className="toast";t.setAttribute("role","status");t.textContent=m;document.body.appendChild(t);clearTimeout(toastT);toastT=setTimeout(()=>t.remove(),ms);return t}
 
@@ -1937,7 +2135,7 @@ document.addEventListener("click",e=>{
   const el=e.target.closest("button");if(!el||el.closest(".modal")||el.closest(".timer"))return;
   const d=el.dataset;
   if(d.view){S.ui.view=d.view;commit();return}
-  if(d.togglePhase){S.ui.open[d.togglePhase]=!S.ui.open[d.togglePhase];commit();return}
+  if(d.togglePhase){if(e.shiftKey&&S.settings.kbShiftClick){const v=!S.ui.open[d.togglePhase];proj().phases.forEach(ph=>S.ui.open[ph.id]=v)}else S.ui.open[d.togglePhase]=!S.ui.open[d.togglePhase];commit();return}
   if(d.openItem)return itemModal(d.openItem);
   if(d.ses){const x=S.sessions.find(s=>s.id===d.ses),r=x&&IX.idx.step[x.step];if(r)return timeLogModal(x.step,r.it.id);return}
   if(d.editProj)return projectModal(d.editProj,false);
@@ -1968,13 +2166,33 @@ document.addEventListener("click",e=>{
   if(el.id==="sync")return Sync.connected()?Sync.pull():Sync.connectScreen();
   if(el.id==="btn-settings")return settingsModal();
 });
-document.addEventListener("keydown",e=>{if(!document.getElementById("ov"))return;
-  if(e.key==="Escape"||(e.altKey&&e.key==="ArrowLeft")||(e.metaKey&&e.key==="[")){e.preventDefault();closeModal()}});
+document.addEventListener("keydown",e=>{
+  if(kbRecording||e.isComposing)return;
+  const st=S.settings,t=e.target,ov=document.getElementById("ov"),mod=IS_APPLE?e.metaKey:e.ctrlKey;
+  if(ov){
+    if(e.key==="Escape"||(e.altKey&&e.key==="ArrowLeft")||(e.metaKey&&e.key==="[")){e.preventDefault();return closeModal()}
+    if(e.key==="Enter"&&st.kbEnter&&!e.defaultPrevented&&!e.shiftKey&&!e.altKey){
+      if(t&&(/^(BUTTON|A|SELECT)$/.test(t.tagName)||t.closest("form")))return;
+      if(t&&t.tagName==="TEXTAREA"&&!mod)return;
+      if(t&&t.tagName!=="TEXTAREA"&&mod)return;
+      const btns=[...ov.querySelectorAll(".m-actions .btn.primary")].filter(b=>!b.disabled&&!b.hidden&&b.offsetParent);const b=btns[btns.length-1];
+      if(b){e.preventDefault();b.click()}return}
+    if((e.key==="Backspace"||e.key==="Delete")&&st.kbDelete&&!isField(t)&&!mod){
+      const b=ov.querySelector(".m-actions .btn.danger");if(b&&b.offsetParent){e.preventDefault();b.click()}return}
+    return}
+  if(isField(t))return;
+  if(e.key==="Enter"&&e.shiftKey&&st.kbShiftEnter&&S.ui.view==="board"&&!mod){e.preventDefault();return phaseModal(null)}
+  const c=comboOf(e);if(!c)return;
+  const id=Object.keys(st.keys||{}).find(k=>st.keys[k]===c);if(!id)return;
+  if(id==="timerPause"&&!(T&&T.kind==="work"))return;
+  e.preventDefault();runAction(id);
+});
 if(S.ui.theme)document.documentElement.setAttribute("data-theme",S.ui.theme);
 applyPalette();
 applyAdv();
 render();
 (()=>{const t=LS.get(K_T,null);if(t&&IX.idx.step[t.stepId]){T={...t,speed:1};clearInterval(tickT);tickT=setInterval(tick,250);document.body.classList.add("timing");drawTimer()}})();
+IDB.get("sounds").then(v=>{if(v&&typeof v==="object"&&!Object.keys(S.sounds||{}).length)S.sounds=v;sndReady=true});
 Sync.init();
 if(!Sync.connected())migrateColors();
 </script>

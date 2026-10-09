@@ -1,5 +1,5 @@
 /* Blue Blaze Project Tracker service worker: lets the app open offline and install as an app. */
-const VERSION = "bbst-202610090235";
+const VERSION = "bbst-202610091206";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
