@@ -98,7 +98,7 @@ h3{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercas
 .btn.danger.armed{background:var(--over);color:#fff}
 .inp{border:1px solid var(--line2);background:var(--field);border-radius:8px;padding:7px 10px;width:100%;min-width:0}
 .inp:focus{outline:none;border-color:var(--accent)}
-textarea.inp{resize:vertical;line-height:1.55}
+textarea.inp{resize:none;overflow:hidden;line-height:1.55;min-height:64px}
 .chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap;background:var(--stat);color:var(--muted)}
 .chip.warn{background:var(--warn-bg);color:var(--warn-fg)}
 .chip.over{background:var(--over);color:#fff}
@@ -192,7 +192,7 @@ main{padding-top:20px;display:grid;gap:18px}
 .status-row button[aria-pressed="true"]{border-color:var(--sc);color:var(--ink);background:color-mix(in srgb,var(--sc) 22%,var(--surface))}
 .check{display:flex;align-items:flex-start;gap:8px;font-size:13.5px}
 .check input{margin-top:3px;accent-color:var(--accent)}
-.check.done span{color:var(--faint);text-decoration:line-through}
+.check.done span{color:var(--faint)}
 .fb{display:grid;gap:2px;border-left:3px solid var(--accent);padding:4px 10px}
 .fb .d{font-size:11.5px;color:var(--muted)}
 
@@ -316,7 +316,11 @@ body.timing .dcol{height:clamp(440px,calc(100dvh - 390px),980px)}
 
 /* palette editor */
 .pal{display:grid;gap:6px}
-.pal-h,.pal-row{display:grid;grid-template-columns:22px 1fr 1fr;gap:10px;align-items:center}
+.pal-h,.pal-row{display:grid;grid-template-columns:30px 18px 1fr 1fr;gap:10px;align-items:center}
+.pal-grip{display:grid;place-items:center;height:38px;border-radius:8px;color:var(--faint);font-size:18px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.pal-grip:hover{background:var(--stat);color:var(--ink)}
+.pal-row.dragging{opacity:.75}.pal-row.dragging .pal-grip{background:var(--accent);color:var(--accent-ink);cursor:grabbing}
+#pal-rows.is-drag{user-select:none;-webkit-user-select:none}
 .pal-h{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .pal-n{font-size:12px;color:var(--faint);text-align:right}
 .pal-c{display:flex;align-items:center;gap:10px;padding:5px;border-radius:9px;background:#F3F4F7;border:2px solid transparent;color:#1A1F2B;text-align:left}
@@ -355,6 +359,37 @@ input.hr::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#
 .seg-ctl button[aria-pressed="true"]{background:var(--tabsel);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.1)}
 .tpl{display:grid;grid-template-columns:1fr;gap:6px;padding:10px 0;border-top:1px solid var(--line)}
 .tpl:first-of-type{border-top:0}
+
+/* round 2 */
+.navg{display:inline-flex;align-items:center;gap:6px;flex-wrap:nowrap}
+.ndot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--act);vertical-align:2px;margin-left:5px}
+.grp-name{border:0;background:none;padding:0;text-align:left;font:inherit;font-weight:700;font-size:13px;color:var(--ink);cursor:pointer}
+.grp-name:hover{text-decoration:underline}
+.title-inp{font-size:19px;font-weight:800;letter-spacing:-.01em;border-color:transparent;background:transparent;padding:3px 6px;margin-left:-7px}
+.title-inp:hover,.title-inp:focus{border-color:var(--line2);background:var(--field)}
+.nt-links{display:grid;gap:4px;overflow-wrap:anywhere;font-size:13px}
+.nt-links a{color:var(--accent)}
+details.sec{border:1px solid var(--line);border-radius:10px;padding:0 12px}
+details.sec>summary{cursor:pointer;padding:10px 0;font-size:12px;font-weight:700;letter-spacing:.03em;color:var(--label);list-style:none;display:flex;align-items:center;gap:8px}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary::before{content:"▶";font-size:9px;color:var(--faint);transition:transform .15s}
+details.sec[open]>summary::before{transform:rotate(90deg)}
+details.sec[open]{padding-bottom:12px}
+.ord{display:grid;gap:10px}
+.ord-g{display:grid;gap:6px;background:var(--stat);border-radius:10px;padding:8px}
+.ord-h,.ord-i{display:flex;align-items:center;gap:6px}
+.ord-h .inp{font-weight:700;flex:1;min-width:0}
+.ord-i{padding-left:10px;font-size:13.5px}
+.ord-i .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ord-i select{width:auto;max-width:44%}
+.ar{border:1px solid var(--line2);background:var(--btn);border-radius:7px;width:30px;height:28px;padding:0;font-size:11px;color:var(--ink);flex:none}
+.ar:disabled{opacity:.3}
+.step .acts .ar{height:26px;width:26px}
+#print-root{display:none}
+@media print{body.printing>*:not(#print-root){display:none!important}body.printing{background:#fff;padding:0}body.printing #print-root{display:block;color:#111;font-family:var(--sans)}}
+.pr h1{font-size:22px;margin:0 0 4px}.pr .sub{color:#555;font-size:12px}.pr h2{font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin:18px 0 6px;color:#333}
+.pr .st{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-size:13px}.pr .st b{font-size:16px}
+.pr p,.pr li{white-space:pre-wrap;font-size:13px;line-height:1.5;margin:0 0 4px}.pr table{border-collapse:collapse;width:100%;font-size:12.5px}.pr td,.pr th{border:1px solid #ccc;padding:6px;text-align:left;vertical-align:top;white-space:pre-wrap}
 
 /* sync chip */
 .sync{border:1px solid var(--line2);background:var(--btn);border-radius:999px;padding:4px 11px;font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap}
@@ -429,6 +464,7 @@ body.timing .toast{bottom:calc(130px + env(safe-area-inset-bottom,0px))}
 </div>
 <div id="timer-root"></div>
 <div id="modal-root"></div>
+<div id="print-root"></div>
 <input type="file" id="upload" accept="application/json,.json" hidden>
 <input type="file" id="upload-bk" accept="application/json,.json" hidden>
 
@@ -459,15 +495,16 @@ const toMin=t=>{const[h,m]=t.split(":").map(Number);return h*60+m};
 const TODAY=()=>iso(new Date());
 const nowMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()};
 const COLORS=["p1","p2","p3","p4","p5","p6","p7","p8","p9","p10","p11","p12"];
-const PAL_DEF={light:["#BFEBC2","#CBCDF7","#ADE2F4","#F4C0DE","#FAE5A6","#F6B9B2","#D6B6F4","#C7E6D6","#E3DED0","#F9CFA8","#B9D7F7","#E1E8A4"],dark:["#3FAF62","#5B67EE","#2A9FD0","#D9468F","#C9961F","#E0563F","#9658E8","#2BA882","#8A826C","#D9822B","#3D7FD9","#9AAE2E"]};
+const PAL_DEF={light:["#C8BEEB","#CBD0F7","#AECFF5","#C1F1F5","#ACFAAC","#EBF5B0","#F5EAB8","#E6D1C8","#E3D1E0","#FAA7C8","#F7BABB","#DBDAE8"],dark:["#492D96","#2E3BA3","#1254A1","#1C6F75","#1C5C1C","#626E1F","#8F7B2C","#6E3D27","#821F70","#751E40","#7D1B1D","#3D3C42"]};
 function applyPalette(pal,lpal){pal=pal||S.settings.palette||PAL_DEF;lpal=lpal||S.settings.lifePalette||LPAL_DEF;const v=(a,k)=>a.map((c,i)=>`--${k}${i+1}:${c}`).join(";");const L=t=>v(pal[t],"p")+";"+v(lpal[t],"lf");let el=document.getElementById("pal");if(!el){el=document.createElement("style");el.id="pal";document.body.appendChild(el)}el.textContent=`html:root{${L("light")}}@media (prefers-color-scheme:dark){html:root:not([data-theme="light"]){${L("dark")}}}html:root[data-theme="dark"]{${L("dark")}}`}
 const LIFE=["lf1","lf2","lf3","lf4","lf5","lf6","lf7","lf8","lf9","lf10","lf11","lf12"];
-const LPAL_DEF={light:["#CEFBD0","#FAF6B7","#BEF5FC","#DCE6E8","#F7D9C4","#E6D7F5","#D5ECC2","#F9CDD8","#C9E4F0","#EDE6D8","#F2E3B3","#D7DEE8"],dark:["#587A62","#7A7851","#3D6C8F","#3D4B55","#8A5E45","#5E4E7A","#4E6B3A","#7A4656","#3E6A7E","#5A5242","#7A6A35","#46536A"]};
+const LPAL_DEF={light:["#CEFBD0","#D5ECC2","#FAF6B7","#F2E3B3","#EDE6D8","#F7D9C4","#F9CDD8","#E6D7F5","#D7DEE8","#C9E4F0","#DCE6E8","#BEF5FC"],dark:["#587A62","#4E6B3A","#7A7851","#7A6A35","#5A5242","#8A5E45","#7A4656","#5E4E7A","#46536A","#3E6A7E","#3D4B55","#3D6C8F"]};
+const LIFE_ORDER=[1,7,2,11,10,5,8,6,12,9,4,3]; /* October 2026 reorder: new slot k shows old slot LIFE_ORDER[k-1] */
 const STATUSES=[["Not Started","--faint"],["In Progress","--accent"],["Submitted","--amber"],["Feedback Received","--p7"],["Revising","--act"],["Done","--ok"]];
 const SC=Object.fromEntries(STATUSES);
 
 /* ===================== advanced settings ===================== */
-const ADV_DEF={weekStart:0,clock24:false,warnAt:80,showPct:true,weekWarn:true,reviewAlerts:true,itemPhaseColors:true,phaseBarColors:false,includeBonus:false,textSize:"m",
+const ADV_DEF={linkNames:true,weekStart:0,clock24:false,warnAt:80,showPct:true,weekWarn:true,reviewAlerts:true,itemPhaseColors:true,phaseBarColors:false,includeBonus:false,textSize:"m",
   sound:true,volume:70,idlePrompt:true,idleMin:30,sprints:[{w:25,b:5},{w:30,b:5}],breaks:{short:5,mid:10,long:15,afterMin:180,longMin:30},colors:{}};
 const CKEYS=[
   {k:"page",l:"Page Background",sub:"Behind Month, Week, Day and Review. The Board has its own.",v:"--bg",d:["#D7D7DB","#19212F"],bg:1,grp:"ap"},
@@ -503,7 +540,27 @@ function applyAdv(st){st=st||S.settings;
     if(all)css+=`${mq}{${all}}}${at}{${all}}`;
     if(mm)css+=`${mq} body.pg-board{${mm}}}${at} body.pg-board{${mm}}`});
   let el=document.getElementById("adv");if(!el){el=document.createElement("style");el.id="adv";document.body.appendChild(el)}el.textContent=css}
-function ensureSettings(){const d=JSON.parse(JSON.stringify(ADV_DEF));for(const k in d)if(S.settings[k]===undefined)S.settings[k]=d[k]}
+function ensureSettings(){const d=JSON.parse(JSON.stringify(ADV_DEF));for(const k in d)if(S.settings[k]===undefined)S.settings[k]=d[k];S.itemTemplates=S.itemTemplates||{};S.phaseTemplates=S.phaseTemplates||{}}
+
+/* ===================== color slot moves ===================== */
+/* Blocks and phases remember a color by slot (p1…p12, lf1…lf12). When colors move to new slots,
+   every reference follows so nothing changes its look. pm[newIndex] = oldIndex (0-based). */
+function remapSlots(kind,pm){
+  if(pm.every((o,k)=>o===k))return;
+  const pre=kind==="life"?"lf":"p",m={};pm.forEach((o,k)=>m[pre+(o+1)]=pre+(k+1));
+  const f=c=>m[c]||c;
+  if(kind==="life"){["wk","sun"].forEach(t=>(S.settings.routine[t]||[]).forEach(x=>x.color=f(x.color)));S.plans.forEach(p=>{if(p.color)p.color=f(p.color)})}
+  else{S.projects.forEach(p=>p.phases.forEach(ph=>ph.color=f(ph.color)));Object.values(S.phaseTemplates||{}).forEach(t=>{if(t.data)t.data.color=f(t.data.color)});
+    (S.templates||[]).forEach(t=>((t.data&&t.data.phases)||[]).forEach(ph=>ph.color=f(ph.color)))}
+}
+/* One-time update (Oct 2026): your new default phase colors, and life colors in spectrum order. Runs once per tracker, after a fresh sync. */
+function migrateColors(){
+  if(S.settings.colorV2)return;const st=S.settings,cp=o=>JSON.parse(JSON.stringify(o)),ro=a=>LIFE_ORDER.map(o=>a[o-1]);
+  st.palette=cp(PAL_DEF);if(st.palDefault&&st.palDefault.phase)st.palDefault.phase=cp(PAL_DEF);
+  const lp=st.lifePalette;if(lp&&lp.light&&lp.light.length===12)st.lifePalette={light:ro(lp.light),dark:ro(lp.dark)};else st.lifePalette=cp(LPAL_DEF);
+  if(st.palDefault&&st.palDefault.life&&st.palDefault.life.light)st.palDefault.life={light:ro(st.palDefault.life.light),dark:ro(st.palDefault.life.dark)};
+  remapSlots("life",LIFE_ORDER.map(o=>o-1));st.colorV2=true;applyPalette();commit();
+}
 
 /* ===================== starting data ===================== */
 function chapterTemplate(){
@@ -518,21 +575,21 @@ function chapterTemplate(){
   return{name:"Anáuac",subtitle:"Portfolio Chapter 02 · Notable Characters",phases:[ph("Brainstorm + References",5,"p1",[brief]),ph("Broad Exploration",50,"p2",broad),ph("Refined Designs",25,"p3"),ph("Callout + Production Pages",30,"p4"),ph("Gameplay Pages",30,"p5"),ph("Mock-Up Screenshot",20,"p6"),ph("Lineup Page + Rendering",45,"p7"),ph("Paging + Presentation",5,"p8"),ph("Bonus: Skins + Costumes",20,"p9",[],true)]};
 }
 function defaultSettings(){return{...JSON.parse(JSON.stringify(ADV_DEF)),dayStart:5,dayEnd:22,target:6,days:6,sprint:25,backupReminder:true,palette:JSON.parse(JSON.stringify(PAL_DEF)),lifePalette:JSON.parse(JSON.stringify(LPAL_DEF)),
-  routine:{wk:[{id:uid(),life:"Morning Routine",color:"lf1",start:300,dur:90},{id:uid(),life:"Walk + Read",color:"lf2",start:420,dur:60},{id:uid(),life:"Lunch",color:"lf3",start:720,dur:60},{id:uid(),life:"Dinner",color:"lf3",start:1080,dur:60}],
-    sun:[{id:uid(),life:"Rest + Recharge",color:"lf4",start:600,dur:420}]}}}
+  routine:{wk:[{id:uid(),life:"Morning Routine",color:"lf1",start:300,dur:90},{id:uid(),life:"Walk + Read",color:"lf3",start:420,dur:60},{id:uid(),life:"Lunch",color:"lf12",start:720,dur:60},{id:uid(),life:"Dinner",color:"lf12",start:1080,dur:60}],
+    sun:[{id:uid(),life:"Rest + Recharge",color:"lf11",start:600,dur:420}]},colorV2:true}}
 const defaultUI=st=>{const t=new Date();return{view:"board",project:(st.projects[0]||{}).id,open:{},week:iso(mondayOf(t)),day:iso(t),month:iso(t).slice(0,7),rtab:"weekly",rweek:iso(mondayOf(t)),theme:null,zoom:1}};
 function seed(){
   const tdata=chapterTemplate();
   const P=fromStructure(tdata,"Anáuac");
   const st={projects:[P],templates:[{id:"tpl1",name:"Stylized Character · Notable Characters",note:"3 archetypes × 4 variations + Sidekick, 210h + 20h bonus",archived:false,data:tdata}],
-    sessions:[],plans:[],settings:defaultSettings(),routineSkip:{},notes:{},weekly:{},weekMeta:{},monthly:{}};
+    sessions:[],plans:[],settings:defaultSettings(),routineSkip:{},notes:{},weekly:{},weekMeta:{},monthly:{},itemTemplates:{},phaseTemplates:{}};
   st.ui=defaultUI(st);if(P.phases[1])st.ui.open[P.phases[1].id]=true;return st;
 }
 
 /* ===================== state ===================== */
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
 const K_CONN="bbst-conn",K_CACHE="bbst-cache",K_SNAP="bbst-snap",K_OUT="bbst-outbox",K_UI="bbst-ui",K_T="bbst-timer";
-const COLS=["projects","templates","sessions","plans","kv"],KVP={note:"notes",weekly:"weekly",wm:"weekMeta",mo:"monthly"};
+const COLS=["projects","templates","sessions","plans","kv"],KVP={note:"notes",weekly:"weekly",wm:"weekMeta",mo:"monthly",itpl:"itemTemplates",ptpl:"phaseTemplates"};
 function docsOf(st){
   const d={projects:{},templates:{},sessions:{},plans:{},kv:{}};
   st.projects.forEach((p,i)=>d.projects[p.id]={...p,_o:i});
@@ -544,7 +601,7 @@ function docsOf(st){
 }
 function stateFrom(d,ui){
   const ord=o=>Object.values(o||{}).sort((a,b)=>(a._o??0)-(b._o??0)).map(x=>{const y={...x};delete y._o;return y});
-  const st={projects:ord(d.projects),templates:ord(d.templates),sessions:Object.values(d.sessions||{}),plans:Object.values(d.plans||{}),settings:null,routineSkip:{},notes:{},weekly:{},weekMeta:{},monthly:{}};
+  const st={projects:ord(d.projects),templates:ord(d.templates),sessions:Object.values(d.sessions||{}),plans:Object.values(d.plans||{}),settings:null,routineSkip:{},notes:{},weekly:{},weekMeta:{},itemTemplates:{},phaseTemplates:{},monthly:{}};
   Object.entries(d.kv||{}).forEach(([k,v])=>{if(k==="settings")st.settings=v;else if(k==="routineSkip")st.routineSkip=v||{};else{const i=k.indexOf(":"),f=KVP[k.slice(0,i)];if(f)st[f][k.slice(i+1)]=v}});
   if(!st.settings)st.settings=defaultSettings();
   st.ui=ui||defaultUI(st);return st;
@@ -619,6 +676,7 @@ const Sync=(()=>{
       LS.set(K_SNAP,snap);offline=false;
     }catch(e){if(e.message==="BAD_KEY"){busy=false;return badKey()}offline=true}
     finally{busy=false;status()}
+    if(!offline&&conn&&!modalOpen())migrateColors();
   }
   function badKey(){conn=null;LS.del(K_CONN);status();connectScreen("The saved key no longer matches your Google Sheet. Paste the current connection details.")}
   function decodeLink(text){
@@ -742,7 +800,7 @@ function viewBoard(){
   <section class="panel proj-head">
     <div class="row"><div class="grow t"><b>${esc(p.name)}</b><span class="sub">${esc(p.subtitle||"")}</span></div>
       <select class="inp" id="proj-pick" style="width:auto" aria-label="Switch project">${projOpts}</select>
-      <button class="btn" data-edit-proj="${p.id}">Edit</button><button class="btn" data-act="add-phase">+ Phase</button></div>
+      <button class="btn" data-notes-proj="${p.id}">Notes${p.notes&&p.notes.trim()?`<i class="ndot"></i>`:""}</button><button class="btn" data-edit-proj="${p.id}">Edit</button><button class="btn" data-act="add-phase">+ Phase</button></div>
     ${bar(ta,te,tb,26)}
     <div class="row"><span class="nums grow">${numsLine(tb,te,ta)} ${budgetChip(ta,tb)}</span>
       ${S.settings.includeBonus?"":`<span class="nums">With Bonus: <b class="a">${fmtH(ca)}</b> of <b>${fmtH(cb)}</b> Ceiling</span>`}</div>
@@ -762,17 +820,19 @@ function phaseCard(ph){
   </section>`;
 }
 function phaseBody(ph){
-  const groups=[];ph.items.forEach(it=>{let g=groups.find(x=>x.name===it.group);if(!g){g={name:it.group,items:[]};groups.push(g)}g.items.push(it)});
+  const done=ph.items.filter(it=>it.status==="Done").length,vis=ph.hideDone?ph.items.filter(it=>it.status!=="Done"):ph.items;
+  const groups=[];vis.forEach(it=>{let g=groups.find(x=>x.name===(it.group||""));if(!g){g={name:it.group||"",items:[]};groups.push(g)}g.items.push(it)});
   const rows=groups.map(g=>{
     let ge=0,ga=0;g.items.forEach(it=>{const s=itemStats(it);ge+=s.est;ga+=s.act});
-    return `<div class="grp"><div class="grp-l"><b>${esc(g.name||"Items")}</b><span>${AE(ga,ge,fmtHM,true)}${pctTag(ga,ge)}</span></div>
+    return `<div class="grp"><div class="grp-l"><button class="grp-name" data-rgrp="${ph.id}" data-g="${esc(g.name)}" title="Rename This Row">${esc(g.name||"Items")}</button><span>${AE(ga,ge,fmtHM,true)}${pctTag(ga,ge)}</span></div>
       <div class="segs">${g.items.map(it=>{const s=itemStats(it),e=Math.max(s.est,1),r=s.act/e,w=WA(),ov=s.act>e,f=ov?100:Math.min(r,w)*100,y=!ov&&r>w?(r-w)*100:0,o=ov?Math.min((s.act-e)/e,.5)*100:0;
         return `<button class="segbox ${S.settings.itemPhaseColors?"tint":""}" style="flex-grow:${e};--bc:var(--${ph.color})" data-open-item="${it.id}" title="${esc(it.name)} · ${esc(it.status)}">
           <span class="segbar"><span class="f ${ov?"over":""}" style="width:${f}%"></span>${y?`<span class="y" style="left:${f}%;width:${y}%"></span>`:""}${o?`<span class="o" style="width:${o}%"></span>`:""}<span class="lab">${esc(it.name)}</span></span>
           <span class="m"><span class="st-dot" style="--sc:var(${SC[it.status]})"></span>${AE(s.act,s.est,fmtHM,true)}${pctTag(s.act,s.est)}</span></button>`}).join("")}</div></div>`;
   }).join("");
-  return `${rows||`<p class="empty">Add the pages or proposals for this phase. Each item gets steps with estimates, and the timer logs time to them.</p>`}
-    <div class="row"><button class="btn sm" data-act="add-item" data-ph="${ph.id}">+ Item</button><button class="btn sm ghost" data-act="edit-phase" data-ph="${ph.id}">Edit Phase</button>
+  return `${rows||(ph.items.length?`<p class="empty">All items in this phase are done. Tap Show Done to see them.</p>`:`<p class="empty">Add the pages or proposals for this phase. Each item gets steps with estimates, and the timer logs time to them.</p>`)}
+    <div class="row"><button class="btn sm" data-act="add-item" data-ph="${ph.id}">+ Item</button><button class="btn sm ghost" data-act="edit-phase" data-ph="${ph.id}">Edit Phase</button><button class="btn sm ghost" data-notes-ph="${ph.id}">Notes${ph.notes&&ph.notes.trim()?`<i class="ndot"></i>`:""}</button>
+    ${done?`<button class="btn sm ghost" data-hidedone="${ph.id}">${ph.hideDone?`Show Done (${done})`:`Hide Done (${done})`}</button>`:""}
     <span class="sub grow" style="text-align:right">Tap an Item to See Its Steps and Start the Timer</span></div>`;
 }
 
@@ -802,24 +862,30 @@ function bindSched(box,list){
   };draw();
 }
 function projectModal(id,isNew){
-  const p=S.projects.find(x=>x.id===id),sched=JSON.parse(JSON.stringify(p.schedule||[]));
+  const p=S.projects.find(x=>x.id===id),sched=JSON.parse(JSON.stringify(p.schedule||[]));let phOrd=p.phases.slice();
   const dayOpts=sel=>DOW.map((d,i)=>`<option value="${i}" ${i===sel?"selected":""}>${["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"][i]}</option>`).join("");
   modal(`<h2>${isNew?"New Project":"Edit Project"}</h2>
     <div class="field"><label for="pj-name">Project Name</label><input class="inp" id="pj-name" value="${esc(isNew?"":p.name)}" placeholder="e.g. Anáuac"></div>
     <div class="field"><label for="pj-sub">Subtitle</label><input class="inp" id="pj-sub" value="${esc(isNew?"":p.subtitle)}" placeholder="e.g. Portfolio Chapter 01 · Protagonist"></div>
     <div class="field"><span class="lbl">WEEKLY SCHEDULE</span><div id="pj-sched"></div>
       <span class="sub">Shows on the Month view. Timed entries also show as blocks on the Week and Day views. To skip one date, open that day and tap Skip.</span></div>
+    ${!isNew&&p.phases.length>1?`<details class="sec"><summary>PHASE ORDER</summary><div class="ord" id="pj-ord"></div></details>`:""}
     <div class="m-actions"><button class="btn" id="pj-cancel">Cancel</button><button class="btn primary" id="pj-save">${isNew?"Create Project":"Save"}</button></div>`,
-  root=>{const nm=root.querySelector("#pj-name");setTimeout(()=>nm.focus(),30);
+  root=>{const nm=root.querySelector("#pj-name");if(isNew)setTimeout(()=>nm.focus(),30);
     bindSched(root.querySelector("#pj-sched"),sched);
+    const ob=root.querySelector("#pj-ord");
+    const drawOrd=()=>{if(!ob)return;ob.innerHTML=`<div class="ord-g">${phOrd.map((x,i)=>`<div class="ord-i"><span class="dot" style="--c:var(--${x.color})"></span><span class="nm">${esc(x.name)}</span><button class="ar" data-pu="${i}" ${i?"":"disabled"} aria-label="Move up">▲</button><button class="ar" data-pd="${i}" ${i<phOrd.length-1?"":"disabled"} aria-label="Move down">▼</button></div>`).join("")}</div>`;
+      ob.querySelectorAll("[data-pu]").forEach(b=>b.onclick=()=>{const i=+b.dataset.pu;[phOrd[i-1],phOrd[i]]=[phOrd[i],phOrd[i-1]];drawOrd()});
+      ob.querySelectorAll("[data-pd]").forEach(b=>b.onclick=()=>{const i=+b.dataset.pd;[phOrd[i+1],phOrd[i]]=[phOrd[i],phOrd[i+1]];drawOrd()})};
+    drawOrd();
     root.querySelector("#pj-cancel").onclick=()=>{if(isNew){S.projects=S.projects.filter(x=>x.id!==id);commit()}closeModal()};
     root.querySelector("#pj-save").onclick=()=>{p.name=nm.value.trim()||"Untitled Project";p.subtitle=root.querySelector("#pj-sub").value.trim();
-      p.schedule=sched.filter(e=>e.label.trim());
+      p.schedule=sched.filter(e=>e.label.trim());if(!isNew)p.phases=phOrd.filter(x=>p.phases.includes(x));
       closeModal();commit();if(isNew)phaseModal(null)}},"wide");
 }
 function itemModal(id){
   const {p,ph,it}=IX.idx.item[id];const s=itemStats(it);
-  modal(`<div class="row"><div class="grow"><h2>${esc(it.name)}</h2><span class="sub">${esc(p.name)} · ${esc(ph.name)} · ${esc(it.group||"")}</span></div><button class="btn ghost" data-close>Close</button></div>
+  modal(`<div style="display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:start"><div style="min-width:0"><input class="inp title-inp" id="it-name" value="${esc(it.name)}" aria-label="Item name" title="Tap to Rename"><span class="sub">${esc(p.name)} · ${esc(ph.name)} · ${esc(it.group||"")}${it.linkId&&S.settings.linkNames?" · Linked Name":""}</span></div><button class="btn" id="it-notes">Notes${it.notes&&it.notes.trim()?`<i class="ndot"></i>`:""}</button><button class="btn ghost" data-close>Close</button></div>
     ${bar(s.act,s.est,s.est,14)}
     <span class="nums"><b>${fmtHM(s.est)}</b> Estimated · <b class="a ${s.act>s.est?"over":""}">${fmtHM(s.act)}</b> Actual${pctTag(s.act,s.est)}${s.act>s.est?` · <span style="color:var(--over);font-weight:700">${fmtHM(s.act-s.est)} Over</span>`:""}</span>
     <div class="field"><span class="lbl">STATUS</span><div class="status-row">${STATUSES.map(([n,c])=>`<button style="--sc:var(${c})" aria-pressed="${it.status===n}" data-status="${n}">${n}</button>`).join("")}</div></div>
@@ -827,7 +893,7 @@ function itemModal(id){
     <div class="field"><span class="lbl">STEPS</span><div class="steps">${it.steps.map(st=>{const a=IX.act[st.id]||0;
       return `<div class="step"><div><div class="nm">${esc(st.name)}${AE(a,st.est)}${pctTag(a,st.est)}</div>
         <div class="stg">${st.stages.length?st.stages.map(x=>`${esc(x.n)} ${x.m}m`).join(" → "):`${S.settings.sprints[0].w}-Min Sprints`}</div></div>
-        <div class="acts"><button class="btn sm primary" data-start="${st.id}">Start</button><button class="btn sm" data-log="${st.id}">Time Log</button><button class="btn sm" data-editstep="${st.id}">Edit Step</button></div>
+        <div class="acts">${it.steps.length>1?`<button class="ar" data-sup="${st.id}" aria-label="Move step up" ${it.steps[0]===st?"disabled":""}>▲</button><button class="ar" data-sdn="${st.id}" aria-label="Move step down" ${it.steps[it.steps.length-1]===st?"disabled":""}>▼</button>`:""}<button class="btn sm primary" data-start="${st.id}">Start</button><button class="btn sm" data-log="${st.id}">Time Log</button><button class="btn sm" data-editstep="${st.id}">Edit Step</button></div>
         <div class="mini">${bar(a,0,st.est,8)}</div></div>`}).join("")}
       <button class="btn sm ghost" style="justify-self:start" data-addstep="${it.id}">+ Step</button></div></div>
     <div class="field"><span class="lbl">CHECKLIST</span>${it.checklist.map(c=>`<label class="check ${c.d?"done":""}"><input type="checkbox" data-chk="${c.id}" ${c.d?"checked":""}><span>${esc(c.t)}</span></label>`).join("")}
@@ -835,9 +901,17 @@ function itemModal(id){
     <div class="field"><span class="lbl">FEEDBACK</span>${it.feedback.length?it.feedback.map(f=>`<div class="fb"><span class="d">${short(f.d)}</span><span>${esc(f.t)}</span></div>`).join(""):`<p class="empty">Feedback notes for this item land here.</p>`}
       <div class="row"><input class="inp" id="fb-new" placeholder="Add Feedback" style="flex:1"><button class="btn sm" id="fb-add">Add</button></div></div>
     <div class="field"><label for="it-links">LINKS TO FILES</label><input class="inp" id="it-links" value="${esc(it.links)}" placeholder="Google Drive or Dropbox link"></div>
-    <div class="m-actions"><button class="btn danger left" id="it-del">Delete</button><button class="btn" data-close>Close</button></div>`,
+    <div class="m-actions"><button class="btn danger left" id="it-del">Delete</button><button class="btn" id="it-move">Move to Phase</button><button class="btn" id="it-stpl">Save as Template</button><button class="btn" id="it-ltpl">Load Template</button><button class="btn" data-close>Close</button></div>`,
   root=>{
     root.querySelectorAll("[data-status]").forEach(b=>b.onclick=()=>{it.status=b.dataset.status;commit();itemModal(id)});
+    const nmI=root.querySelector("#it-name");nmI.onchange=()=>{renameItem(it,nmI.value);itemModal(id)};nmI.onkeydown=e=>{if(e.key==="Enter")nmI.blur()};
+    root.querySelector("#it-notes").onclick=()=>notesModal("item",it,it.name,()=>itemModal(id));
+    const mvStep=(sid,d)=>{const i=it.steps.findIndex(x=>x.id===sid),j=i+d;if(j<0||j>=it.steps.length)return;[it.steps[i],it.steps[j]]=[it.steps[j],it.steps[i]];commit();itemModal(id)};
+    root.querySelectorAll("[data-sup]").forEach(b=>b.onclick=()=>mvStep(b.dataset.sup,-1));
+    root.querySelectorAll("[data-sdn]").forEach(b=>b.onclick=()=>mvStep(b.dataset.sdn,1));
+    root.querySelector("#it-move").onclick=()=>moveItemModal(id);
+    root.querySelector("#it-stpl").onclick=()=>askText("Save as Item Template","Template Name",it.name,v=>{const tid=uid();S.itemTemplates[tid]={id:tid,name:v,steps:tplSteps(it.steps),checklist:it.checklist.map(c=>({t:c.t}))};commit();itemModal(id);toast("Item template saved")},()=>itemModal(id));
+    root.querySelector("#it-ltpl").onclick=()=>tplPicker("item",t=>{closeModal();undoable(()=>applyItemTemplate(it,t),`${t.name} loaded`);itemModal(id)},()=>itemModal(id));
     root.querySelector("#it-week").onchange=e=>{it.week=e.target.value;commit()};
     root.querySelector("#it-links").oninput=e=>{it.links=e.target.value;save()};
     root.querySelectorAll("[data-chk]").forEach(c=>c.onchange=()=>{const x=it.checklist.find(k=>k.id===c.dataset.chk);x.d=c.checked;c.parentElement.classList.toggle("done",c.checked);save()});
@@ -914,22 +988,124 @@ function addTimeModal(stepId,itemId){
     root.querySelector("#m-save").onclick=()=>{S.sessions.push({id:uid(),step:stepId,date:root.querySelector("#m-date").value||TODAY(),start:toMin(root.querySelector("#m-start").value||"09:00"),dur:Number(root.querySelector("#m-dur").value)||0,manual:true});commit();itemModal(itemId);toast("Time added")}});
 }
 function phaseModal(phId){
-  const p=proj();const ph=phId?IX.idx.phase[phId].ph:{name:"",budget:600,color:COLORS[p.phases.length%COLORS.length],bonus:false};
+  const p=proj();const ph=phId?IX.idx.phase[phId].ph:{name:"",budget:600,color:COLORS[p.phases.length%COLORS.length],bonus:false,items:[]};
   let color=ph.color;const sched=JSON.parse(JSON.stringify(ph.schedule||[]));
+  let ord=ph.items.map(x=>({id:x.id,name:x.name,group:x.group||""}));
+  const others=p.phases.filter(x=>x.id!==phId),pi=p.phases.indexOf(ph),nextPh=phId?(p.phases[pi+1]||others[0]):null;
+  const itplOpts=sel=>`<option value="">None</option>`+Object.values(S.itemTemplates).sort((a,b)=>a.name.localeCompare(b.name)).map(t=>`<option value="${t.id}" ${t.id===sel?"selected":""}>${esc(t.name)}</option>`).join("");
   modal(`<h2>${phId?"Edit Phase":"New Phase"}</h2>
     <div class="two"><div class="field"><label for="ph-name">Phase</label><input class="inp" id="ph-name" value="${esc(ph.name)}"></div>
     <div class="field"><label for="ph-b">Budget (Hours)</label><input class="inp" type="number" id="ph-b" min="0" step="0.5" value="${ph.budget/60}"></div></div>
     <div class="field"><div class="row"><span class="lbl grow">COLOR</span><button class="btn sm" id="ph-pal">Edit Colors</button></div>${swatchGrid(COLORS,color)}</div>
-    <div class="field"><label for="ph-due">Target Date (Optional)</label><input class="inp" type="date" id="ph-due" value="${ph.due||""}" style="width:auto"></div>
-    <div class="field"><span class="lbl">WEEKLY SCHEDULE</span><div id="ph-sched"></div></div>
+    <div class="two"><div class="field"><label for="ph-due">Target Date (Optional)</label><input class="inp" type="date" id="ph-due" value="${ph.due||""}"></div>
+    <div class="field"><label for="ph-dt">Default Item Template</label><select class="inp" id="ph-dt">${itplOpts(ph.defTpl)}</select></div></div>
     <label class="check"><input type="checkbox" id="ph-bonus" ${ph.bonus?"checked":""}><span>Bonus Phase (Counts Toward the Ceiling, Not the Main Budget)</span></label>
-    <div class="m-actions">${phId?`<button class="btn danger left" id="ph-del">Delete</button>`:""}<button class="btn" data-close>Cancel</button><button class="btn primary" id="ph-save">Save</button></div>`,
+    <details class="sec"><summary>WEEKLY SCHEDULE${sched.length?` (${sched.length})`:""}</summary><div id="ph-sched"></div></details>
+    ${phId&&ph.items.length?`<details class="sec"><summary>ORDER · ROWS AND ITEMS</summary><div class="ord" id="ph-ord"></div><span class="sub">Rename a row by typing in its box. Use the menu next to an item to move it to another row.</span></details>`:""}
+    ${phId&&ph.items.length&&others.length?`<details class="sec"><summary>SEND ITEMS TO ANOTHER PHASE</summary><div style="display:grid;gap:8px">
+      <span class="sub">Tick the items going forward. Each copy keeps its name and row, starts at zero hours, and gets the steps you pick below.${S.settings.linkNames?" Copies share their name with the original.":""}</span>
+      <div style="display:grid;gap:4px">${ph.items.map(x=>`<label class="check"><input type="checkbox" data-snd="${x.id}"><span>${esc(x.name)} <span class="sub">${esc(x.group||"")}${x.status==="Done"?" · Done":""}</span></span></label>`).join("")}</div>
+      <div class="two"><div class="field"><label for="sd-ph">To Phase</label><select class="inp" id="sd-ph">${others.map(x=>`<option value="${x.id}" ${x===nextPh?"selected":""}>${esc(x.name)}</option>`).join("")}</select></div>
+      <div class="field"><label for="sd-tpl">Steps From</label><select class="inp" id="sd-tpl">${itplOpts(nextPh&&nextPh.defTpl)}</select></div></div>
+      <button class="btn primary" id="sd-go" style="justify-self:start">Send Items</button></div></details>`:""}
+    <div class="m-actions">${phId?`<button class="btn danger left" id="ph-del">Delete</button><button class="btn" id="ph-stpl">Save as Template</button>`:""}<button class="btn ${phId?"":"left"}" id="ph-ltpl">Load Template</button><button class="btn" data-close>Cancel</button><button class="btn primary" id="ph-save">Save</button></div>`,
   root=>{root.querySelectorAll("[data-sw]").forEach(b=>b.onclick=()=>{color=b.dataset.sw;root.querySelectorAll("[data-sw]").forEach(x=>x.setAttribute("aria-pressed",x===b))});
     root.querySelector("#ph-pal").onclick=()=>paletteModal(()=>phaseModal(phId));
     bindSched(root.querySelector("#ph-sched"),sched);
-    root.querySelector("#ph-save").onclick=()=>{const d={name:root.querySelector("#ph-name").value.trim()||"Phase",budget:Math.round((Number(root.querySelector("#ph-b").value)||0)*60),color,bonus:root.querySelector("#ph-bonus").checked,due:root.querySelector("#ph-due").value,schedule:sched.filter(e=>e.label.trim())};
-      if(phId)Object.assign(ph,d);else p.phases.push({id:uid(),items:[],...d});closeModal();commit()};
+    const ob=root.querySelector("#ph-ord");
+    const groupsOf=()=>{const g=[];ord.forEach(x=>{if(!g.includes(x.group))g.push(x.group)});return g};
+    const rebuild=gs=>{ord=gs.flatMap(g=>ord.filter(x=>x.group===g))};
+    const drawOrd=()=>{if(!ob)return;const gs=groupsOf();
+      ob.innerHTML=gs.map((g,gi)=>`<div class="ord-g"><div class="ord-h"><input class="inp" data-gname="${gi}" value="${esc(g)}" placeholder="Row Name" aria-label="Row name"><button class="ar" data-gup="${gi}" ${gi?"":"disabled"} aria-label="Move row up">▲</button><button class="ar" data-gdn="${gi}" ${gi<gs.length-1?"":"disabled"} aria-label="Move row down">▼</button></div>
+        ${ord.filter(x=>x.group===g).map((x,ii,ia)=>`<div class="ord-i"><span class="nm">${esc(x.name)}</span><select class="inp" data-irow="${x.id}" aria-label="Row for ${esc(x.name)}">${gs.map(o=>`<option value="${esc(o)}" ${o===g?"selected":""}>${esc(o||"(No Row Name)")}</option>`).join("")}<option value="__new">New Row</option></select><button class="ar" data-iup="${x.id}" ${ii?"":"disabled"} aria-label="Move item up">▲</button><button class="ar" data-idn="${x.id}" ${ii<ia.length-1?"":"disabled"} aria-label="Move item down">▼</button></div>`).join("")}</div>`).join("");
+      ob.querySelectorAll("[data-gname]").forEach(i=>i.onchange=()=>{const old=groupsOf()[+i.dataset.gname],nv=i.value.trim();if(nv&&nv!==old){ord.forEach(x=>{if(x.group===old)x.group=nv});rebuild(groupsOf())}drawOrd()});
+      ob.querySelectorAll("[data-gup],[data-gdn]").forEach(b=>b.onclick=()=>{const gs2=groupsOf(),i=+(b.dataset.gup??b.dataset.gdn),j=b.dataset.gup!==undefined?i-1:i+1;[gs2[i],gs2[j]]=[gs2[j],gs2[i]];rebuild(gs2);drawOrd()});
+      ob.querySelectorAll("[data-iup],[data-idn]").forEach(b=>b.onclick=()=>{const id=b.dataset.iup||b.dataset.idn,up=!!b.dataset.iup,i=ord.findIndex(x=>x.id===id),g=ord[i].group;
+        let j=i;do{j+=up?-1:1}while(j>=0&&j<ord.length&&ord[j].group!==g);if(j<0||j>=ord.length)return;[ord[i],ord[j]]=[ord[j],ord[i]];drawOrd()});
+      ob.querySelectorAll("[data-irow]").forEach(sel=>sel.onchange=()=>{const x=ord.find(o=>o.id===sel.dataset.irow);let v=sel.value;
+        if(v==="__new"){const gs2=groupsOf();let n=1;v="New Row";while(gs2.includes(v))v="New Row "+(++n)}
+        const gs2=groupsOf();ord=ord.filter(o=>o!==x);x.group=v;const last=ord.map(o=>o.group).lastIndexOf(v);if(last<0)ord.push(x);else ord.splice(last+1,0,x);rebuild(gs2.includes(v)?gs2:[...gs2,v]);drawOrd()});
+    };drawOrd();
+    const sdPh=root.querySelector("#sd-ph");if(sdPh)sdPh.onchange=()=>{const t=p.phases.find(x=>x.id===sdPh.value);root.querySelector("#sd-tpl").innerHTML=itplOpts(t&&t.defTpl)};
+    const form=()=>({name:root.querySelector("#ph-name").value.trim()||"Phase",budget:Math.round((Number(root.querySelector("#ph-b").value)||0)*60),color,bonus:root.querySelector("#ph-bonus").checked,due:root.querySelector("#ph-due").value,defTpl:root.querySelector("#ph-dt").value||"",schedule:sched.filter(e=>e.label.trim())});
+    const apply=(d=form())=>{if(phId){Object.assign(ph,d);if(ord.length){const byId=Object.fromEntries(ph.items.map(x=>[x.id,x]));ph.items=ord.map(o=>{const x=byId[o.id];if(x)x.group=o.group;return x}).filter(Boolean)}return ph}const n={id:uid(),items:[],...d};p.phases.push(n);return n};
+    root.querySelector("#ph-save").onclick=()=>{const d=form();closeModal();undoable(()=>{apply(d)},phId?"Phase saved":"Phase added")};
+    const go=root.querySelector("#sd-go");if(go)go.onclick=()=>{const ids=[...root.querySelectorAll("[data-snd]:checked")].map(c=>c.dataset.snd);if(!ids.length)return toast("Tick at least one item to send");
+      const to=p.phases.find(x=>x.id===sdPh.value),t=S.itemTemplates[root.querySelector("#sd-tpl").value]||null;let r;const d=form();
+      closeModal();undoable(()=>{apply(d);r=sendItems(ph,ids,to,t);S.ui.open[to.id]=true},()=>`Sent ${r.sent} to ${to.name}${r.skipped?` · ${r.skipped} already there`:""}`)};
+    const st=root.querySelector("#ph-stpl");if(st)st.onclick=()=>{const d=form();askText("Save as Phase Template","Template Name",d.name,v=>{apply(d);const tid=uid();
+      S.phaseTemplates[tid]={id:tid,name:v,data:{name:ph.name,budget:ph.budget,color:ph.color,bonus:!!ph.bonus,defTpl:ph.defTpl||"",schedule:(ph.schedule||[]).map(e=>({...e,id:undefined,skip:[]})),items:ph.items.map(x=>({name:x.name,group:x.group||"",steps:tplSteps(x.steps),checklist:x.checklist.map(c=>({t:c.t}))}))}};
+      commit();phaseModal(phId);toast("Phase template saved")},()=>phaseModal(phId))};
+    root.querySelector("#ph-ltpl").onclick=()=>tplPicker("phase",t=>{const D=t.data;closeModal();undoable(()=>{let tgt=ph;if(!phId){tgt={id:uid(),name:D.name,items:[],budget:0,color:D.color};p.phases.push(tgt)}
+        Object.assign(tgt,{budget:D.budget,color:D.color,bonus:!!D.bonus,defTpl:D.defTpl&&S.itemTemplates[D.defTpl]?D.defTpl:"",schedule:(D.schedule||[]).map(e=>({...e,id:uid(),skip:[]}))});
+        D.items.forEach(x=>tgt.items.push({id:uid(),name:x.name,group:x.group||"",status:"Not Started",week:"",steps:freshSteps(x.steps),checklist:freshChecklist(x.checklist),feedback:[],links:"",notes:""}));S.ui.open[tgt.id]=true},`${t.name} loaded`)},()=>phaseModal(phId));
     if(phId)armDelete(root.querySelector("#ph-del"),()=>{closeModal();undoable(()=>{p.phases=p.phases.filter(x=>x.id!==phId)},"Phase deleted")},phaseStats(ph).act?"Delete Phase and Its Logged Time":"Tap Again to Delete");},"wide");
+}
+
+/* ===================== templates, notes, renames, moves ===================== */
+const tplSteps=steps=>steps.map(s=>({name:s.name,est:s.est,stages:(s.stages||[]).map(x=>({...x}))}));
+const freshSteps=steps=>(steps||[]).map(s=>({id:uid(),name:s.name,est:s.est,stages:(s.stages||[]).map(x=>({...x}))}));
+const freshChecklist=cl=>(cl||[]).map(c=>({id:uid(),t:c.t,d:false}));
+function askText(title,label,value,ok,back,btn="Save"){
+  modal(`<h2>${esc(title)}</h2><div class="field"><label for="ask-v">${esc(label)}</label><input class="inp" id="ask-v" value="${esc(value)}"></div>
+    <div class="m-actions"><button class="btn" id="ask-c">Cancel</button><button class="btn primary" id="ask-ok">${btn}</button></div>`,root=>{
+    const i=root.querySelector("#ask-v");setTimeout(()=>{i.focus();i.select()},30);
+    const go=()=>{const v=i.value.trim();if(!v)return i.focus();ok(v)};
+    root.querySelector("#ask-ok").onclick=go;i.onkeydown=e=>{if(e.key==="Enter")go()};
+    root.querySelector("#ask-c").onclick=()=>back?back():closeModal()});
+}
+function tplPicker(kind,onLoad,back){
+  const store=kind==="item"?S.itemTemplates:S.phaseTemplates,list=Object.values(store).sort((a,b)=>a.name.localeCompare(b.name));
+  modal(`<h2>Load ${kind==="item"?"Item":"Phase"} Template</h2>
+    <p class="sub" style="margin:0">${kind==="item"?"Replaces this item's steps and checklist. Logged hours are never erased: a step with the same name keeps its hours, and old steps that have hours stay on the item.":"Applies the template's budget, color, weekly schedule and default item template, and adds its items to this phase at zero hours. Items already here stay."}</p>
+    <div style="display:grid">${list.map(t=>`<div class="tpl"><div class="row"><input class="inp" data-tn="${t.id}" value="${esc(t.name)}" style="flex:1;min-width:150px" aria-label="Template name"><button class="btn sm primary" data-tl="${t.id}">Load</button><button class="btn sm ghost danger" data-td="${t.id}">Delete</button></div>
+      <span class="sub">${kind==="item"?`${t.steps.length} Step${t.steps.length===1?"":"s"}: ${t.steps.map(x=>esc(x.name)).join(", ")||"None"} · ${t.checklist.length} Checklist Item${t.checklist.length===1?"":"s"}`:`${fmtH(t.data.budget)} Budget · ${t.data.items.length} Item${t.data.items.length===1?"":"s"}`}</span></div>`).join("")||`<p class="empty">No ${kind} templates yet. Use Save as Template first.</p>`}</div>
+    <div class="m-actions"><button class="btn" id="tp-back">Back</button></div>`,root=>{
+    root.querySelector("#tp-back").onclick=()=>back();
+    root.querySelectorAll("[data-tn]").forEach(i=>i.onchange=()=>{const v=i.value.trim();if(v){store[i.dataset.tn].name=v;commit()}});
+    root.querySelectorAll("[data-tl]").forEach(b=>b.onclick=()=>onLoad(store[b.dataset.tl]));
+    root.querySelectorAll("[data-td]").forEach(b=>armDelete(b,()=>{delete store[b.dataset.td];commit();tplPicker(kind,onLoad,back)}));
+  },"wide");
+}
+function renameItem(it,name){const n=String(name||"").trim();if(!n||n===it.name)return;
+  const all=[];if(S.settings.linkNames&&it.linkId)S.projects.forEach(p=>p.phases.forEach(ph=>ph.items.forEach(x=>{if(x.linkId===it.linkId)all.push(x)})));if(!all.length)all.push(it);
+  all.forEach(x=>x.name=n);commit();toast(all.length>1?`Renamed in ${all.length} phases`:"Renamed")}
+function applyItemTemplate(it,t){
+  const old=it.steps,used=new Set();
+  const steps=t.steps.map(s=>{const m=old.find(o=>!used.has(o.id)&&o.name.trim().toLowerCase()===s.name.trim().toLowerCase());if(m)used.add(m.id);return{id:m?m.id:uid(),name:s.name,est:s.est,stages:(s.stages||[]).map(x=>({...x}))}});
+  old.forEach(o=>{if(!used.has(o.id)&&(IX.act[o.id]||0)>0)steps.push(o)});
+  const dropped=old.filter(o=>!used.has(o.id)&&!(IX.act[o.id]||0)).map(o=>o.id);
+  it.steps=steps;it.checklist=freshChecklist(t.checklist);S.plans=S.plans.filter(x=>!dropped.includes(x.step));
+}
+const hasLinked=(ph,linkId,exceptId)=>!!linkId&&ph.items.some(x=>x.linkId===linkId&&x.id!==exceptId);
+function sendItems(fromPh,ids,toPh,tpl){
+  let sent=0,skipped=0;
+  ids.forEach(id=>{const src=fromPh.items.find(x=>x.id===id);if(!src)return;
+    if(S.settings.linkNames){if(!src.linkId)src.linkId=uid();if(hasLinked(toPh,src.linkId)){skipped++;return}}
+    const n={id:uid(),name:src.name,group:src.group||"",status:"Not Started",week:"",steps:tpl?freshSteps(tpl.steps):[],checklist:tpl?freshChecklist(tpl.checklist):[],feedback:[],links:"",notes:""};
+    if(S.settings.linkNames)n.linkId=src.linkId;toPh.items.push(n);sent++});
+  return{sent,skipped};
+}
+function moveItemModal(id){const {p,ph,it}=IX.idx.item[id];const opts=p.phases.filter(x=>x.id!==ph.id);
+  modal(`<h2>Move ${esc(it.name)} to Another Phase</h2><p class="sub" style="margin:0">The item keeps its steps, checklist, notes and logged hours, and keeps its row name.</p>
+    ${opts.length?`<div class="field"><label for="mv-ph">Phase</label><select class="inp" id="mv-ph">${opts.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join("")}</select></div>`:`<p class="empty">This project has no other phases.</p>`}
+    <p class="sub" id="mv-err" style="color:var(--over);margin:0" hidden></p>
+    <div class="m-actions"><button class="btn" id="mv-back">Back</button>${opts.length?`<button class="btn primary" id="mv-go">Move</button>`:""}</div>`,root=>{
+    root.querySelector("#mv-back").onclick=()=>itemModal(id);
+    const g=root.querySelector("#mv-go");if(g)g.onclick=()=>{const to=p.phases.find(x=>x.id===root.querySelector("#mv-ph").value);
+      if(hasLinked(to,it.linkId,it.id)){const e=root.querySelector("#mv-err");e.hidden=false;e.textContent=`${to.name} already has an item for ${it.name}. Each character can only appear once per phase.`;return}
+      closeModal();undoable(()=>{ph.items=ph.items.filter(x=>x.id!==id);to.items.push(it);S.ui.open[to.id]=true},`${it.name} moved to ${to.name}`)}});
+}
+function notesModal(kind,obj,title,back){
+  const ph={project:"Lore, references, links to resources…",phase:"Process reminders and workflow notes for this phase…",item:"Notes for this item…"}[kind];
+  modal(`<h2>${esc(title)} · Notes</h2><textarea class="inp" id="nt" rows="6" placeholder="${ph}">${esc(obj.notes||"")}</textarea>
+    <div id="nt-links" class="nt-links"></div>
+    <div class="m-actions"><span class="sub left" id="nt-st">Saves as You Type</span><button class="btn primary" id="nt-done">Done</button></div>`,root=>{
+    const t=root.querySelector("#nt"),L=root.querySelector("#nt-links");let tm;
+    const links=()=>{const u=[...new Set((t.value.match(/https?:\/\/[^\s<>"')\]]+/g)||[]))];L.innerHTML=u.length?`<span class="lbl">LINKS</span>${u.map(x=>`<a href="${esc(x)}" target="_blank" rel="noopener">${esc(x)}</a>`).join("")}`:""};
+    links();t.oninput=()=>{obj.notes=t.value;links();root.querySelector("#nt-st").textContent="Saving…";clearTimeout(tm);tm=setTimeout(()=>{save();root.querySelector("#nt-st").textContent="Saved"},500)};
+    root.querySelector("#nt-done").onclick=()=>{clearTimeout(tm);obj.notes=t.value;commit();back?back():closeModal()};
+  },"wide");
 }
 const swatchGrid=(list,sel,attr="data-sw")=>`<div class="swatches">${list.map((c,i)=>`<button style="--c:var(--${c})" ${attr}="${c}" aria-pressed="${c===sel}" aria-label="Color ${i+1}"><span>${i+1}</span></button>`).join("")}</div>`;
 const hex2rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
@@ -940,17 +1116,19 @@ const hsvHex=(h,s,v)=>rgb2hex(...hsv2rgb(h,s,v));
 function paletteModal(back,kind="phase"){
   const KEYP=kind==="life"?"lifePalette":"palette",DEF=(S.settings.palDefault||{})[kind]||(kind==="life"?LPAL_DEF:PAL_DEF);
   const draft=JSON.parse(JSON.stringify(S.settings[KEYP]||DEF));
-  const preview=d=>kind==="life"?applyPalette(null,d):applyPalette(d);
-  let sel={t:"light",i:0};
-  const rows=()=>draft.light.map((_,i)=>`<div class="pal-row"><span class="pal-n">${i+1}</span>
+  let perm=draft.light.map((_,i)=>i); /* perm[row] = the slot that color came from */
+  const unperm=d=>{const o={light:[],dark:[]};perm.forEach((src,k)=>{o.light[src]=d.light[k];o.dark[src]=d.dark[k]});return o};
+  const preview=()=>{const d=unperm(draft);kind==="life"?applyPalette(null,d):applyPalette(d)};
+  let sel={t:"light",i:0},dg=null;
+  const rows=()=>draft.light.map((_,i)=>`<div class="pal-row ${dg&&dg.i===i?"dragging":""}"><span class="pal-grip" data-grip="${i}" title="Drag to Reorder" aria-label="Drag color ${i+1} to reorder">≡</span><span class="pal-n">${i+1}</span>
     ${["light","dark"].map(t=>`<button class="pal-c ${t==="dark"?"dk":""}" data-slot="${t}:${i}" aria-pressed="${sel.t===t&&sel.i===i}"><span class="pal-sw" style="background:${draft[t][i]}"></span><span class="pal-hx">${draft[t][i]}</span></button>`).join("")}</div>`).join("");
   modal(`<div class="row"><h2 class="grow">${kind==="life"?"Edit Life Block Colors":"Edit Phase Colors"}</h2></div>
-    <p class="sub" style="margin:0">Each ${kind==="life"?"life block":"phase"} color has a Light Theme and a Dark Theme version. Pick a swatch below, then adjust Hue, Saturation and Value, or type a hex code. Changes show everywhere as you edit.</p>
+    <p class="sub" style="margin:0">Each ${kind==="life"?"life block":"phase"} color has a Light Theme and a Dark Theme version. Pick a swatch below, then adjust Hue, Saturation and Value, or type a hex code. Drag the ≡ handle to move a pair up or down; ${kind==="life"?"blocks":"phases"} keep their colors when you reorder.</p>
     <div class="hsv" id="hsv"></div>
-    <div class="pal-h"><span></span><span>Light Theme</span><span>Dark Theme</span></div><div class="pal" id="pal-rows">${rows()}</div>
+    <div class="pal-h"><span></span><span></span><span>Light Theme</span><span>Dark Theme</span></div><div class="pal" id="pal-rows">${rows()}</div>
     <div class="m-actions"><button class="btn ghost left" id="pal-reset">Reset to Defaults</button><button class="btn" id="pal-cancel">Cancel</button><button class="btn" id="pal-def">Save as Default</button><button class="btn primary" id="pal-save">Save Colors</button></div>`,
   root=>{
-    const box=root.querySelector("#hsv");
+    const box=root.querySelector("#hsv"),list=root.querySelector("#pal-rows");
     const drawEditor=()=>{
       const hex=draft[sel.t][sel.i],[h,sa,v]=rgb2hsv(...hex2rgb(hex));
       box.innerHTML=`<div class="hsv-prev ${sel.t==="dark"?"dk":""}"><span style="background:${hex}"></span><b>Color ${sel.i+1} · ${sel.t==="light"?"Light":"Dark"} Theme</b></div>
@@ -964,30 +1142,54 @@ function paletteModal(back,kind="phase"){
         Sa.style.background=`linear-gradient(to right,${hsvHex(h,0,v2)},${hsvHex(h,100,v2)})`;
         V.style.background=`linear-gradient(to right,#000000,${hsvHex(h,s2,100)})`;
         box.querySelector("#hv-hv").textContent=h+"°";box.querySelector("#hv-sv").textContent=s2+"%";box.querySelector("#hv-vv").textContent=v2+"%"};
-      const set=hex=>{draft[sel.t][sel.i]=hex;box.querySelector(".hsv-prev span").style.background=hex;const b=root.querySelector(`[data-slot="${sel.t}:${sel.i}"]`);b.querySelector(".pal-sw").style.background=hex;b.querySelector(".pal-hx").textContent=hex;preview(draft)};
+      const set=hex=>{draft[sel.t][sel.i]=hex;box.querySelector(".hsv-prev span").style.background=hex;const b=root.querySelector(`[data-slot="${sel.t}:${sel.i}"]`);b.querySelector(".pal-sw").style.background=hex;b.querySelector(".pal-hx").textContent=hex;preview()};
       [H,Sa,V].forEach(r=>r.oninput=()=>{const hex=hsvHex(+H.value,+Sa.value,+V.value);X.value=hex;set(hex);paint()});
       X.oninput=()=>{let v=X.value.trim();if(!v.startsWith("#"))v="#"+v;if(!/^#[0-9a-fA-F]{6}$/.test(v))return;v=v.toUpperCase();const[h2,s2,v2]=rgb2hsv(...hex2rgb(v));H.value=h2;Sa.value=s2;V.value=v2;set(v);paint()};
       paint();
     };
     const bindRows=()=>root.querySelectorAll("[data-slot]").forEach(b=>b.onclick=()=>{const[t,i]=b.dataset.slot.split(":");sel={t,i:+i};root.querySelectorAll("[data-slot]").forEach(x=>x.setAttribute("aria-pressed",x===b));drawEditor()});
+    const redraw=()=>{list.innerHTML=rows();bindRows()};
     bindRows();drawEditor();
-    root.querySelector("#pal-reset").onclick=()=>{draft.light=[...DEF.light];draft.dark=[...DEF.dark];root.querySelector("#pal-rows").innerHTML=rows();bindRows();drawEditor();preview(draft)};
+    /* drag a Light/Dark pair by its ≡ handle; only the handle starts a drag, so the list still scrolls normally */
+    const move=(a,b)=>{[draft.light,draft.dark,perm].forEach(arr=>{const x=arr.splice(a,1)[0];arr.splice(b,0,x)});
+      if(sel.i===a)sel.i=b;else if(a<sel.i&&b>=sel.i)sel.i--;else if(a>sel.i&&b<=sel.i)sel.i++};
+    list.addEventListener("pointerdown",e=>{const g=e.target.closest("[data-grip]");if(!g)return;e.preventDefault();dg={i:+g.dataset.grip};list.classList.add("is-drag");try{list.setPointerCapture(e.pointerId)}catch(x){}redraw();try{navigator.vibrate&&navigator.vibrate(10)}catch(x){}});
+    list.addEventListener("pointermove",e=>{if(!dg)return;e.preventDefault();const els=[...list.querySelectorAll(".pal-row")];let t=dg.i;
+      els.forEach((r,k)=>{const rc=r.getBoundingClientRect();if(e.clientY>=rc.top&&e.clientY<rc.bottom)t=k});
+      if(e.clientY<els[0].getBoundingClientRect().top)t=0;if(e.clientY>=els[els.length-1].getBoundingClientRect().bottom)t=els.length-1;
+      if(t!==dg.i){move(dg.i,t);dg.i=t;redraw();drawEditor()}
+      const sc=root.querySelector(".modal"),mr=sc.getBoundingClientRect();if(e.clientY<mr.top+40)sc.scrollTop-=12;else if(e.clientY>mr.bottom-40)sc.scrollTop+=12});
+    const end=()=>{if(!dg)return;dg=null;list.classList.remove("is-drag");redraw()};
+    list.addEventListener("pointerup",end);list.addEventListener("pointercancel",end);
+    list.addEventListener("touchmove",e=>{if(dg)e.preventDefault()},{passive:false});
+    root.querySelector("#pal-reset").onclick=()=>{draft.light=[...DEF.light];draft.dark=[...DEF.dark];perm=draft.light.map((_,i)=>i);redraw();drawEditor();preview()};
     root.querySelector("#pal-cancel").onclick=()=>{applyPalette();back?back():closeModal()};
-    root.querySelector("#pal-save").onclick=()=>{S.settings[KEYP]=draft;applyPalette();save();toast("Colors saved");back?back():closeModal();render()};
-    root.querySelector("#pal-def").onclick=()=>{S.settings[KEYP]=JSON.parse(JSON.stringify(draft));S.settings.palDefault=S.settings.palDefault||{};S.settings.palDefault[kind]=JSON.parse(JSON.stringify(draft));applyPalette();save();toast("Saved as your default colors. Reset to Defaults now returns to these.");back?back():closeModal();render()};
+    const commitColors=(asDef)=>{const d=JSON.parse(JSON.stringify(draft)),pm=perm.slice();
+      undoable(()=>{S.settings[KEYP]=d;if(asDef){S.settings.palDefault=S.settings.palDefault||{};S.settings.palDefault[kind]=JSON.parse(JSON.stringify(d))}remapSlots(kind,pm)},asDef?"Saved as your default colors":"Colors saved");
+      applyPalette();back?back():closeModal()};
+    root.querySelector("#pal-save").onclick=()=>commitColors(false);
+    root.querySelector("#pal-def").onclick=()=>commitColors(true);
   },"wide");
 }
 function addItemModal(phId){
-  const {ph}=IX.idx.phase[phId];const groups=[...new Set(ph.items.map(i=>i.group))];const like=ph.items[0];
+  const {ph}=IX.idx.phase[phId];const groups=[...new Set(ph.items.map(i=>i.group||""))];const like=ph.items[ph.items.length-1];
+  const tpls=Object.values(S.itemTemplates).sort((a,b)=>a.name.localeCompare(b.name));
+  const def=ph.defTpl&&S.itemTemplates[ph.defTpl]?"tpl:"+ph.defTpl:like?"copy":"blank";
   modal(`<h2>New Item in ${esc(ph.name)}</h2>
     <div class="two"><div class="field"><label for="ni-name">Name</label><input class="inp" id="ni-name" placeholder="e.g. C5, Page 1, Turnaround"></div>
-    <div class="field"><label for="ni-g">Group</label><input class="inp" id="ni-g" list="ni-gl" value="${esc(groups[groups.length-1]||"")}"><datalist id="ni-gl">${groups.map(g=>`<option value="${esc(g)}">`).join("")}</datalist></div></div>
-    ${like?`<label class="check"><input type="checkbox" id="ni-copy" checked><span>Copy Steps From ${esc(like.name)} (${like.steps.map(s=>esc(s.name)).join(", ")})</span></label>`:`<p class="sub" style="margin:0">You'll add steps after creating it.</p>`}
+    <div class="field"><label for="ni-g">Row</label><input class="inp" id="ni-g" list="ni-gl" value="${esc(groups[groups.length-1]||"")}"><datalist id="ni-gl">${groups.map(g=>`<option value="${esc(g)}">`).join("")}</datalist></div></div>
+    <div class="field"><label for="ni-from">Start From</label><select class="inp" id="ni-from">
+      ${tpls.map(t=>`<option value="tpl:${t.id}" ${def==="tpl:"+t.id?"selected":""}>Template: ${esc(t.name)}</option>`).join("")}
+      ${like?`<option value="copy" ${def==="copy"?"selected":""}>Copy Steps From ${esc(like.name)} (${like.steps.map(s=>esc(s.name)).join(", ")||"No Steps"})</option>`:""}
+      <option value="blank" ${def==="blank"?"selected":""}>No Steps</option></select></div>
     <div class="m-actions"><button class="btn" data-close>Cancel</button><button class="btn primary" id="ni-save">Add Item</button></div>`,
-  root=>root.querySelector("#ni-save").onclick=()=>{const name=root.querySelector("#ni-name").value.trim()||"New Item";
-    const steps=like&&root.querySelector("#ni-copy")?.checked?like.steps.map(s=>({...s,id:uid(),stages:s.stages.map(x=>({...x}))})):[];
-    const it={id:uid(),name,group:root.querySelector("#ni-g").value.trim(),status:"Not Started",week:S.ui.week,steps,checklist:[],feedback:[],links:""};
-    ph.items.push(it);S.ui.open[phId]=true;commit();itemModal(it.id)});
+  root=>{const nm=root.querySelector("#ni-name");setTimeout(()=>nm.focus(),30);
+    root.querySelector("#ni-save").onclick=()=>{const name=nm.value.trim()||"New Item",from=root.querySelector("#ni-from").value;
+    let steps=[],checklist=[];
+    if(from.startsWith("tpl:")){const t=S.itemTemplates[from.slice(4)];if(t){steps=freshSteps(t.steps);checklist=freshChecklist(t.checklist)}}
+    else if(from==="copy"&&like){steps=freshSteps(like.steps)}
+    const it={id:uid(),name,group:root.querySelector("#ni-g").value.trim(),status:"Not Started",week:S.ui.week,steps,checklist,feedback:[],links:"",notes:""};
+    ph.items.push(it);S.ui.open[phId]=true;commit();itemModal(it.id)}});
 }
 
 /* ===================== timer ===================== */
@@ -1008,6 +1210,7 @@ function startSheet(stepId){
 }
 function startTimer(stepId,stages,idx,speed,sprint){
   if(T&&T.kind==="work"&&T.elapsed>60000)logWork();
+  const rr=IX.idx.step[stepId];if(rr&&rr.it.status==="Not Started"){rr.it.status="In Progress";commit()}
   try{audio=audio||new (window.AudioContext||window.webkitAudioContext)()}catch(e){}
   T={stepId,stages,idx,speed,sprint:!!sprint,kind:"work",dur:stages[idx].m*60000,elapsed:0,running:true,last:Date.now(),since:T?.since||0};
   clearInterval(tickT);tickT=setInterval(tick,250);document.body.classList.add("timing");drawTimer();
@@ -1094,8 +1297,8 @@ function viewWeek(){
   const meta=S.weekMeta[ws]=S.weekMeta[ws]||{priorities:[],achievements:[]};
   const total=days.reduce((a,d)=>a+loggedOn(d),0),target=S.settings.target*S.settings.days*60,z=S.ui.zoom||1;
   return `<div class="row"><h2 class="grow">Week of ${short(ws)}</h2><span class="sub tot"><span class="a">${fmtH(total)}</span> of <b>${fmtH(target)}</b> Logged</span>
-    <button class="btn" data-wk="-7" aria-label="Previous week">←</button><button class="btn" data-wk="0">This Week</button><button class="btn" data-wk="7" aria-label="Next week">→</button>
-    <button class="btn" data-rv-week="${ws}">Weekly Review</button></div>
+    <span class="navg"><button class="btn" data-wk="-7" aria-label="Previous week">←</button><button class="btn" data-wk="0">This Week</button><button class="btn" data-wk="7" aria-label="Next week">→</button>
+    <button class="btn" data-rv-week="${ws}">Weekly Review</button></span></div>
   <div class="row"><span class="sub grow">Pinch the Chart to Zoom the Hours. Tap a Day to Plan It in Detail.</span>
     <span class="zoombar"><button class="btn sm" data-zoom="-1" aria-label="Zoom out">−</button><button class="btn sm" data-zoom="0">Fit</button><button class="btn sm" data-zoom="1" aria-label="Zoom in">+</button></span></div>
   <div class="sched-scroll" id="wk-scroll"><div class="sched" id="wk-sched" style="${zoomW(z)}">${hoursHeader()}${rows}</div></div>
@@ -1126,8 +1329,8 @@ function viewDay(){
   const now=d===TODAY()&&nowMin()>=a&&nowMin()<=b?`<i class="now" style="top:${pct(nowMin())}%"></i>`:"";
   const items=[...new Set(S.plans.filter(p=>p.date===d&&p.step).map(p=>IX.idx.step[p.step]?.it.id).filter(Boolean))].map(id=>IX.idx.item[id]);
   return `<div class="row"><h2 class="grow">${dt.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}</h2>
-    <button class="btn" data-dd="-1" aria-label="Previous day">←</button><button class="btn" data-dd="0">Today</button><button class="btn" data-dd="1" aria-label="Next day">→</button>
-    <button class="btn primary" data-addblock="${d}">+ Block</button></div>
+    <span class="navg"><button class="btn" data-dd="-1" aria-label="Previous day">←</button><button class="btn" data-dd="0">Today</button><button class="btn" data-dd="1" aria-label="Next day">→</button>
+    <button class="btn primary" data-addblock="${d}">+ Block</button></span></div>
   <div class="day-grid">
     <div style="display:grid;gap:8px">
       <div class="row"><span class="sub grow">${(S.ui.dzoom||1)>1?"Zoomed In · Scroll for the Rest of the Day":"Whole Day on One Screen"}</span><span class="zoombar"><button class="btn sm" data-dzoom="-1" aria-label="Zoom out">−</button><button class="btn sm" data-dzoom="0">Fit</button><button class="btn sm" data-dzoom="1" aria-label="Zoom in">+</button></span></div>
@@ -1153,8 +1356,8 @@ function stepOptions(sel){
   return S.projects.filter(p=>!p.archived).map(p=>p.phases.filter(ph=>ph.items.length).map(ph=>`<optgroup label="${esc(p.name)} · ${esc(ph.name)}">${ph.items.map(it=>it.steps.map(st=>`<option value="${st.id}" ${st.id===sel?"selected":""}>${esc(it.name)} · ${esc(st.name)} (${fmtHM(st.est)})</option>`).join("")).join("")}</optgroup>`).join("")).join("");
 }
 function blockModal(planId,date,startMin){
-  const b=planId?getPlan(planId):{date,start:startMin??540,dur:60,step:null,life:null,color:"lf3"};
-  let kind=b.life?"life":"work",color=b.color&&b.color.startsWith("lf")?b.color:"lf3";
+  const b=planId?getPlan(planId):{date,start:startMin??540,dur:60,step:null,life:null,color:"lf12"};
+  let kind=b.life?"life":"work",color=b.color&&b.color.startsWith("lf")?b.color:"lf12";
   const firstStep=(()=>{for(const p of S.projects)if(!p.archived)for(const ph of p.phases)for(const it of ph.items)for(const st of it.steps)return st.id;return null})();
   const phOf=sid=>IX.idx.step[sid]?.ph;let phc=(phOf(b.step||firstStep)||{}).color||"p1";
   modal(`<h2>${planId?"Edit Block":"New Block"} · ${short(b.date)}</h2>
@@ -1282,8 +1485,8 @@ function viewMonth(){
       <span class="mk">${mk.map(x=>`<span style="--c:var(--${x.c})" class="${x.due?"due":""}">${esc(x.t)}</span>`).join("")}</span></button>`}).join("");
   const rec=monthRec(S.ui.month);
   return `<div class="row"><h2 class="grow">${first.toLocaleDateString(undefined,{month:"long",year:"numeric"})}</h2><span class="sub tot"><span class="a">${fmtH(total)}</span> of <b>${fmtH(daysW*t)}</b> Logged</span>
-    <button class="btn" data-mo="-1" aria-label="Previous month">←</button><button class="btn" data-mo="0">This Month</button><button class="btn" data-mo="1" aria-label="Next month">→</button>
-    <button class="btn" data-rv-month="1">Monthly Review</button></div>
+    <span class="navg"><button class="btn" data-mo="-1" aria-label="Previous month">←</button><button class="btn" data-mo="0">This Month</button><button class="btn" data-mo="1" aria-label="Next month">→</button>
+    <button class="btn" data-rv-month="1">Monthly Review</button></span></div>
   <div class="row" style="justify-content:flex-end"><span class="sub">Shade Days By</span><div class="seg-ctl"><button data-mshade="target" aria-pressed="${mode==="target"}">Hours vs Target</button><button data-mshade="phase" aria-pressed="${mode==="phase"}">Main Phase</button></div></div>
   <div class="mgrid">${[...Array(7)].map((_,i)=>DOW[(i+(S.settings.weekStart||0))%7]).map(x=>`<div class="hd">${x.toUpperCase()}</div>`).join("")}${html}</div>
   <div class="legend">${mode==="phase"?[...usedPh.values()].map(ph=>`<span><i style="--c:var(--${ph.color})"></i>${esc(ph.name)}</span>`).join("")+`<span>Stronger = Closer to Your ${S.settings.target}h Target</span>`:`<span><i style="--c:color-mix(in srgb,var(--act) 26%,var(--surface))"></i>Darker = Closer to Your ${S.settings.target}h Target</span>`}
@@ -1309,9 +1512,10 @@ function weeklyReview(){
   const l=S.sessions.filter(s=>s.date>=ws&&s.date<=we).reduce((a,s)=>a+s.dur,0);
   let sub=0,its=0;S.projects.forEach(p=>p.phases.forEach(ph=>ph.items.forEach(it=>{if(it.week===ws){its++;if(["Submitted","Feedback Received","Revising","Done"].includes(it.status))sub++}})));
   let ba=0,bb=0;proj().phases.forEach(ph=>{if(!ph.bonus){const s=phaseStats(ph);ba+=s.act;bb+=s.budget}});
-  const f=(k,l,ph)=>`<section class="panel field"><label for="wr-${k}">${l}</label><textarea class="inp" id="wr-${k}" data-wr="${k}" rows="4" placeholder="${ph}">${esc(r[k]||"")}</textarea></section>`;
+  const f=(k,l,ph)=>`<section class="panel field"><label for="wr-${k}">${l}</label><textarea class="inp" id="wr-${k}" data-wr="${k}" rows="5" placeholder="${ph}">${esc(r[k]||"")}</textarea></section>`;
   return `<div class="row"><h2 class="grow">Week of ${short(ws)} – ${short(we)}</h2>
-    <button class="btn" data-rw="-7" aria-label="Previous week">←</button><button class="btn" data-rw="0">This Week</button><button class="btn" data-rw="7" aria-label="Next week">→</button></div>
+    <span class="navg"><button class="btn" data-rw="-7" aria-label="Previous week">←</button><button class="btn" data-rw="0">This Week</button><button class="btn" data-rw="7" aria-label="Next week">→</button>
+    <button class="btn" data-rv-export="weekly">Export</button></span></div>
   <div class="stat-row rv-stats"><div class="stat"><span class="k">Logged vs Target</span><span class="v">${AE(l,S.settings.target*S.settings.days*60,fmtH)}</span></div>
     <div class="stat"><span class="k">Items Submitted</span><span class="v num"><span class="a">${sub}</span> / ${its}</span></div>
     <div class="stat"><span class="k">${esc(proj().name)} Budget Used</span><span class="v">${AE(ba,bb,fmtH)}</span></div></div>
@@ -1325,7 +1529,8 @@ function monthlyReview(){
   const per={};ses.forEach(s=>{const x=IX.idx.step[s.step];if(x)per[x.p.name]=(per[x.p.name]||0)+s.dur});
   const lst=(k,arr)=>`<div class="list-ed" data-mlist="${k}">${arr.map((v,i)=>`<div class="li"><span class="n">${i+1}</span><input class="inp" data-mi="${i}" value="${esc(v)}" aria-label="${k} ${i+1}"><button class="btn sm ghost" data-mx="${i}" aria-label="Remove">✕</button></div>`).join("")}<button class="btn sm ghost" style="justify-self:start" data-madd>+ Add</button></div>`;
   return `<div class="row"><h2 class="grow">${new Date(y,m-1,1).toLocaleDateString(undefined,{month:"long",year:"numeric"})}</h2>
-    <button class="btn" data-mr="-1" aria-label="Previous month">←</button><button class="btn" data-mr="0">This Month</button><button class="btn" data-mr="1" aria-label="Next month">→</button></div>
+    <span class="navg"><button class="btn" data-mr="-1" aria-label="Previous month">←</button><button class="btn" data-mr="0">This Month</button><button class="btn" data-mr="1" aria-label="Next month">→</button>
+    <button class="btn" data-rv-export="monthly">Export</button></span></div>
   <section class="panel field"><label for="mr-focus">FOCUS</label><input class="inp" id="mr-focus" value="${esc(r.focus)}" placeholder="One line for the month, e.g. Broad Exploration + Pitch Pages"></section>
   <div class="stat-row rv-stats"><div class="stat"><span class="k">Logged This Month</span><span class="v a">${fmtH(l)}</span></div>${Object.entries(per).map(([n,v])=>`<div class="stat"><span class="k">${esc(n)}</span><span class="v a">${fmtH(v)}</span></div>`).join("")}</div>
   ${alertsRow(from,to)}
@@ -1338,6 +1543,68 @@ function monthlyReview(){
       <button class="btn sm ghost" data-gx="${i}" aria-label="Remove goal">✕</button></div>`).join("")}</div>
     <button class="btn sm" style="justify-self:start" id="goal-add">+ Goal</button></section>
   <section class="panel field"><label for="mr-notes">NOTES</label><textarea class="inp" id="mr-notes" rows="4">${esc(r.notes)}</textarea></section>`;
+}
+
+/* ===================== review export ===================== */
+function weekInfo(ws){const we=iso(addDays(parse(ws),6)),r=S.weekly[ws]||{};
+  const l=S.sessions.filter(s=>s.date>=ws&&s.date<=we).reduce((a,s)=>a+s.dur,0);
+  let sub=0,its=0;S.projects.forEach(p=>p.phases.forEach(ph=>ph.items.forEach(it=>{if(it.week===ws){its++;if(["Submitted","Feedback Received","Revising","Done"].includes(it.status))sub++}})));
+  return{ws,we,r,l,target:S.settings.target*S.settings.days*60,sub,its,alerts:alertsList(ws,we)}}
+function monthInfo(mk){const [y,m]=mk.split("-").map(Number),from=iso(new Date(y,m-1,1)),to=iso(new Date(y,m,0)),r=S.monthly[mk]||{focus:"",wins:[],improve:[],goals:[],notes:""};
+  const ses=S.sessions.filter(s=>s.date>=from&&s.date<=to),l=ses.reduce((a,s)=>a+s.dur,0),per={};
+  ses.forEach(s=>{const x=IX.idx.step[s.step];if(x)per[x.p.name]=(per[x.p.name]||0)+s.dur});
+  return{mk,from,to,r,l,per,title:new Date(y,m-1,1).toLocaleDateString(undefined,{month:"long",year:"numeric"}),alerts:alertsList(from,to)}}
+function alertsList(from,to){const seen=new Set();S.sessions.filter(s=>s.date>=from&&s.date<=to).forEach(s=>{const r=IX.idx.step[s.step];if(r)seen.add(r.ph.id)});
+  return[...seen].map(id=>IX.idx.phase[id]).filter(Boolean).map(({ph})=>{const t=phaseStats(ph);return{name:ph.name,over:t.act>t.budget,pct:pctOf(t.act,t.budget),r:t.act/Math.max(t.budget,1)}}).filter(x=>x.r>=WA()).sort((a,b)=>b.r-a.r)}
+const alertsText=al=>al.map(a=>`${a.name} ${a.over?"Over ":""}${a.pct}%`).join("; ");
+function printReview(kind){
+  const P=document.getElementById("print-root"),e=esc,para=t=>t&&String(t).trim()?`<p>${e(t)}</p>`:`<p class="sub">Nothing written.</p>`;
+  let h="";
+  if(kind==="weekly"){const w=weekInfo(S.ui.rweek);
+    h=`<h1>Weekly Review · ${short(w.ws)} – ${short(w.we)}</h1><div class="sub">Blue Blaze Project Tracker · Exported ${short(TODAY())}</div>
+      <div class="st"><span>Logged <b>${fmtH(w.l)}</b> of ${fmtH(w.target)}</span><span>Items Submitted <b>${w.sub}</b> / ${w.its}</span>${w.alerts.length?`<span>Budget Alerts: ${e(alertsText(w.alerts))}</span>`:""}</div>
+      <h2>What Worked</h2>${para(w.r.worked)}<h2>What to Improve</h2>${para(w.r.improve)}<h2>Feedback Summary</h2>${para(w.r.mentor)}<h2>Next Week's Focus</h2>${para(w.r.focus)}`}
+  else{const m=monthInfo(S.ui.month),li=a=>(a||[]).filter(x=>String(x).trim()).length?`<ol>${a.filter(x=>String(x).trim()).map(x=>`<li>${e(x)}</li>`).join("")}</ol>`:`<p class="sub">Nothing written.</p>`;
+    const goals=(m.r.goals||[]).filter(g=>g.g||g.w||g.r);
+    h=`<h1>Monthly Review · ${e(m.title)}</h1><div class="sub">Blue Blaze Project Tracker · Exported ${short(TODAY())}</div>
+      ${m.r.focus?`<h2>Focus</h2><p>${e(m.r.focus)}</p>`:""}
+      <div class="st"><span>Logged <b>${fmtH(m.l)}</b></span>${Object.entries(m.per).map(([n,v])=>`<span>${e(n)} <b>${fmtH(v)}</b></span>`).join("")}${m.alerts.length?`<span>Budget Alerts: ${e(alertsText(m.alerts))}</span>`:""}</div>
+      <h2>Wins</h2>${li(m.r.wins)}<h2>Improvements</h2>${li(m.r.improve)}
+      <h2>Goals</h2>${goals.length?`<table><tr><th>#</th><th>Goal</th><th>Why / How</th><th>Rewards</th></tr>${goals.map((g,i)=>`<tr><td>${i+1}</td><td>${e(g.g)}</td><td>${e(g.w)}</td><td>${e(g.r)}</td></tr>`).join("")}</table>`:`<p class="sub">No goals set.</p>`}
+      <h2>Notes</h2>${para(m.r.notes)}`}
+  P.innerHTML=`<div class="pr">${h}</div>`;document.body.classList.add("printing");
+  const done=()=>{document.body.classList.remove("printing");P.innerHTML="";removeEventListener("afterprint",done)};addEventListener("afterprint",done);
+  setTimeout(()=>{try{window.print()}catch(x){toast("Printing isn't available here.")}setTimeout(()=>{if(!matchMedia("print").matches)done()},1500)},60);
+}
+function reviewExportModal(kind){
+  modal(`<h2>Export ${kind==="weekly"?"Weekly":"Monthly"} Review</h2>
+    <div class="field"><span class="lbl">PDF · THIS REVIEW</span><span class="sub">A printable page of the review on screen. In the print window, choose "Save as PDF".</span><button class="btn primary" id="rx-pdf" style="justify-self:start">Create PDF</button></div>
+    <div class="field"><span class="lbl">EXCEL · A DATE RANGE</span><span class="sub">Every weekly and monthly review in the range: one sheet for weeks, one for months.</span>
+      <div class="row"><select class="inp" id="rx-range" style="width:auto"><option value="month">This Month</option><option value="3m" selected>Last 3 Months</option><option value="year">This Year</option><option value="all">Everything</option></select><button class="btn" id="rx-xl">Export Excel File</button></div>
+      <p class="sub" id="rx-msg" hidden style="margin:0"></p></div>
+    <div class="m-actions"><button class="btn" data-close>Close</button></div>`,root=>{
+    root.querySelector("#rx-pdf").onclick=()=>{closeModal();setTimeout(()=>printReview(kind),120)};
+    root.querySelector("#rx-xl").onclick=async()=>{const b=root.querySelector("#rx-xl"),msg=root.querySelector("#rx-msg");b.disabled=true;b.textContent="Preparing…";
+      try{const X=await loadXLSX();exportReviewsXLSX(X,root.querySelector("#rx-range").value);closeModal();toast("Reviews downloaded")}
+      catch(x){b.disabled=false;b.textContent="Export Excel File";msg.hidden=false;msg.textContent="Couldn't load the spreadsheet tool. Check your connection (VPN in China) and try again."}};
+  });
+}
+function exportReviewsXLSX(X,range){
+  const now=new Date(),ty=now.getFullYear(),tm=now.getMonth();
+  let from=range==="month"?new Date(ty,tm,1):range==="3m"?new Date(ty,tm-2,1):range==="year"?new Date(ty,0,1):null;
+  if(!from){const ds=[...S.sessions.map(s=>s.date),...Object.keys(S.weekly),...Object.keys(S.monthly).map(k=>k+"-01")].sort();from=ds.length?parse(ds[0]):new Date(ty,tm,1)}
+  const fromS=iso(from),toS=TODAY(),H=m=>Math.round(m/60*100)/100;
+  const wk=[["Week Start","Week End","Logged (h)","Target (h)","Items Submitted","Items Planned","Budget Alerts","What Worked","What to Improve","Feedback Summary","Next Week's Focus"]];
+  for(let d=weekOf(from);iso(d)<=toS;d=addDays(d,7)){const w=weekInfo(iso(d));const has=w.l||Object.values(w.r).some(v=>String(v||"").trim());if(!has)continue;
+    wk.push([w.ws,w.we,H(w.l),H(w.target),w.sub,w.its,alertsText(w.alerts),w.r.worked||"",w.r.improve||"",w.r.mentor||"",w.r.focus||""])}
+  const mo=[["Month","Focus","Logged (h)","Hours by Project","Budget Alerts","Wins","Improvements","Goals","Notes"]];
+  for(let d=new Date(from.getFullYear(),from.getMonth(),1);iso(d)<=toS;d=new Date(d.getFullYear(),d.getMonth()+1,1)){const m=monthInfo(iso(d).slice(0,7));
+    const has=m.l||m.r.focus||m.r.notes||(m.r.wins||[]).some(x=>String(x).trim())||(m.r.improve||[]).some(x=>String(x).trim())||(m.r.goals||[]).some(g=>g.g||g.w||g.r);if(!has)continue;
+    mo.push([m.title,m.r.focus||"",H(m.l),Object.entries(m.per).map(([n,v])=>`${n}: ${fmtH(v)}`).join("; "),alertsText(m.alerts),(m.r.wins||[]).filter(x=>String(x).trim()).map((x,i)=>`${i+1}. ${x}`).join("\n"),(m.r.improve||[]).filter(x=>String(x).trim()).map((x,i)=>`${i+1}. ${x}`).join("\n"),(m.r.goals||[]).filter(g=>g.g||g.w||g.r).map((g,i)=>`${i+1}. ${g.g}${g.w?` — Why/How: ${g.w}`:""}${g.r?` — Reward: ${g.r}`:""}`).join("\n"),m.r.notes||""])}
+  const wb=X.utils.book_new(),sh=(rows,cols)=>{const ws=X.utils.aoa_to_sheet(rows);ws["!cols"]=cols.map(w=>({wch:w}));return ws};
+  X.utils.book_append_sheet(wb,sh(wk,[12,12,10,10,15,13,28,40,40,40,40]),"Weekly");
+  X.utils.book_append_sheet(wb,sh(mo,[16,36,10,30,28,40,40,50,50]),"Monthly");
+  downloadFile(`Project Tracker Reviews ${TODAY()}.xlsx`,new Blob([X.write(wb,{bookType:"xlsx",type:"array"})],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
 }
 
 /* ===================== projects & templates ===================== */
@@ -1450,7 +1717,8 @@ function settingsModal(tab="general",D){
     <section><h3>Board</h3>
       ${tgl("itemPhaseColors","Phase Colors on Items","Off: every item bar is teal.")}
       ${tgl("phaseBarColors","Phase Colors on Phase Bars","Off: phase bars are teal, like the project meter.")}
-      ${tgl("includeBonus","Include Bonus Hours in Project Totals","Off: the project meter shows the main budget only.")}</section>
+      ${tgl("includeBonus","Include Bonus Hours in Project Totals","Off: the project meter shows the main budget only.")}
+      ${tgl("linkNames","Linked Character Names","Items sent to another phase share one name. Renaming one renames them all. Copies made while this is off stay independent.")}</section>
     <section><h3>Calendar</h3>
       <div class="tgl"><span>Week Starts On</span><select class="inp" data-sel="weekStart" style="width:auto">${DN.map((d,i)=>`<option value="${i}" ${i===D.weekStart?"selected":""}>${d}</option>`).join("")}</select></div>
       <div class="tgl"><span>Day Starts</span><select class="inp" data-sel="dayStart" style="width:auto">${[4,5,6,7,8].map(h=>`<option ${h===D.dayStart?"selected":""} value="${h}">${D.clock24?h+":00":clock(h*60)}</option>`).join("")}</select></div>
@@ -1534,7 +1802,7 @@ function importProject(f){
 document.getElementById("upload-bk").addEventListener("change",async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;
   let d;try{d=JSON.parse(await f.text())}catch(x){return toast("That file isn't a tracker backup.")}
   if(d.kind!=="bbst-backup"||!d.data)return toast("That file isn't a full tracker backup.");
-  closeModal();undoable(()=>{const n=stateFrom(d.data,S.ui);["projects","templates","sessions","plans","settings","routineSkip","notes","weekly","weekMeta","monthly"].forEach(k=>S[k]=n[k]);ensureSettings();applyPalette();applyAdv()},"Backup restored");
+  closeModal();undoable(()=>{const n=stateFrom(d.data,S.ui);["projects","templates","sessions","plans","settings","routineSkip","notes","weekly","weekMeta","monthly","itemTemplates","phaseTemplates"].forEach(k=>S[k]=n[k]);ensureSettings();applyPalette();applyAdv()},"Backup restored");
 });
 
 /* ===================== excel report ===================== */
@@ -1602,16 +1870,26 @@ function exportModal(pid){
 const effTheme=()=>S.ui.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
 function restoreTheme(){if(S.ui.theme)document.documentElement.setAttribute("data-theme",S.ui.theme);else document.documentElement.removeAttribute("data-theme")}
 function closeModal(){document.getElementById("modal-root").innerHTML="";restoreTheme();applyPalette();applyAdv();Sync.afterModal()}
+/* Back (Android swipe, mouse back button, Alt+Left, Cmd+[) closes a pop-up instead of leaving the app */
+let histArmed=false;
+addEventListener("popstate",()=>{histArmed=false;if(document.getElementById("ov"))closeModal()});
+function grow(t){if(!t||(!t.offsetParent&&!t.offsetHeight))return;t.style.height="auto";t.style.height=(t.scrollHeight+2)+"px"}
+document.addEventListener("input",e=>{if(e.target.matches&&e.target.matches("textarea.inp"))grow(e.target)});
+const growAll=root=>requestAnimationFrame(()=>(root||document).querySelectorAll("textarea.inp").forEach(grow));
+addEventListener("resize",()=>growAll());
+document.addEventListener("toggle",e=>{if(e.target.tagName==="DETAILS")growAll(e.target)},true);
 function modal(html,bind,cls=""){
   const root=document.getElementById("modal-root");
   root.innerHTML=`<div class="ov" id="ov"><div class="modal ${cls}" role="dialog" aria-modal="true">${html}</div></div>`;
   root.querySelector("#ov").addEventListener("mousedown",e=>{if(e.target.id==="ov")closeModal()});
   root.querySelectorAll("[data-close]").forEach(b=>b.onclick=closeModal);
   bind&&bind(root);
+  if(!histArmed){try{history.pushState({bbm:1},"");histArmed=true}catch(x){}}
+  growAll(root);
 }
 function armDelete(btn,fn,armedText="Tap Again to Delete"){if(!btn)return;btn.addEventListener("click",()=>{if(btn.classList.contains("armed"))fn();else{btn.classList.add("armed");btn.textContent=armedText}})}
 function undoable(fn,msg){
-  const before=JSON.stringify({projects:S.projects,templates:S.templates,sessions:S.sessions,plans:S.plans,routineSkip:S.routineSkip,settings:S.settings,notes:S.notes,weekly:S.weekly,weekMeta:S.weekMeta,monthly:S.monthly});
+  const before=JSON.stringify({projects:S.projects,templates:S.templates,sessions:S.sessions,plans:S.plans,routineSkip:S.routineSkip,settings:S.settings,notes:S.notes,weekly:S.weekly,weekMeta:S.weekMeta,monthly:S.monthly,itemTemplates:S.itemTemplates,phaseTemplates:S.phaseTemplates});
   fn();commit();
   const t=toast(typeof msg==="function"?msg():msg,6000);
   const u=document.createElement("button");u.className="undo";u.textContent="Undo";u.onclick=()=>{Object.assign(S,JSON.parse(before));t.remove();applyPalette();applyAdv();commit();toast("Undone")};t.appendChild(u);
@@ -1631,6 +1909,7 @@ function render(){
   if(V==="week"){const sc=document.getElementById("wk-scroll");if(keep!=null)sc.scrollLeft=keep;bindPinch()}
   if(V==="day"){const sc=document.getElementById("day-scroll"),n=sc.querySelector(".now");if(dkeep!=null)sc.scrollTop=dkeep;else if(n&&(S.ui.dzoom||1)>1)sc.scrollTop=Math.max(0,n.offsetTop-sc.clientHeight/3);bindDayPinch()}
   bindView(v);
+  growAll(v);
 }
 function bindView(v){
   const mn=v.querySelector("#mn-notes");if(mn){let t;mn.oninput=()=>{monthRec(S.ui.month).notes=mn.value;v.querySelector("#mn-st").textContent="Saving…";clearTimeout(t);t=setTimeout(()=>{save();v.querySelector("#mn-st").textContent="Saved"},500)}}
@@ -1662,6 +1941,11 @@ document.addEventListener("click",e=>{
   if(d.openItem)return itemModal(d.openItem);
   if(d.ses){const x=S.sessions.find(s=>s.id===d.ses),r=x&&IX.idx.step[x.step];if(r)return timeLogModal(x.step,r.it.id);return}
   if(d.editProj)return projectModal(d.editProj,false);
+  if(d.notesProj){const p=S.projects.find(x=>x.id===d.notesProj);return notesModal("project",p,p.name)}
+  if(d.notesPh){const r=IX.idx.phase[d.notesPh];return notesModal("phase",r.ph,r.ph.name)}
+  if(d.hidedone){const r=IX.idx.phase[d.hidedone];r.ph.hideDone=!r.ph.hideDone;commit();return}
+  if(d.rgrp){const r=IX.idx.phase[d.rgrp],old=d.g;return askText("Rename Row","Row Name",old,v=>{r.ph.items.forEach(x=>{if((x.group||"")===old)x.group=v});closeModal();commit();toast("Row renamed")})}
+  if(d.rvExport)return reviewExportModal(d.rvExport);
   if(d.act==="add-phase")return phaseModal(null);
   if(d.act==="edit-phase")return phaseModal(d.ph);
   if(d.act==="add-item")return addItemModal(d.ph);
@@ -1684,13 +1968,15 @@ document.addEventListener("click",e=>{
   if(el.id==="sync")return Sync.connected()?Sync.pull():Sync.connectScreen();
   if(el.id==="btn-settings")return settingsModal();
 });
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.getElementById("ov"))closeModal()});
+document.addEventListener("keydown",e=>{if(!document.getElementById("ov"))return;
+  if(e.key==="Escape"||(e.altKey&&e.key==="ArrowLeft")||(e.metaKey&&e.key==="[")){e.preventDefault();closeModal()}});
 if(S.ui.theme)document.documentElement.setAttribute("data-theme",S.ui.theme);
 applyPalette();
 applyAdv();
 render();
 (()=>{const t=LS.get(K_T,null);if(t&&IX.idx.step[t.stepId]){T={...t,speed:1};clearInterval(tickT);tickT=setInterval(tick,250);document.body.classList.add("timing");drawTimer()}})();
 Sync.init();
+if(!Sync.connected())migrateColors();
 </script>
 
 </body>
