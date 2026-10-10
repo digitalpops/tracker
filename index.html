@@ -479,12 +479,45 @@ body.timing .toast{bottom:calc(130px + env(safe-area-inset-bottom,0px))}
 .att-x{position:absolute;top:2px;right:2px;z-index:2;min-width:24px;height:24px;border-radius:12px;border:1px solid var(--line2);background:var(--surface);color:var(--muted);font-size:11px;font-weight:700;padding:0 6px;line-height:1}
 .att-x.armed{background:var(--over);border-color:var(--over);color:#fff}
 .att-wrap{display:grid;gap:8px}
+.att .sz{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.att .cnt{font-size:11px;font-weight:800;color:var(--ink);flex:none}
+.att{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.att img{-webkit-touch-callout:none;pointer-events:none}
+.att.dragging{opacity:.85;z-index:3}.att.dragging .att-open{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent),var(--shadow);transform:scale(1.03)}
+.att-grid.is-drag{touch-action:none}
+.att-x{font-size:14px;letter-spacing:.05em}
+.modal.sheet{width:min(440px,100%);gap:12px}
+.opts{display:grid;gap:6px}
+.opt{display:flex;align-items:center;gap:8px;width:100%;text-align:left;border:1px solid var(--line2);background:var(--btn);border-radius:9px;padding:10px 12px;font-weight:600;font-size:14px;color:var(--ink)}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:disabled{opacity:.5;cursor:default}
+.opt.ind{margin-left:22px;width:calc(100% - 22px);padding-block:8px;font-weight:500}
+.opt.danger{color:var(--over);border-color:var(--over)}.opt.danger.armed{background:var(--over);color:#fff}
+.opts.places{max-height:min(56vh,520px);overflow:auto}
+.fd-list{display:grid;gap:4px;max-height:min(44vh,420px);overflow:auto;border:1px solid var(--line);border-radius:10px;padding:6px}
+.fd-row{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 8px;border-radius:8px;border:0;background:transparent;text-align:left;font-size:13.5px;color:var(--ink);cursor:pointer}
+.fd-row:hover{background:var(--stat)}
+.fd-fold{grid-template-columns:auto minmax(0,1fr) auto}
+.fd-row .bdg{font-size:9.5px;font-weight:800;letter-spacing:.04em;color:#fff;background:var(--bc);padding:2px 6px;border-radius:5px;white-space:nowrap}
+.fd-nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.fd-row input{accent-color:var(--accent);width:17px;height:17px}
+.guide{display:grid;gap:12px}
+.guide h3{font-size:12px;margin-top:6px}
+.guide h4{font-size:15px;margin:10px 0 2px;font-weight:800}
+.guide p,.guide li{font-size:13.5px;line-height:1.55;margin:0 0 6px}
+.guide ul{margin:0 0 8px;padding-left:20px}
+.guide .toc{display:flex;flex-wrap:wrap;gap:6px}
+.guide .toc button{border:1px solid var(--line2);background:var(--btn);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;color:var(--ink)}
+.guide section{border-top:1px solid var(--line);padding-top:10px}
+.guide .k{display:inline-block;border:1px solid var(--line2);border-radius:5px;padding:0 5px;font-size:12px;font-weight:700;background:var(--btn)}
+.ver{font-size:11.5px;color:var(--faint);font-weight:600;letter-spacing:.02em}
 .brand-prev{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:var(--bg);border:1px solid var(--line);min-width:0}
 .brand-prev svg{height:30px;width:auto;fill:var(--accent);flex:none}
 .brand-prev b{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .inl input[type="color"]{width:44px;height:30px;border:1px solid var(--line2);border-radius:7px;padding:2px;background:var(--field)}
 #viewer-root .vw{position:fixed;inset:0;z-index:60;background:rgba(8,10,16,.97);display:grid;grid-template-rows:auto 1fr;color:#E9ECF2}
-.vw-top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px}
+.vw-top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:calc(10px + env(safe-area-inset-top,0px)) calc(14px + env(safe-area-inset-right,0px)) 10px calc(14px + env(safe-area-inset-left,0px));position:relative;z-index:62;background:rgba(8,10,16,.97)}
+.vw-top .row{flex-wrap:wrap;justify-content:flex-end}
 .vw-t{margin-right:auto;min-width:0;display:grid}
 .vw-t b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .vw-t span{font-size:12px;color:#A5ADC0}
@@ -566,6 +599,7 @@ const LPAL_DEF={light:["#CEFBD0","#D5ECC2","#FAF6B7","#F2E3B3","#EDE6D8","#F7D9C
 const LIFE_ORDER=[1,7,2,11,10,5,8,6,12,9,4,3]; /* October 2026 reorder: new slot k shows old slot LIFE_ORDER[k-1] */
 const STATUSES=[["Not Started","--faint"],["In Progress","--accent"],["Submitted","--amber"],["Feedback Received","--p7"],["Revising","--act"],["Approved","--p3"],["Done","--ok"]];
 const SC=Object.fromEntries(STATUSES);
+const APP_VERSION="2026.10.10.01";
 const isDone=it=>it.status==="Done"||it.status==="Approved";
 const DEF_NAME="Blue Blaze Project Tracker";
 const appName=()=>((typeof S!=="undefined"&&S&&S.settings&&S.settings.brandName)||"").trim()||DEF_NAME;
@@ -582,9 +616,9 @@ const KEY_ACTIONS=[
   ["prev","Previous Week, Month or Day"],["next","Next Week, Month or Day"],["today","This Week, This Month or Today"],["newBlock","New Block (Day and Week)"],
   ["timerPause","Pause / Resume the Timer"],["timerStop","Stop the Timer"],["undo","Undo the Last Change"],["projects","Projects & Templates"],["settings","Settings"],
   ["theme","Light / Dark Theme"],["sync","Sync Now"],["help","Show Keyboard Shortcuts"],
-  ["weeklyReview","Open This Week's Review"],["monthlyReview","Open This Month's Review"],["editProject","Edit Project"],["projectNotes","Project Notes"],["backup","Export Everything (Backup)"]];
-const KEY_EXTRA=new Set(["weeklyReview","monthlyReview","editProject","projectNotes","backup"]);
-const KEY_DEF={viewBoard:"1",viewMonth:"2",viewWeek:"3",viewDay:"4",viewReview:"5",prev:"ArrowLeft",next:"ArrowRight",today:"T",newBlock:"N",timerPause:"Space",timerStop:"Shift+T",undo:"Mod+Z",projects:"P",settings:"Mod+,",theme:"Shift+D",sync:"Shift+S",help:"?",weeklyReview:"",monthlyReview:"",editProject:"",projectNotes:"",backup:""};
+  ["weeklyReview","Open This Week's Review"],["monthlyReview","Open This Month's Review"],["editProject","Edit Project"],["projectNotes","Project Notes"],["backup","Export Everything (Backup)"],["guide","Open the Guide"]];
+const KEY_EXTRA=new Set(["weeklyReview","monthlyReview","editProject","projectNotes","backup","guide"]);
+const KEY_DEF={viewBoard:"1",viewMonth:"2",viewWeek:"3",viewDay:"4",viewReview:"5",prev:"ArrowLeft",next:"ArrowRight",today:"T",newBlock:"N",timerPause:"Space",timerStop:"Shift+T",undo:"Mod+Z",projects:"P",settings:"Mod+,",theme:"Shift+D",sync:"Shift+S",help:"?",weeklyReview:"",monthlyReview:"",editProject:"",projectNotes:"",backup:"",guide:""};
 const KEY_RESERVED=["Mod+T","Mod+W","Mod+N","Mod+Q","Mod+R","Mod+L","Mod+Tab","Mod+Shift+T","Mod+Shift+N","Mod+Shift+W","Alt+F4","Alt+ArrowLeft","Alt+ArrowRight","Mod+[","Mod+]","Tab","Shift+Tab","Enter","Escape","Backspace","Delete","Mod+C","Mod+V","Mod+X","Mod+A","Mod+P","Mod+F"];
 function comboOf(e){
   if(["Shift","Control","Alt","Meta","CapsLock","Dead","Unidentified"].includes(e.key))return null;
@@ -727,7 +761,7 @@ const Sync=(()=>{
   function status(){
     if(!conn)return chip("bad","Not Connected","Connect this device to your Google Sheet.");
     if(busy)return chip("busy","Syncing…");
-    if(out.length)return chip("busy",`${out.length} Waiting`,"These changes are saved on this device and sync when you're back online (in China, turn on your VPN).");
+    if(out.length)return chip("busy",`${out.length} Waiting`,"These changes are saved on this device and sync when you're back online (turn on your VPN if Google is blocked where you are).");
     if(offline)return chip("bad","Offline","Couldn't reach your Google Sheet. Keep working; changes sync when you're back online.");
     chip("ok","Synced","Everything is saved in your Google Sheet.");
   }
@@ -809,7 +843,7 @@ const Sync=(()=>{
         const btn=root.querySelector("#c-go");btn.disabled=true;btn.textContent="Checking…";
         try{await api("ping",null,c);conn=c;LS.set(K_CONN,c);closeModal();toast("Connected");pull()}
         catch(x){btn.disabled=false;btn.textContent="Connect";err.hidden=false;
-          err.textContent=x.message==="BAD_KEY"?"That key doesn't match. Run setupKey in Apps Script again and copy the key from the log.":"Couldn't reach that URL. Check it ends in /exec, that the deployment's access is set to Anyone, and that you're online (VPN in China)."}});
+          err.textContent=x.message==="BAD_KEY"?"That key doesn't match. Run setupKey in Apps Script again and copy the key from the log.":"Couldn't reach that URL. Check it ends in /exec, that the deployment's access is set to Anyone, and that you're online (VPN if needed)."}});
     });
   }
   return{
@@ -1278,15 +1312,15 @@ const extOf=n=>{const m=String(n||"").toLowerCase().split(/[?#]/)[0].match(/\.([
 const MIMES={jpg:"image/jpeg",jpeg:"image/jpeg",png:"image/png",gif:"image/gif",webp:"image/webp",pdf:"application/pdf",psd:"image/vnd.adobe.photoshop",svg:"image/svg+xml",zip:"application/zip",mp4:"video/mp4",mov:"video/quicktime",txt:"text/plain"};
 const mimeOf=n=>MIMES[extOf(n)]||"application/octet-stream";
 const kindOf=a=>{if(a.kind==="link")return"other";const e=extOf(a.name),m=a.mime||"";if(/^image\/(jpeg|png|gif|webp)$/.test(m)||["jpg","jpeg","png","gif","webp"].includes(e))return"img";if(m==="application/pdf"||e==="pdf")return"pdf";return"other"};
-const BADGE_C={psd:"#2F7FD9",psb:"#2F7FD9",procreate:"#4A4A55",ai:"#E07B00",eps:"#E07B00",pdf:"#D33A3A",jpg:"#2E9E6A",jpeg:"#2E9E6A",png:"#2E9E6A",gif:"#2E9E6A",webp:"#2E9E6A",heic:"#2E9E6A",tif:"#2E9E6A",tiff:"#2E9E6A",svg:"#C79A00",zip:"#6F7482",rar:"#6F7482",mp4:"#8A4FD8",mov:"#8A4FD8",blend:"#E87D0D",clip:"#C0457A",kra:"#3A6FD8",fig:"#A259FF",doc:"#2B5FB4",docx:"#2B5FB4",xls:"#1F7A45",xlsx:"#1F7A45",ppt:"#C4502A",pptx:"#C4502A",key:"#2B6BD8",txt:"#6F7482",drive:"#1A73E8",dropbox:"#0061FE"};
-function badgeOf(a){let e=a.kind==="link"?(extOf(a.name)||extOf(a.url)):extOf(a.name);
-  if(!e&&a.kind==="link"){const u=String(a.url||"");e=/drive\.google|docs\.google/.test(u)?"drive":/dropbox\./.test(u)?"dropbox":"link"}
+const BADGE_C={psd:"#2F7FD9",psb:"#2F7FD9",procreate:"#4A4A55",ai:"#E07B00",eps:"#E07B00",pdf:"#D33A3A",jpg:"#2E9E6A",jpeg:"#2E9E6A",png:"#2E9E6A",gif:"#2E9E6A",webp:"#2E9E6A",heic:"#2E9E6A",tif:"#2E9E6A",tiff:"#2E9E6A",svg:"#C79A00",zip:"#6F7482",rar:"#6F7482",mp4:"#8A4FD8",mov:"#8A4FD8",blend:"#E87D0D",clip:"#C0457A",kra:"#3A6FD8",fig:"#A259FF",doc:"#2B5FB4",docx:"#2B5FB4",xls:"#1F7A45",xlsx:"#1F7A45",ppt:"#C4502A",pptx:"#C4502A",key:"#2B6BD8",txt:"#6F7482",drive:"#1A73E8",dropbox:"#0061FE",proton:"#6D4AFF",gdoc:"#1A73E8"};
+function badgeOf(a){if(/^application\/vnd\.google-apps/.test(a.mime||""))return{t:({"application/vnd.google-apps.document":"GDOC","application/vnd.google-apps.spreadsheet":"GSHEET","application/vnd.google-apps.presentation":"GSLIDES"})[a.mime]||"GOOGLE",c:"#1A73E8"};let e=a.kind==="link"?(extOf(a.name)||extOf(a.url)):extOf(a.name);
+  if(!e&&a.kind==="link"){const u=String(a.url||"");e=/drive\.google|docs\.google/.test(u)?"drive":/dropbox\./.test(u)?"dropbox":/proton\.me|protondrive/.test(u)?"proton":"link"}
   return{t:(e||"file").toUpperCase(),c:BADGE_C[e]||"#5A6378"}}
 const fsize=b=>!b?"":b<1048576?Math.max(1,Math.round(b/1024))+" KB":(b/1048576).toFixed(b<10485760?1:0)+" MB";
 const attOwners=()=>{const o=[];S.projects.forEach(p=>{o.push(p);p.phases.forEach(ph=>{o.push(ph);ph.items.forEach(it=>o.push(it))})});return o};
 function findAtt(id){for(const o of attOwners())for(const a of o.files||[])if(a.id===id)return{o,a};return null}
 const allDriveIds=()=>{const s=new Set();attOwners().forEach(o=>(o.files||[]).forEach(a=>{if(a.driveId)s.add(a.driveId)}));return s};
-const driveIdsIn=o=>{const out=[],walk=x=>{(x.files||[]).forEach(a=>{if(a.driveId)out.push(a.driveId)});(x.phases||[]).forEach(walk);(x.items||[]).forEach(walk)};walk(o);return out};
+const driveIdsIn=o=>{const out=[],walk=x=>{(x.files||[]).forEach(a=>{if(a.driveId&&!a.fromDrive)out.push(a.driveId)});(x.phases||[]).forEach(walk);(x.items||[]).forEach(walk)};walk(o);return out};
 const ownerOf=ref=>ref.kind==="project"?S.projects.find(p=>p.id===ref.id):ref.kind==="phase"?(IX.idx.phase[ref.id]||{}).ph:(IX.idx.item[ref.id]||{}).it;
 const projOfRef=ref=>ref.kind==="project"?ownerOf(ref):ref.kind==="phase"?(IX.idx.phase[ref.id]||{}).p:(IX.idx.item[ref.id]||{}).p;
 const FIDX=()=>LS.get(K_FIDX,{});
@@ -1302,7 +1336,7 @@ function driveErr(x){const m=String(x&&x.message||x);
     :m==="NO_DRIVE"||/permission|authoriz/i.test(m)?"Google Drive access isn't allowed yet. In Apps Script, run setupDrive once and approve it."
     :m==="NOT_CONNECTED"?"Connect this device to your Google Sheet first."
     :m==="NO_FILE"?"That file is no longer in your Google Drive."
-    :"Couldn't reach Google Drive. Check your connection (VPN in China) and try again."}
+    :"Couldn't reach Google Drive. Check your connection (VPN if needed) and try again."}
 async function driveFetch(a){const parts=[];let n=1,mime=a.mime;
   for(let i=0;i<n;i++){const r=await Sync.call("download",{id:a.driveId,part:i});n=r.parts||1;mime=r.mime||mime;parts.push(b64ToBytes(r.data||""))}
   return new Blob(parts,{type:mime||"application/octet-stream"})}
@@ -1322,7 +1356,7 @@ async function addFiles(ref,list){
   const files=[...list],big=files.filter(f=>f.size>MAX_UP),ok=files.filter(f=>f.size<=MAX_UP&&f.size>0);
   if(big.length)toast(`${big.map(f=>f.name).join(", ")} ${big.length>1?"are":"is"} over 15 MB. Use Add Link for big files.`,5500);
   if(!ok.length)return;const p=projOfRef(ref),folder=p?p.name:"";
-  const added=[];for(const f of ok){const a={id:uid(),kind:"drive",name:f.name,mime:f.type||mimeOf(f.name),size:f.size,added:TODAY(),pending:true};
+  const added=[];for(const f of ok){const a={id:uid(),kind:"drive",name:f.name,mime:f.type||mimeOf(f.name),size:f.size,added:TODAY(),at:Date.now(),pending:true};
     const rec={blob:f.slice(0,f.size,f.type||mimeOf(f.name)),folder};memUp[a.id]=rec;await IDB.set("up:"+a.id,rec);added.push(a)}
   const o=ownerOf(ref);if(!o)return;o.files=[...(o.files||[]),...added];
   LS.set(K_UPQ,[...LS.get(K_UPQ,[]),...added.map(a=>a.id)]);commit();runUploads();
@@ -1365,7 +1399,7 @@ async function syncOffline(){
       try{const b=await driveFetch(a);await cachePut(a.driveId,b);refreshAttViews()}catch(x){if(x.message==="NO_FILE")continue;return}}}
   finally{offRun=false}
 }
-function afterSync(){migrateColors();migrateFiles();runUploads().then(()=>{runTrash();syncOffline()})}
+function afterSync(){migrateColors();migrateFiles();runUploads().then(()=>{runTrash();return convertDriveLinks()}).then(()=>syncOffline())}
 addEventListener("online",()=>setTimeout(()=>{runUploads();runTrash()},1500));
 /* One-time update (Oct 2026): item "Links to Files" move into the item's notes. */
 function migrateFiles(){
@@ -1373,51 +1407,200 @@ function migrateFiles(){
   S.projects.forEach(p=>p.phases.forEach(ph=>ph.items.forEach(it=>{const l=String(it.links||"").trim();if(l){it.notes=(it.notes&&it.notes.trim()?it.notes.replace(/\s+$/,"")+"\n\n":"")+l;n++}it.links=""})));
   S.settings.filesV1=true;commit();
 }
-function attCard(a){
-  const k=kindOf(a),bd=badgeOf(a),st=a.pending?"Waiting to Upload":a.kind==="link"?"Link":fsize(a.size);
-  return `<div class="att ${a.pending?"pending":""}"><button class="att-open" data-att-open="${a.id}" title="${esc(a.name)}"><span class="th" ${k==="img"?`data-th="${a.id}"`:""}><span class="bdg" style="--bc:${bd.c}">${esc(bd.t)}</span></span><span class="nm">${esc(a.name)}</span><span class="sz">${st}</span></button><button class="att-x" data-att-del="${a.id}" aria-label="Remove ${esc(a.name)}">✕</button></div>`}
+/* ---- cards, sharing, menus ---- */
+const MAX_DOWN=50*1048576;
+const isGdoc=a=>/^application\/vnd\.google-apps/.test(a.mime||"");
+const driveIdOf=u=>{const s=String(u||"");if(!/(drive|docs)\.google\.com/.test(s))return null;const m=s.match(/(?:\/file\/d\/|\/document\/d\/|\/spreadsheets\/d\/|\/presentation\/d\/|[?&]id=)([A-Za-z0-9_-]{10,})/);return m?m[1]:null};
+const linkHost=u=>{const s=String(u||"").toLowerCase();return /(drive|docs)\.google\.com/.test(s)?"drive":/(^|\/\/|\.)dropbox\.com|db\.tt/.test(s)?"dropbox":/proton\.me|protondrive/.test(s)?"proton":"web"};
+const dropboxDl=u=>{try{const x=new URL(u);x.searchParams.set("dl","1");return x.toString()}catch(e){return u}};
+const shareKey=a=>a.driveId?"d:"+a.driveId:a.kind==="link"?"u:"+a.url:"a:"+a.id;
+const attUrl=a=>a.url||(a.driveId?`https://drive.google.com/file/d/${a.driveId}/view`:"");
+const isTouch=()=>matchMedia("(pointer:coarse)").matches;
+const IS_IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+function shareCounts(){const m={};attOwners().forEach(o=>(o.files||[]).forEach(a=>{const k=shareKey(a);m[k]=(m[k]||0)+1}));return m}
+function placeList(p){const out=[{ref:{kind:"project",id:p.id},label:"Project Notes",lvl:0}];p.phases.forEach(ph=>{out.push({ref:{kind:"phase",id:ph.id},label:`${ph.name} Notes`,lvl:0,color:ph.color});ph.items.forEach(it=>out.push({ref:{kind:"item",id:it.id},label:it.name,sub:it.group||"",lvl:1,color:ph.color}))});return out}
+function placesOf(a,except){const k=shareKey(a),out=[];S.projects.forEach(p=>placeList(p).forEach(x=>{const o=ownerOf(x.ref);if(o&&o!==except&&(o.files||[]).some(y=>shareKey(y)===k))out.push(x.lvl?`${x.label} (${(IX.idx.item[x.ref.id]||{}).ph?.name||""})`:x.label)}));return out}
+function attCard(a,cnt){
+  const k=kindOf(a),bd=badgeOf(a),st=a.pending?"Waiting to Upload":a.kind==="link"?"Link":fsize(a.size)||(isGdoc(a)?"Google File":"");
+  return `<div class="att ${a.pending?"pending":""}" data-att="${a.id}"><button class="att-open" data-att-open="${a.id}" title="${esc(a.name)}"><span class="th" ${k==="img"&&a.kind==="drive"?`data-th="${a.id}"`:""}><span class="bdg" style="--bc:${bd.c}">${esc(bd.t)}</span></span><span class="nm">${esc(a.name)}</span><span class="sz"><span>${st}</span>${cnt>1?`<b class="cnt" title="In ${cnt} Places">${cnt}x</b>`:""}</span></button><button class="att-x" data-att-menu="${a.id}" aria-label="Options for ${esc(a.name)}">⋯</button></div>`}
+/* a small pop-up on top of the notes pop-up */
+function sheet(title,sub,body,onMount){
+  document.getElementById("ov2")?.remove();
+  const host=document.createElement("div");host.className="ov";host.id="ov2";host.style.zIndex=45;
+  host.innerHTML=`<div class="modal sheet" role="dialog" aria-modal="true"><div class="row" style="flex-wrap:nowrap;align-items:flex-start"><h2 class="grow" style="font-size:16px;overflow-wrap:anywhere;min-width:0">${title}</h2><button class="btn sm ghost" data-sx>Close</button></div>${sub?`<p class="sub" style="margin:0">${sub}</p>`:""}${body}</div>`;
+  document.body.appendChild(host);
+  const esc2=e=>{if(!host.isConnected)return document.removeEventListener("keydown",esc2,true);if(e.key==="Escape"){e.preventDefault();e.stopImmediatePropagation();close()}};
+  const close=()=>{host.remove();document.removeEventListener("keydown",esc2,true)};
+  document.addEventListener("keydown",esc2,true);
+  host.addEventListener("mousedown",e=>{if(e.target===host)close()});host.querySelector("[data-sx]").onclick=close;
+  onMount&&onMount(host,close);return close}
 function mountAtt(el,ref){
   el.setAttribute("data-attgrid","1");
-  const draw=()=>{const o=ownerOf(ref);if(!o){el.innerHTML="";return}const L=o.files||[];
-    el.innerHTML=`${L.length?`<div class="att-grid">${L.map(attCard).join("")}</div>`:""}
-      <div class="row"><button class="btn sm" data-att-add>+ Add Files</button><button class="btn sm ghost" data-att-link>+ Add Link</button><span class="sub grow">${L.length?"":"JPG, PNG and PDF Open Here. Other Files Open in Google Drive. Up to 15 MB Each."}</span></div>
+  const draw=()=>{const o=ownerOf(ref);if(!o){el.innerHTML="";return}const L=o.files||[],cn=shareCounts();
+    el.innerHTML=`${L.length?`<div class="att-grid">${L.map(a=>attCard(a,cn[shareKey(a)])).join("")}</div>`:""}
+      <div class="row"><button class="btn sm" data-att-add>+ Add Files</button><button class="btn sm ghost" data-att-drive>+ From Drive</button><button class="btn sm ghost" data-att-link>+ Add Link</button>${L.length>1?`<button class="btn sm ghost" data-att-sort>Sort</button>`:""}<span class="sub grow">${L.length?(L.length>1?"Hold and Drag a Card to Reorder":""):"JPG, PNG and PDF Open Here. Other Files Open in Google Drive. Up to 15 MB Each."}</span></div>
       <input type="file" multiple hidden data-att-file>`;
-    el.querySelectorAll("[data-th]").forEach(t=>{const a=L.find(x=>x.id===t.dataset.th);if(a)localURL(a).then(u=>{if(u&&t.isConnected){t.insertAdjacentHTML("afterbegin",`<img src="${u}" alt="">`);t.classList.add("has")}}).catch(()=>{})});
-    const fi=el.querySelector("[data-att-file]");
+    el.querySelectorAll("[data-th]").forEach(t=>{const a=L.find(x=>x.id===t.dataset.th);if(a)localURL(a).then(u=>{if(u&&t.isConnected){t.insertAdjacentHTML("afterbegin",`<img src="${u}" alt="" draggable="false">`);t.classList.add("has")}}).catch(()=>{})});
+    const fi=el.querySelector("[data-att-file]"),grid=el.querySelector(".att-grid");
     el.querySelector("[data-att-add]").onclick=()=>fi.click();
     fi.onchange=()=>{const fl=[...fi.files];fi.value="";if(fl.length)addFiles(ref,fl)};
-    el.querySelector("[data-att-link]").onclick=()=>linkModal(ref,el);
-    el.querySelectorAll("[data-att-open]").forEach(b=>b.onclick=()=>openAtt(ref,b.dataset.attOpen));
-    el.querySelectorAll("[data-att-del]").forEach(b=>armDelete(b,()=>removeAtt(ref,b.dataset.attDel),"Remove?"));
+    el.querySelector("[data-att-link]").onclick=()=>linkModal(ref);
+    el.querySelector("[data-att-drive]").onclick=()=>fromDriveSheet(ref);
+    const so=el.querySelector("[data-att-sort]");if(so)so.onclick=()=>sortSheet(ref);
+    el.querySelectorAll("[data-att-open]").forEach(b=>b.onclick=()=>{if(grid&&grid._dragged&&Date.now()-grid._dragged<500)return;openAtt(ref,b.dataset.attOpen)});
+    el.querySelectorAll("[data-att-menu]").forEach(b=>b.onclick=()=>attMenu(ref,b.dataset.attMenu));
+    if(grid)bindReorder(grid,ref);
   };
   el._draw=draw;draw();
 }
-function removeAtt(ref,id){const o=ownerOf(ref);if(!o)return;const a=(o.files||[]).find(x=>x.id===id);if(!a)return;
-  undoable(()=>{o.files=o.files.filter(x=>x.id!==id)},a.kind==="drive"&&!a.pending?`${a.name} removed and moved to the Drive trash`:`${a.name} removed`);
-  if(a.driveId)queueTrash([a.driveId]);refreshAttViews()}
-function linkModal(ref,el){
-  const host=document.createElement("div");host.className="ov";host.id="ov2";host.style.zIndex=45;
-  host.innerHTML=`<div class="modal" role="dialog" aria-modal="true"><h2>Add a Link</h2><p class="sub" style="margin:0">For big files, like a Procreate or PSD file in Dropbox or Google Drive. The card shows the file type from the name.</p>
-    <div class="field"><label for="lk-u">Link</label><input class="inp" id="lk-u" placeholder="https://…"></div>
-    <div class="field"><label for="lk-n">Name</label><input class="inp" id="lk-n" placeholder="e.g. Lineup Final.procreate"></div>
-    <p class="sub" id="lk-e" style="color:var(--over);margin:0" hidden></p>
-    <div class="m-actions"><button class="btn" id="lk-c">Cancel</button><button class="btn primary" id="lk-ok">Add Link</button></div></div>`;
-  document.body.appendChild(host);const u=host.querySelector("#lk-u"),n=host.querySelector("#lk-n");setTimeout(()=>u.focus(),30);
-  const close=()=>host.remove();
-  host.addEventListener("mousedown",e=>{if(e.target===host)close()});host.querySelector("#lk-c").onclick=close;
-  const go=()=>{let url=u.value.trim();if(url&&!/^https?:\/\//i.test(url))url="https://"+url;
-    if(!/^https?:\/\/[^\s]+\.[^\s]+/i.test(url)){const e=host.querySelector("#lk-e");e.hidden=false;e.textContent="Paste a full link, starting with https://";return}
-    let nm=n.value.trim();if(!nm){try{const x=new URL(url);nm=decodeURIComponent(x.pathname.split("/").filter(Boolean).pop()||x.hostname)}catch(e){nm=url}}
-    const o=ownerOf(ref);if(!o)return close();close();o.files=[...(o.files||[]),{id:uid(),kind:"link",name:nm,url,added:TODAY()}];commit();toast("Link added")};
-  host.querySelector("#lk-ok").onclick=go;[u,n].forEach(i=>i.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();e.stopPropagation();go()}else if(e.key==="Escape"){e.preventDefault();e.stopPropagation();close()}});
+/* hold (touch) or drag (mouse) a card to reorder; the order syncs and the viewer follows it */
+function bindReorder(grid,ref){
+  let d=null;
+  const start=()=>{d.on=true;d.c.classList.add("dragging");grid.classList.add("is-drag");try{d.c.setPointerCapture(d.pid)}catch(x){}try{navigator.vibrate&&navigator.vibrate(10)}catch(x){}};
+  grid.addEventListener("pointerdown",e=>{const c=e.target.closest(".att");if(!c||e.target.closest(".att-x")||(e.pointerType==="mouse"&&e.button!==0))return;
+    d={c,x:e.clientX,y:e.clientY,pid:e.pointerId,mouse:e.pointerType==="mouse",on:false};if(!d.mouse)d.t=setTimeout(()=>{if(d&&!d.cancel)start()},380)});
+  grid.addEventListener("pointermove",e=>{if(!d)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;
+    if(!d.on){if(d.mouse&&Math.hypot(dx,dy)>6)start();else if(!d.mouse&&Math.hypot(dx,dy)>8){clearTimeout(d.t);d=null}return}
+    e.preventDefault();const over=document.elementsFromPoint(e.clientX,e.clientY).map(x=>x.closest&&x.closest(".att")).find(x=>x&&x!==d.c&&grid.contains(x));
+    if(over){const r=over.getBoundingClientRect(),after=e.clientX>r.left+r.width/2;if(after?over.nextSibling!==d.c:over.previousSibling!==d.c)grid.insertBefore(d.c,after?over.nextSibling:over)}});
+  const end=()=>{if(!d)return;clearTimeout(d.t);const was=d.on,c=d.c;d=null;if(!was)return;c.classList.remove("dragging");grid.classList.remove("is-drag");grid._dragged=Date.now();
+    const order=[...grid.querySelectorAll(".att")].map(x=>x.dataset.att),o=ownerOf(ref);if(!o)return;if(order.join()===(o.files||[]).map(x=>x.id).join())return;
+    const by=Object.fromEntries(o.files.map(x=>[x.id,x]));o.files=order.map(i=>by[i]).filter(Boolean);commit()};
+  grid.addEventListener("pointerup",end);grid.addEventListener("pointercancel",()=>{if(d&&d.on)return end();if(d)clearTimeout(d.t);d=null});
+  grid.addEventListener("touchmove",e=>{if(d&&d.on)e.preventDefault()},{passive:false});
+  grid.addEventListener("contextmenu",e=>{if(e.target.closest(".att"))e.preventDefault()});
 }
+function sortSheet(ref){
+  const tm=a=>a.at||Date.parse(a.added||"")||0;
+  sheet("Sort Attachments","Sorts the cards here once. You can still drag them afterward.",`<div class="opts"><button class="opt" data-so="name">Name (A to Z)</button><button class="opt" data-so="new">Newest First</button><button class="opt" data-so="old">Oldest First</button></div>`,(h,close)=>{
+    h.querySelectorAll("[data-so]").forEach(b=>b.onclick=()=>{const o=ownerOf(ref);if(!o)return close();const k=b.dataset.so,L=(o.files||[]).map((a,i)=>({a,i}));
+      L.sort((x,y)=>k==="name"?x.a.name.localeCompare(y.a.name,undefined,{numeric:true,sensitivity:"base"})||x.i-y.i:k==="new"?(tm(y.a)-tm(x.a))||(y.i-x.i):(tm(x.a)-tm(y.a))||(x.i-y.i));
+      close();undoable(()=>{o.files=L.map(x=>x.a)},"Attachments sorted")})})}
+function attMenu(ref,id){
+  const o=ownerOf(ref),a=o&&(o.files||[]).find(x=>x.id===id);if(!a)return;const others=placesOf(a,o),dl=canDownload(a),u=attUrl(a);
+  sheet(esc(a.name),others.length?`Also in ${esc(others.join(", "))}`:"",`<div class="opts">
+    <button class="opt" data-m="move">Move To…</button><button class="opt" data-m="copy" ${a.pending?"disabled":""}>Copy To…${a.pending?` <span class="sub">(After It Uploads)</span>`:""}</button>
+    ${dl?`<button class="opt" data-m="dl">Download</button>`:""}${u?`<button class="opt" data-m="link">Copy Link</button>`:""}
+    <button class="opt danger" data-m="rm">Remove</button></div>`,(h,close)=>{
+    const on=(m,f)=>{const b=h.querySelector(`[data-m="${m}"]`);if(b)b.onclick=f};
+    on("move",()=>{close();placePicker(ref,id,"move")});on("copy",()=>{close();placePicker(ref,id,"copy")});
+    on("dl",()=>{close();downloadAtt(a)});on("link",()=>{close();copyText(u)});
+    armDelete(h.querySelector('[data-m="rm"]'),()=>{close();removeAtt(ref,id)},"Tap Again to Remove")})}
+function placePicker(ref,id,mode){
+  const o=ownerOf(ref),a=o&&(o.files||[]).find(x=>x.id===id),p=projOfRef(ref);if(!a||!p)return;const k=shareKey(a);
+  const L=placeList(p).map(x=>{const t=ownerOf(x.ref),here=t===o,has=!here&&(t.files||[]).some(y=>shareKey(y)===k);
+    return `<button class="opt ${x.lvl?"ind":""}" data-to="${x.ref.kind}:${x.ref.id}" ${here||has?"disabled":""}>${x.color?`<span class="dot" style="--c:var(--${x.color})"></span>`:""}<span>${esc(x.label)}${x.sub&&x.lvl?` <span class="sub">${esc(x.sub)}</span>`:""}${here?` <span class="sub">· Here Now</span>`:has?` <span class="sub">· Already There</span>`:""}</span></button>`}).join("");
+  sheet(`${mode==="move"?"Move":"Copy"} ${esc(a.name)} To…`,mode==="copy"?"Both places show the same Drive file, marked 2x. Nothing is duplicated.":"",`<div class="opts places">${L}</div>`,(h,close)=>{
+    h.querySelectorAll("[data-to]").forEach(b=>b.onclick=()=>{const[kind,tid]=b.dataset.to.split(":"),dref={kind,id:tid},dst=ownerOf(dref),src=ownerOf(ref);if(!dst||!src)return close();
+      const lbl=b.querySelector("span:not(.dot)").childNodes[0].textContent.trim();close();
+      undoable(()=>{if(mode==="move"){src.files=(src.files||[]).filter(x=>x.id!==id);dst.files=[...(dst.files||[]),a]}else dst.files=[...(dst.files||[]),{...a,id:uid(),at:Date.now()}]},`${mode==="move"?"Moved":"Copied"} to ${lbl}`)})})}
+function removeAtt(ref,id){const o=ownerOf(ref);if(!o)return;const a=(o.files||[]).find(x=>x.id===id);if(!a)return;const others=placesOf(a,o);
+  undoable(()=>{o.files=o.files.filter(x=>x.id!==id)},others.length?`Removed here. Still in ${others[0]}${others.length>1?` and ${others.length-1} more`:""}.`:a.fromDrive?`${a.name} removed. It stays in your Google Drive.`:a.kind==="drive"&&!a.pending?`${a.name} removed and moved to the Drive trash`:`${a.name} removed`);
+  if(a.driveId&&!a.fromDrive)queueTrash([a.driveId]);refreshAttViews()}
+function copyText(t){(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("Link copied"),()=>sheet("Copy Link","Select the link and copy it.",`<textarea class="inp" rows="3" readonly>${esc(t)}</textarea>`,h=>{const x=h.querySelector("textarea");setTimeout(()=>{x.focus();x.select()},30)}))}
+function newDriveAtt(r){return{id:uid(),kind:"drive",driveId:r.id,name:r.name,mime:r.mime,size:r.size,url:r.url,added:TODAY(),at:Date.now(),fromDrive:true}}
+function linkModal(ref){
+  sheet("Add a Link","For big files kept in Dropbox or Drive, or any web page. Google Drive links to a file become a normal Drive card, with a preview.",`
+    <div class="field"><label for="lk-u">Link</label><input class="inp" id="lk-u" placeholder="https://…"></div>
+    <div class="field"><label for="lk-n">Name</label><input class="inp" id="lk-n" placeholder="Optional, e.g. Lineup Final.procreate"></div>
+    <p class="sub" id="lk-e" style="color:var(--over);margin:0" hidden></p>
+    <div class="m-actions"><button class="btn primary" id="lk-ok">Add Link</button></div>`,(host,close)=>{
+    const u=host.querySelector("#lk-u"),n=host.querySelector("#lk-n");setTimeout(()=>u.focus(),30);
+    const go=async()=>{let url=u.value.trim();if(url&&!/^https?:\/\//i.test(url))url="https://"+url;
+      if(!/^https?:\/\/[^\s]+\.[^\s]+/i.test(url)){const e=host.querySelector("#lk-e");e.hidden=false;e.textContent="Paste a full link, starting with https://";return}
+      let nm=n.value.trim(),auto=!nm;if(!nm){try{const x=new URL(url);nm=decodeURIComponent(x.pathname.split("/").filter(Boolean).pop()||x.hostname)}catch(e){nm=url}}
+      const did=driveIdOf(url);let card={id:uid(),kind:"link",name:nm,url,added:TODAY(),at:Date.now(),autoName:auto||undefined};
+      if(did&&Sync.connected()){const b=host.querySelector("#lk-ok");b.disabled=true;b.textContent="Checking…";
+        try{const r=await Sync.call("driveInfo",{id:did});if(!r.gdoc){card=newDriveAtt(r);card.url=url;if(!auto)card.name=nm}}catch(x){}}
+      const o=ownerOf(ref);close();if(!o)return;o.files=[...(o.files||[]),card];commit();toast(card.kind==="drive"?"Added from Google Drive":"Link added");if(card.kind==="drive")syncOffline()};
+    host.querySelector("#lk-ok").onclick=go;[u,n].forEach(i=>i.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();e.stopPropagation();go()}});
+  });
+}
+/* + From Drive: paste a Drive link, browse your Project Tracker Files folders, or search your whole Drive by name */
+function fromDriveSheet(ref){
+  if(!Sync.connected())return toast("Connect this device to your Google Sheet first.");
+  const sel=new Map();let path=[];
+  sheet("Add From Google Drive","Files already in your Drive. Nothing is copied or uploaded, and removing a card later leaves the file in Drive.",`
+    <div class="field"><label for="fd-link">Paste a Drive Link</label><div class="row" style="flex-wrap:nowrap"><input class="inp" id="fd-link" placeholder="https://drive.google.com/file/d/…"><button class="btn sm" id="fd-go">Add</button></div></div>
+    <div class="field"><label for="fd-q">Or Browse and Search</label><div class="row" style="flex-wrap:nowrap"><input class="inp" id="fd-q" type="search" placeholder="Search Your Whole Drive by Name"><button class="btn sm" id="fd-s">Search</button></div></div>
+    <div class="row sub" id="fd-crumb" style="gap:4px 6px"></div><div class="fd-list" id="fd-list"><p class="sub">Loading…</p></div>
+    <div class="m-actions"><span class="sub left" id="fd-n"></span><button class="btn primary" id="fd-add" disabled>Add</button></div>`,(h,close)=>{
+    const list=h.querySelector("#fd-list"),crumb=h.querySelector("#fd-crumb"),addB=h.querySelector("#fd-add"),cnt=h.querySelector("#fd-n");
+    const upd=()=>{addB.disabled=!sel.size;addB.textContent=sel.size>1?`Add ${sel.size} Files`:"Add";cnt.textContent=sel.size?`${sel.size} Selected`:""};
+    const fail=x=>{list.innerHTML=`<p class="sub" style="color:var(--over)">${esc(x.message==="NO_FILE"?"Couldn't find that. It may have been moved or deleted.":driveErr(x))}</p>`};
+    const fileRow=f=>{const b=badgeOf({kind:"drive",name:f.name,mime:f.mime});return `<label class="fd-row"><input type="checkbox" data-fid="${f.id}" ${sel.has(f.id)?"checked":""}><span class="bdg" style="--bc:${b.c}">${esc(b.t)}</span><span class="fd-nm">${esc(f.name)}</span><span class="sub">${f.gdoc?"Google File":fsize(f.size)}${f.updated?" · "+short(f.updated.slice(0,10)):""}</span></label>`};
+    const bindFiles=files=>list.querySelectorAll("[data-fid]").forEach(c=>c.onchange=()=>{const f=files.find(x=>x.id===c.dataset.fid);c.checked?sel.set(f.id,f):sel.delete(f.id);upd()});
+    async function open(folder){list.innerHTML=`<p class="sub">Loading…</p>`;let r;try{r=await Sync.call("driveList",{folder:folder||""})}catch(x){return fail(x)}
+      if(!folder)path=[{id:"",name:r.name}];else{const i=path.findIndex(x=>x.id===folder);path=i>=0?path.slice(0,i+1):[...path,{id:folder,name:r.name}]}
+      crumb.innerHTML=path.map((x,i)=>i<path.length-1?`<button class="btn sm ghost" data-cr="${x.id}">${esc(x.name)}</button><span>›</span>`:`<b>${esc(x.name)}</b>`).join("");
+      crumb.querySelectorAll("[data-cr]").forEach(b=>b.onclick=()=>open(b.dataset.cr));
+      list.innerHTML=r.folders.map(f=>`<button class="fd-row fd-fold" data-fold="${f.id}"><span class="bdg" style="--bc:#6F7482">FOLDER</span><span class="fd-nm">${esc(f.name)}</span><span class="sub">›</span></button>`).join("")+r.files.map(fileRow).join("")||`<p class="sub">This folder is empty.</p>`;
+      list.querySelectorAll("[data-fold]").forEach(b=>b.onclick=()=>open(b.dataset.fold));bindFiles(r.files)}
+    async function search(){const q=h.querySelector("#fd-q").value.trim();if(!q)return open("");list.innerHTML=`<p class="sub">Searching…</p>`;let r;try{r=await Sync.call("driveSearch",{q})}catch(x){return fail(x)}
+      crumb.innerHTML=`<button class="btn sm ghost" data-back>‹ Folders</button><b>Results for "${esc(q)}"</b>`;crumb.querySelector("[data-back]").onclick=()=>open("");
+      list.innerHTML=r.map(fileRow).join("")||`<p class="sub">No files found with that name.</p>`;bindFiles(r)}
+    const add=infos=>{const o=ownerOf(ref);if(!o)return close();const have=new Set((o.files||[]).map(shareKey));const fresh=infos.filter(f=>!have.has("d:"+f.id));
+      close();if(!fresh.length)return toast("Already in these notes");o.files=[...(o.files||[]),...fresh.map(newDriveAtt)];commit();syncOffline();toast(fresh.length>1?`${fresh.length} files added from Google Drive`:"Added from Google Drive")};
+    h.querySelector("#fd-s").onclick=search;h.querySelector("#fd-q").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();e.stopPropagation();search()}};
+    const pasteGo=async()=>{const v=h.querySelector("#fd-link").value.trim(),id=driveIdOf(v);if(!id){list.innerHTML=`<p class="sub" style="color:var(--over)">That doesn't look like a Google Drive file link. It should look like drive.google.com/file/d/…</p>`;return}
+      try{const r=await Sync.call("driveInfo",{id});add([r])}catch(x){fail(x)}};
+    h.querySelector("#fd-go").onclick=pasteGo;h.querySelector("#fd-link").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();e.stopPropagation();pasteGo()}};
+    addB.onclick=()=>add([...sel.values()]);
+    open("");
+  });
+}
+/* Drive links added before this update become real Drive cards (preview, offline copy, download) */
+let dlRun=false;
+async function convertDriveLinks(){
+  if(dlRun||!Sync.connected()||!navigator.onLine)return;dlRun=true;let changed=0;
+  try{for(const o of attOwners())for(const a of (o.files||[]).slice()){if(a.kind!=="link"||a.dchk)continue;const id=driveIdOf(a.url);if(!id)continue;
+      let r;try{r=await Sync.call("driveInfo",{id})}catch(x){if(/Unknown action|NOT_CONNECTED|NO_DRIVE|permission/i.test(x.message)||!navigator.onLine)return;const g=findAtt(a.id);if(g){g.a.dchk=1;changed++}continue}
+      const g=findAtt(a.id);if(!g)continue;if(r.gdoc){g.a.dchk=1;changed++;continue}
+      const keep=g.a.name&&!g.a.autoName&&!/^(view|edit|open|preview|uc|usp=sharing)$/i.test(g.a.name)&&g.a.name!==g.a.url;
+      Object.assign(g.a,{kind:"drive",driveId:r.id,mime:r.mime,size:r.size,fromDrive:true,name:keep?g.a.name:r.name});delete g.a.autoName;changed++}}
+  finally{dlRun=false;if(changed){commit();syncOffline()}}
+}
+/* what happens when you tap a card that the viewer can't show */
+const K_ACT="bbst-actions";
+const ACT_L={app:"Open in App",browser:"Open in Browser",download:"Download",copy:"Copy Link"};
+function canDownload(a){if(a.kind==="link")return linkHost(a.url)==="dropbox";return a.kind==="drive"&&!a.pending&&!isGdoc(a)&&(a.size||0)<=MAX_DOWN}
+function actKey(a){if(a.kind==="link"){const h=linkHost(a.url);return h==="web"?null:{k:"link:"+h,l:{drive:"Google Drive Links",dropbox:"Dropbox Links",proton:"Proton Drive Links"}[h]}}
+  if(isGdoc(a))return{k:"gdoc",l:"Google Docs, Sheets and Slides"};const e=extOf(a.name);return{k:"ext:"+(e||"file"),l:e?e.toUpperCase()+" Files":"Files Without a Type"}}
+function actOptions(a){const h=a.kind==="link"?linkHost(a.url):"drive",o=[];
+  if(h==="drive"&&isTouch())o.push("app");o.push("browser");if(canDownload(a))o.push("download");o.push("copy");return o}
+function openInApp(url){
+  if(!IS_IOS)return void window.open(url,"_blank","noopener");
+  location.href="googledrive://"+url.replace(/^https?:\/\//,"");
+  setTimeout(()=>{if(document.visibilityState==="visible")toast("Couldn't open the Google Drive app. Try Open in Browser or Copy Link.",5000)},2000)}
+function runAct(a,act){const u=attUrl(a);
+  if(act==="app")return openInApp(u);if(act==="download")return downloadAtt(a);if(act==="copy")return copyText(u);
+  window.open(a.kind==="link"?u:u,"_blank","noopener")}
 function openAtt(ref,id){
   const o=ownerOf(ref),a=o&&(o.files||[]).find(x=>x.id===id);if(!a)return;
-  if(a.kind==="link")return void window.open(a.url,"_blank","noopener");
-  if(kindOf(a)!=="other")return openViewer(ref,id);
-  if(a.pending)return toast("This file is waiting to upload. It opens in Google Drive once it's there.",4000);
-  window.open(a.url||`https://drive.google.com/file/d/${a.driveId}/view`,"_blank","noopener");
+  if(a.kind==="drive"&&kindOf(a)!=="other")return openViewer(ref,id);
+  if(a.pending)return toast("This file is waiting to upload. It opens once it's in Google Drive.",4000);
+  const K=actKey(a);if(!K)return void window.open(a.url,"_blank","noopener");
+  const opts=actOptions(a),saved=LS.get(K_ACT,{})[K.k];if(saved&&opts.includes(saved))return runAct(a,saved);
+  sheet(esc(a.name),`How should ${esc(K.l)} open on this device?`,`<div class="opts">${opts.map(x=>`<button class="opt" data-act-o="${x}">${ACT_L[x]}${x==="app"?` <span class="sub">Google Drive App</span>`:x==="download"&&a.kind==="link"?` <span class="sub">Starts the Download in the Browser</span>`:""}</button>`).join("")}</div>
+    <label class="check"><input type="checkbox" id="act-rem" checked><span>Remember for ${esc(K.l)}</span></label><span class="sub">Change it later in Settings > Advanced > Data > Link and File Actions.</span>`,(h,close)=>{
+    h.querySelectorAll("[data-act-o]").forEach(b=>b.onclick=()=>{const act=b.dataset.actO;if(h.querySelector("#act-rem").checked&&act!=="copy"){const A=LS.get(K_ACT,{});A[K.k]=act;LS.set(K_ACT,A)}close();runAct(a,act)})});
 }
+function actsBox(el){const A=LS.get(K_ACT,{}),ks=Object.keys(A);
+  const name=k=>k.startsWith("ext:")?(k.slice(4)==="file"?"Files Without a Type":k.slice(4).toUpperCase()+" Files"):{gdoc:"Google Docs, Sheets and Slides","link:drive":"Google Drive Links","link:dropbox":"Dropbox Links","link:proton":"Proton Drive Links"}[k]||k;
+  el.innerHTML=ks.length?ks.sort().map(k=>`<div class="tgl"><span>${esc(name(k))}<small>${ACT_L[A[k]]||A[k]}</small></span><button class="btn sm ghost" data-act-r="${esc(k)}">Reset</button></div>`).join("")+`<button class="btn sm ghost" style="justify-self:start" data-act-r="*">Reset All</button>`:`<span class="sub">Nothing remembered yet. The first time you open a PSD, a Dropbox link and so on, the tracker asks how to open it.</span>`;
+  el.querySelectorAll("[data-act-r]").forEach(b=>b.onclick=()=>{const k=b.dataset.actR,A2=LS.get(K_ACT,{});if(k==="*")LS.set(K_ACT,{});else{delete A2[k];LS.set(K_ACT,A2)}actsBox(el);toast("Reset. It asks again next time.")})}
+async function downloadAtt(a){
+  if(a.kind==="link"){if(linkHost(a.url)==="dropbox")return void window.open(dropboxDl(a.url),"_blank","noopener");return toast("This link can't be downloaded from here. Open it instead.")}
+  if(isGdoc(a))return toast("Google Docs, Sheets and Slides open in Drive. Use Open instead.");
+  if((a.size||0)>MAX_DOWN)return toast("Too Big to Download Here. Open It in the Google Drive App.",5000);
+  const t=toast("Preparing "+a.name+"…",30000);let b;
+  try{b=await getBlob(a)}catch(x){return toast(x.message==="TOO_BIG"?"Too Big to Download Here. Open It in the Google Drive App.":x.message==="NOT_CONNECTED"||!navigator.onLine?"This file isn't saved on this device yet. Download it once while online.":driveErr(x),5000)}
+  t.remove();deliverFile(a.name,b)}
+function deliverFile(name,b){
+  const f=new File([b],name,{type:b.type||mimeOf(name)});
+  const share=()=>navigator.share({files:[f]}).catch(e=>{if(e&&e.name==="NotAllowedError")toastAct(`${name} Is Ready`,"Save",share,20000)});
+  if(isTouch()&&navigator.canShare&&navigator.canShare({files:[f]}))return share();
+  downloadFile(name,b);toast("Downloaded "+name)}
 
 /* ===================== viewer (images + PDF) ===================== */
 const PDFJS="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
@@ -1430,7 +1613,7 @@ function openViewer(ref,id){
   const o=ownerOf(ref);if(!o)return;const list=(o.files||[]).filter(a=>kindOf(a)!=="other");let i=Math.max(0,list.findIndex(a=>a.id===id));
   const root=document.getElementById("viewer-root");
   root.innerHTML=`<div class="vw" id="vw" role="dialog" aria-modal="true" aria-label="File viewer"><div class="vw-top"><span class="vw-t"><b id="vw-n"></b><span id="vw-c"></span></span>
-    <span class="row" style="gap:6px"><button class="btn sm" id="vw-out" aria-label="Zoom out">−</button><button class="btn sm" id="vw-fit">Fit</button><button class="btn sm" id="vw-zin" aria-label="Zoom in">+</button><button class="btn sm" id="vw-drive">Open in Drive</button><button class="btn sm" id="vw-x">Close</button></span></div>
+    <span class="row" style="gap:6px"><button class="btn sm" id="vw-out" aria-label="Zoom out">−</button><button class="btn sm" id="vw-fit">Fit</button><button class="btn sm" id="vw-zin" aria-label="Zoom in">+</button><button class="btn sm" id="vw-dl">Download</button><button class="btn sm" id="vw-drive">Open in Drive</button><button class="btn sm" id="vw-x">Close</button></span></div>
     <div class="vw-stage" id="vw-stage"><div class="vw-in" id="vw-box"></div></div>
     ${list.length>1?`<button class="vw-nav prev" id="vw-prev" aria-label="Previous">‹</button><button class="vw-nav next" id="vw-next" aria-label="Next">›</button>`:""}</div>`;
   const st=root.querySelector("#vw-stage"),box=root.querySelector("#vw-box");
@@ -1448,13 +1631,13 @@ function openViewer(ref,id){
   async function show(){
     const a=VW.list[VW.i];VW.tok++;VW.pdf=null;VW.zoom=1;VW.base=null;VW.kind=kindOf(a);const tok=VW.tok;
     q("#vw-n").textContent=a.name;q("#vw-c").textContent=`${VW.list.length>1?`${VW.i+1} of ${VW.list.length} · `:""}${a.pending?"Waiting to Upload":fsize(a.size)}`;
-    q("#vw-drive").hidden=!a.driveId;box.innerHTML=`<div class="vw-msg">Opening…</div>`;
-    let b;try{b=await getBlob(a)}catch(x){if(tok===VW.tok)box.innerHTML=`<div class="vw-msg">${x.message==="ELSEWHERE"?"This file was added on another device and hasn't reached Google Drive yet. It opens once that device is back online.":x.message==="NOT_CONNECTED"||!navigator.onLine?"This file isn't saved on this device yet. Open it once while online (VPN in China), or turn on Keep All Attachments Offline in Settings > Advanced.":esc(driveErr(x))}</div>`;return}
+    q("#vw-drive").hidden=!a.driveId;q("#vw-dl").hidden=!canDownload(a)&&!a.pending;box.innerHTML=`<div class="vw-msg">Opening…</div>`;
+    let b;try{b=await getBlob(a)}catch(x){if(tok===VW.tok)box.innerHTML=`<div class="vw-msg">${x.message==="ELSEWHERE"?"This file was added on another device and hasn't reached Google Drive yet. It opens once that device is back online.":x.message==="NOT_CONNECTED"||!navigator.onLine?"This file isn't saved on this device yet. Open it once while online (VPN if needed), or turn on Keep All Attachments Offline in Settings > Advanced.":esc(driveErr(x))}</div>`;return}
     if(tok!==VW.tok)return;const r=st.getBoundingClientRect(),aw=r.width-24,ah=r.height-24;
     if(VW.kind==="img"){const u=fileURLs[a.id]||(fileURLs[a.id]=URL.createObjectURL(b));const im=await loadImg(u).catch(()=>null);if(tok!==VW.tok)return;
       if(!im){box.innerHTML=`<div class="vw-msg">This image couldn't be shown.</div>`;return}
       const k=Math.min(1,aw/im.naturalWidth,ah/im.naturalHeight);VW.base={w:im.naturalWidth*k};box.innerHTML="";im.draggable=false;box.appendChild(im);setW()}
-    else{let lib;try{lib=await loadPDF()}catch(x){if(tok===VW.tok)box.innerHTML=`<div class="vw-msg">The PDF viewer needs the internet the first time. Open one PDF while online (VPN in China), and after that PDFs open offline too.</div>`;return}
+    else{let lib;try{lib=await loadPDF()}catch(x){if(tok===VW.tok)box.innerHTML=`<div class="vw-msg">The PDF viewer needs the internet the first time. Open one PDF while online (VPN if needed), and after that PDFs open offline too.</div>`;return}
       try{const doc=await lib.getDocument({data:new Uint8Array(await b.arrayBuffer()),isEvalSupported:false}).promise;if(tok!==VW.tok)return;VW.pdf=doc;
         const n=Math.min(doc.numPages,80),p1=(await doc.getPage(1)).getViewport({scale:1});VW.base={w:Math.max(160,Math.min(aw,ah*p1.width/p1.height))};
         box.innerHTML="";for(let j=0;j<n;j++){const c=document.createElement("canvas");c.style.width=VW.base.w+"px";c.style.aspectRatio=`${p1.width}/${p1.height}`;box.appendChild(c)}
@@ -1463,6 +1646,7 @@ function openViewer(ref,id){
   }
   const go=d=>{if(VW.list.length<2)return;VW.i=(VW.i+d+VW.list.length)%VW.list.length;show()};
   q("#vw-x").onclick=()=>closeViewer();q("#vw-zin").onclick=()=>zoomTo(VW.zoom*1.4);q("#vw-out").onclick=()=>zoomTo(VW.zoom/1.4);q("#vw-fit").onclick=()=>zoomTo(1);
+  q("#vw-dl").onclick=()=>{const a=VW.list[VW.i];if(a.pending){getBlob(a).then(b=>deliverFile(a.name,b)).catch(()=>{})}else downloadAtt(a)};
   q("#vw-drive").onclick=()=>{const a=VW.list[VW.i];if(a.driveId)window.open(a.url||`https://drive.google.com/file/d/${a.driveId}/view`,"_blank","noopener")};
   if(q("#vw-prev")){q("#vw-prev").onclick=()=>go(-1);q("#vw-next").onclick=()=>go(1)}
   st.addEventListener("wheel",e=>{if(e.ctrlKey||e.metaKey||VW.kind==="img"){e.preventDefault();const r=st.getBoundingClientRect();zoomTo(VW.zoom*Math.exp(-e.deltaY*(e.ctrlKey?.01:.002)),e.clientX-r.left,e.clientY-r.top)}},{passive:false});
@@ -1472,8 +1656,10 @@ function openViewer(ref,id){
   st.addEventListener("touchstart",e=>{if(e.touches.length===2){const r=st.getBoundingClientRect();pz={d0:Math.max(dist(e.touches),20),z0:VW.zoom,fx:(e.touches[0].clientX+e.touches[1].clientX)/2-r.left,fy:(e.touches[0].clientY+e.touches[1].clientY)/2-r.top}}},{passive:true});
   st.addEventListener("touchmove",e=>{if(pz&&e.touches.length===2){e.preventDefault();zoomTo(pz.z0*dist(e.touches)/pz.d0,pz.fx,pz.fy)}},{passive:false});
   st.addEventListener("touchend",e=>{if(e.touches.length<2)pz=null},{passive:true});
-  let sx=0;st.addEventListener("touchstart",e=>{if(e.touches.length===1)sx=e.touches[0].clientX},{passive:true});
-  st.addEventListener("touchend",e=>{if(VW.zoom<=1.02&&e.changedTouches.length===1&&!pz){const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>70&&st.scrollWidth<=st.clientWidth+2)go(dx<0?1:-1)}},{passive:true});
+  let sx=0,sy=0,st0=0;st.addEventListener("touchstart",e=>{if(e.touches.length===1){sx=e.touches[0].clientX;sy=e.touches[0].clientY;st0=st.scrollTop}},{passive:true});
+  st.addEventListener("touchend",e=>{if(VW.zoom<=1.02&&e.changedTouches.length===1&&!pz){const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
+    if(dy>110&&Math.abs(dx)<70&&st0<=2)return closeViewer();
+    if(Math.abs(dx)>70&&Math.abs(dy)<80&&st.scrollWidth<=st.clientWidth+2)go(dx<0?1:-1)}},{passive:true});
   st.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"||e.button!==0)return;pan={x:e.clientX,y:e.clientY,l:st.scrollLeft,t:st.scrollTop};st.classList.add("dragging")});
   addEventListener("pointermove",e=>{if(pan){st.scrollLeft=pan.l-(e.clientX-pan.x);st.scrollTop=pan.t-(e.clientY-pan.y)}});
   addEventListener("pointerup",()=>{pan=null;st.classList.remove("dragging")});
@@ -2103,7 +2289,8 @@ function clientReportModal(pid){
 async function clientReportHTML(p,phs,o){
   const e=esc,P=priceOf(p),f=forecast(p),inc=roundsIncl(p);
   let ni=0,nd=0,te=0,de=0;phs.forEach(ph=>ph.items.forEach(it=>{ni++;const x=Math.max(itemStats(it).est,1);te+=x;if(isDone(it)){nd++;de+=x}}));
-  const thumbs=async L=>{if(!o.thumbs)return"";const imgs=L.filter(a=>kindOf(a)==="img").slice(0,12),out=[];
+  const seen=new Set();
+  const thumbs=async L=>{if(!o.thumbs)return"";const imgs=L.filter(a=>{if(a.kind!=="drive"||kindOf(a)!=="img"||seen.has(shareKey(a)))return false;seen.add(shareKey(a));return true}).slice(0,12),out=[];
     for(const a of imgs){try{const b=await Promise.race([getBlob(a),new Promise((_,rej)=>setTimeout(()=>rej(new Error("T")),20000))]);const u=fileURLs[a.id]||(fileURLs[a.id]=URL.createObjectURL(b));out.push(`<figure><img src="${u}" alt=""><figcaption>${e(a.name)}</figcaption></figure>`)}catch(x){}}
     return out.length?`<div class="thumbs">${out.join("")}</div>`:""};
   let h=`<h1>${e(p.name)}</h1>${p.subtitle?`<div class="sub">${e(p.subtitle)}</div>`:""}
@@ -2135,7 +2322,7 @@ function reviewExportModal(kind){
     root.querySelector("#rx-pdf").onclick=()=>{closeModal();setTimeout(()=>printReview(kind),120)};
     root.querySelector("#rx-xl").onclick=async()=>{const b=root.querySelector("#rx-xl"),msg=root.querySelector("#rx-msg");b.disabled=true;b.textContent="Preparing…";
       try{const X=await loadXLSX();exportReviewsXLSX(X,root.querySelector("#rx-range").value);closeModal();toast("Reviews downloaded")}
-      catch(x){b.disabled=false;b.textContent="Export Excel File";msg.hidden=false;msg.textContent="Couldn't load the spreadsheet tool. Check your connection (VPN in China) and try again."}};
+      catch(x){b.disabled=false;b.textContent="Export Excel File";msg.hidden=false;msg.textContent="Couldn't load the spreadsheet tool. Check your connection (VPN if needed) and try again."}};
   });
 }
 function exportReviewsXLSX(X,range){
@@ -2320,13 +2507,16 @@ function settingsModal(tab="general",D){
       <div class="row"><button class="btn sm" id="st-exp">Export Everything</button><button class="btn sm" id="st-imp">Import Backup</button></div>
       ${tgl("backupReminder","Sunday Backup Reminder")}
       <span class="lbl">ATTACHMENTS (THIS DEVICE)</span>
-      <div class="tgl"><span>Keep All Attachments Offline<small>Saves a copy of every attached file on this device so it opens without internet, like in China without a VPN. Links aren't downloaded.</small></span><input type="checkbox" id="st-off" ${keepOffline()?"checked":""}></div>
+      <div class="tgl"><span>Keep All Attachments Offline<small>Saves a copy of every attached file on this device so it opens without internet, like when traveling without a VPN. Links aren't downloaded.</small></span><input type="checkbox" id="st-off" ${keepOffline()?"checked":""}></div>
       <div class="row"><span class="sub grow" id="st-offsz">${offlineLine()}</span><button class="btn sm ghost danger" id="st-offclr">Clear Offline Copies</button></div>
+      <span class="lbl">LINK AND FILE ACTIONS (THIS DEVICE)</span>
+      <span class="sub">What happens when you tap a file the tracker can't show, like a PSD or a Dropbox link. Web pages always open in the browser.</span>
+      <div id="st-acts" style="display:grid;gap:8px"></div>
       <div class="row"><button class="btn sm ghost" id="st-drive">Check Google Drive Access</button><span class="sub grow">Files are saved in a "Project Tracker Files" folder in your Google Drive.</span></div>
       <div class="row"><button class="btn sm ghost danger" id="st-reset">Clear All Data</button><span class="sub">Removes every project, logged session, plan, note and review. Settings and templates stay. You get a few seconds to undo.</span></div>
       <span class="lbl">GOOGLE SHEET</span><div id="st-conn"></div></section>
   </div>`;
-  modal(`<h2>Settings</h2>
+  modal(`<div class="row"><h2 class="grow">Settings</h2><span class="ver">Version ${APP_VERSION}</span><button class="btn sm" id="st-guide">Guide</button></div>
     <div class="seg-ctl" id="st-tabs"><button data-tab="general" aria-pressed="${tab==="general"}">General</button><button data-tab="advanced" aria-pressed="${tab==="advanced"}">Advanced</button></div>
     <div id="st-body" style="display:grid;gap:14px"></div>
     <div class="m-actions"><button class="btn left" id="st-keys" ${tab==="advanced"?"":"hidden"}>Keyboard Shortcuts</button><button class="btn" id="st-cancel">Cancel</button><button class="btn primary" id="st-save">Save</button></div>`,
@@ -2352,6 +2542,7 @@ function settingsModal(tab="general",D){
         try{await exportIcons(D);toast("Icon files downloaded")}catch(x){toast("Couldn't make the icon files on this device. Try Chrome on your laptop.",4500)}
         finally{b.disabled=false;b.textContent="Export Icon Files"}});
       const so=body.querySelector("#st-off");if(so)so.onchange=()=>{LS.set(K_OFF,so.checked);if(so.checked){toast("Downloading attachments for offline use");syncOffline().then(()=>{const e=body.querySelector("#st-offsz");if(e)e.textContent=offlineLine()})}else toast("Offline copies off on this device. Tap Clear Offline Copies to free space.",4500)};
+      const sa=body.querySelector("#st-acts");if(sa)actsBox(sa);
       on2("st-offclr",async()=>{await clearOffline();const e=body.querySelector("#st-offsz");if(e)e.textContent=offlineLine();toast("Offline copies cleared on this device")});
       on2("st-drive",async()=>{const b=body.querySelector("#st-drive");if(!Sync.connected())return toast("Connect this device to your Google Sheet first.");b.disabled=true;
         try{await Sync.call("driveTest");toast("Google Drive is ready for attachments")}catch(x){toast(driveErr(x),6000)}finally{b.disabled=false}});
@@ -2362,7 +2553,7 @@ function settingsModal(tab="general",D){
         if(!Sync.connected()){ca.checked=false;return toast("Connect this device to your Google Sheet first.")}
         ca.disabled=true;
         try{await Sync.call("alerts",{test:true});LS.set(K_CAL,true);lastCalSig=null;calSync(true);toast("Calendar Alerts on for this device")}
-        catch(x){ca.checked=false;toast(/Unknown action/i.test(x.message)?"Update your Google Sheet script first: paste the new Code.gs, run setupCalendar, then deploy a new version.":x.message==="NO_CALENDAR"?"Calendar access isn't allowed yet. In Apps Script, run setupCalendar once and approve it.":"Couldn't reach your Google Sheet. Check your connection (VPN in China) and try again.",6000)}
+        catch(x){ca.checked=false;toast(/Unknown action/i.test(x.message)?"Update your Google Sheet script first: paste the new Code.gs, run setupCalendar, then deploy a new version.":x.message==="NO_CALENDAR"?"Calendar access isn't allowed yet. In Apps Script, run setupCalendar once and approve it.":"Couldn't reach your Google Sheet. Check your connection (VPN if needed) and try again.",6000)}
         finally{ca.disabled=false}};
       const nt=body.querySelector("#st-notify");if(nt)nt.onchange=async()=>{if(!nt.checked){D.notify=false;return}
         if(!("Notification" in window)){nt.checked=false;return toast("This device doesn't support notifications. On iPad, install the tracker to the Home Screen first.",4500)}
@@ -2388,6 +2579,7 @@ function settingsModal(tab="general",D){
       armDelete(body.querySelector("#st-reset"),()=>{closeModal();T=null;persistT(true);drawTimer();undoable(()=>{S.projects=[];S.sessions=[];S.plans=[];S.notes={};S.weekly={};S.weekMeta={};S.monthly={};S.routineSkip={}},"All data cleared")},"Tap Again to Clear Everything");
     };
     root.querySelector("#st-keys").onclick=()=>kbModal(()=>settingsModal("advanced",D),D);
+    root.querySelector("#st-guide").onclick=()=>guideModal("quick",()=>settingsModal(tab,D));
     root.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;open=null;root.querySelector("#st-keys").hidden=tab!=="advanced";root.querySelectorAll("[data-tab]").forEach(x=>x.setAttribute("aria-pressed",x===b));draw()});
     root.querySelector("#st-cancel").onclick=()=>closeModal();
     root.querySelector("#st-save").onclick=()=>{
@@ -2538,7 +2730,7 @@ function exportModal(pid){
         if(dl){try{await dl.save({filename:name,data:new Blob([buf])});closeModal();toast("Report saved")}
           catch(e){go.disabled=false;go.textContent="Export Excel File";if(e&&e.code==="declined")say("Export cancelled.");else if(e&&e.code==="rate_limited")say("A save prompt is already open. Try again in a moment.");else say("Saving files isn't available here. It works in the installed app.")}}
         else{downloadFile(name,new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));closeModal();toast("Report downloaded")}
-      }catch(e){go.disabled=false;go.textContent="Export Excel File";say("Couldn't load the spreadsheet tool. Check your connection (VPN in China) and try again.")}};
+      }catch(e){go.disabled=false;go.textContent="Export Excel File";say("Couldn't load the spreadsheet tool. Check your connection (VPN if needed) and try again.")}};
   },"wide");
 }
 
@@ -2617,16 +2809,339 @@ function runAction(id){
     case"editProject":return projectModal(proj().id,false);
     case"projectNotes":{const p=proj();return notesModal("project",p,p.name)}
     case"backup":return backupNow();
+    case"guide":return guideModal();
   }
+}
+
+/* ===================== guide ===================== */
+/* Quick Start and User's Manual. [[fig:name|Caption]] marks a screenshot spot for the PDF version; the app hides it. */
+const GUIDE={
+quick:[
+{id:"q-how",h:"How the Tracker Works",html:`
+<p>Every project is split into phases, each phase holds items (a character, a page, a proposal), and each item has steps with time estimates. You start the timer on a step, and every minute it logs fills the budget bars. Your data lives in your own Google Sheet and syncs to every device.</p>
+<ul>
+<li>The top bar has the five pages, the sync chip (green Synced means everything reached your Sheet), today's hours against your daily target, the Light/Dark switch, Projects and Settings.</li>
+<li>Almost every change shows an Undo button for a few seconds. <span class="k">Cmd/Ctrl+Z</span> works too.</li>
+<li>Settings has this Guide and the version number, so you can check that each device has the latest update.</li>
+</ul>`},
+{id:"q-board",h:"Board",html:`
+<p>Home base. One project at a time, with every phase as a budget bar.</p>[[fig:q-board|The Board]]
+<ul>
+<li>The top card shows the whole project: hours used against the budget, the value of the work, and the deadline forecast.</li>
+<li>Tap a phase to open it and see its items as bars, grouped in rows. Tap an item to see its steps and start the timer.</li>
+<li>Teal is time used. Yellow means a budget is past its warning point, pink means it's over. The thin line marks the estimate.</li>
+<li>Notes, Edit, Client Report and + Phase sit at the top. Each open phase has + Item, Edit Phase, Notes and Feedback Rounds.</li>
+</ul>`},
+{id:"q-month",h:"Month",html:`
+<p>The big picture of your month.</p>[[fig:month|Month]]
+<ul>
+<li>Each day shows the hours you logged and gets darker the closer you got to your daily target. Switch to Main Phase to color days by what you worked on.</li>
+<li>Labels come from your project and phase schedules, plus phase target dates and project due dates.</li>
+<li>Tap a day to open it. Monthly Review and a notes box for the month are on this page.</li>
+</ul>`},
+{id:"q-week",h:"Week",html:`
+<p>Plan the week and see where the time went.</p>[[fig:week|Week]]
+<ul>
+<li>Each day is a row. The top of the row is your plan (blocks), the thin line under it is the time the timer logged.</li>
+<li>Tap empty space to add a block. Hold a block, then drag it, even to another day. Drag its right edge to resize.</li>
+<li>Below: Hours by Phase, Weekly Priorities, Achievements and This Week's Items (items whose target week is this week).</li>
+</ul>`},
+{id:"q-day",h:"Day",html:`
+<p>One day in a single column that fits the screen.</p>[[fig:day|Day]]
+<ul>
+<li>+ Block adds a block. Hold a block to drag it up or down, or hold its bottom edge to resize. Pinch to zoom the hours.</li>
+<li>The thin column on the right is logged time. Tap a piece of it to fix a session.</li>
+<li>On the side: planned and logged time, today's schedule (with Skip), today's items and your Diary.</li>
+</ul>`},
+{id:"q-review",h:"Review",html:`
+<p>Two reviews that keep you honest.</p>[[fig:review|Weekly Review]]
+<ul>
+<li>Weekly Review: hours against target, items submitted, budget alerts, and four boxes: What Worked, What to Improve, Feedback Summary, Next Week's Focus.</li>
+<li>Monthly Review: the month's focus, hours by project, wins, improvements, goals with why/how and rewards, and notes.</li>
+<li>Export turns either review into a PDF, or a range of reviews into an Excel file.</li>
+</ul>`}
+],
+manual:[
+{id:"m1",h:"1. The Five Pages",html:`
+<h4>The Top Bar</h4>
+<ul>
+<li>Board, Month, Week, Day and Review switch pages. Keys <span class="k">1</span> to <span class="k">5</span> do the same on a keyboard.</li>
+<li>The sync chip: Synced (everything is in your Sheet), X Waiting (saved on this device, will sync), Offline (can't reach Google), Not Connected (tap to connect). Tap it anytime to sync now.</li>
+<li>The ring shows hours logged today against your daily target.</li>
+<li>Light/Dark switches the theme on this device. Projects opens Projects & Templates. Settings has General, Advanced, this Guide and the version.</li>
+<li>On Sundays a Backup banner offers a full backup file.</li>
+</ul>
+<h4>Board</h4>
+[[fig:board|The Board with an open phase]]
+<p>The project card at the top shows the whole project. Switch projects with the menu next to Notes; it groups projects by type (Client, Internal, Pitch).</p>
+<ul>
+<li>The bar: teal is hours used, the light part is hours left, yellow starts at your warning threshold (80% by default), pink is over budget. The thin vertical line is the total of your step estimates.</li>
+<li>Under the bar: Budget, Estimated and Actual hours. Bonus phases count toward a separate ceiling unless you include them in Settings.</li>
+<li>The value line shows Estimated Value, Earned So Far and Effective Rate (see chapter 6). The forecast line shows the due date, hours left and the projected finish.</li>
+<li>Client projects show the client and decision-maker. Amber chips are flags: low rate, over scope, running late, no decision-maker.</li>
+</ul>
+<p>Each phase card shows its own bar and value. Tap it to open it. Shift+click a phase on a laptop to open or close all of them.</p>
+<ul>
+<li>Inside, items sit in rows (for example Archetype A, B, C). Each item's bar is as wide as its estimate. The dot shows its status.</li>
+<li>Tap a row name to rename the row.</li>
+<li>Buttons: + Item, Edit Phase, Notes (a dot means it has notes or attachments), Feedback Rounds, and Hide Done once items are finished.</li>
+</ul>
+<h4>The Item Pop-Up</h4>
+[[fig:item|An item with steps, notes and attachments]]
+<ul>
+<li>Tap the name to rename it. Status: Not Started, In Progress, Submitted, Feedback Received, Revising, Approved, Done. Starting the timer moves Not Started to In Progress for you.</li>
+<li>Target Week puts the item in This Week's Items on the Week page.</li>
+<li>Steps: each has an estimate and optional timer stages. Start runs the timer, Time Log fixes logged sessions, Edit Step changes the estimate and stages. The arrows reorder steps.</li>
+<li>Checklist and Feedback keep their own lists. Notes has a writing box, any links you type become tappable, and Attachments sits below it.</li>
+<li>At the bottom: Delete, Move to Phase, Save as Template and Load Template.</li>
+</ul>
+<h4>Month</h4>
+[[fig:month|Month, shaded by hours]]
+<ul>
+<li>Shade Days By: Hours vs Target (darker = closer to your daily target) or Main Phase (each day takes the color of the phase you worked on most).</li>
+<li>Labels on days come from the weekly schedules you set on projects and phases. Dashed labels are phase target dates and project due dates.</li>
+<li>The arrows and This Month move between months. Tap a day to open it on the Day page.</li>
+<li>The Notes box under the calendar belongs to this month. Monthly Review opens the review for this month.</li>
+</ul>
+<h4>Week</h4>
+[[fig:week|Week: plan above, logged time below]]
+<ul>
+<li>Each row is a day from Day Starts to Day Ends (5am to 10pm by default). Tap a day's name to open it.</li>
+<li>Blocks: tap empty space to add one. Project Work blocks belong to a step and take its phase color. Life Blocks (meals, walks, rest) never count toward a budget. Dashed blocks come from schedules.</li>
+<li>Hold a block, then drag to move it, even to another day. On a laptop, just drag. Drag the right edge to change its length.</li>
+<li>Pinch the chart, or use − Fit +, to zoom the hours.</li>
+<li>Hours by Phase compares actual and planned time this week. Weekly Priorities and Achievements are simple lists. This Week's Items lists items with this target week.</li>
+</ul>
+<h4>Day</h4>
+[[fig:day|Day: one column for the whole day]]
+<ul>
+<li>+ Block adds a block at the current time. Hold a block and drag it up or down; hold its bottom edge to resize. Pinch or use − Fit + to zoom.</li>
+<li>The thin column next to the plan shows logged time. Tap a piece of it to open that step's Time Log.</li>
+<li>Planned Project Time, Logged and Daily Target sit at the top of the side column.</li>
+<li>Schedule lists today's schedule entries; Skip removes one for this day only. Today's Items lists the items you planned blocks for.</li>
+<li>Diary saves as you type.</li>
+</ul>
+<h4>Review</h4>
+[[fig:review|Weekly Review]]
+<ul>
+<li>Weekly Review: Logged vs Target, Items Submitted (items with this target week that reached Submitted or later), and the project's budget used. Budget Alerts list phases past the warning point.</li>
+<li>The four boxes save as you type. The arrows move between weeks.</li>
+<li>Monthly Review: Focus, hours logged in total and per project, Previous Month Review (Wins and Improvements), Goals (Goal, Why/How, Rewards) and Notes.</li>
+<li>Export: Create PDF prints the review on screen (choose Save as PDF in the print window; on iPad tap Share > Save to Files). Export Excel File saves every review in a date range.</li>
+</ul>`},
+{id:"m2",h:"2. Projects, Phases and Items",html:`
+<h4>Projects & Templates</h4>
+[[fig:lib|Projects & Templates]]
+<ul>
+<li>New Blank Project, or New Project from This on a pipeline template (it copies the phases, budgets, items and steps with zero hours).</li>
+<li>Filter by All, Client, Internal or Pitches. Each project has Open, Edit, Client Report, Save as Template, Download (a file with its logged time), Archive, Export Report and Delete.</li>
+<li>Load from File reads a downloaded project or template.</li>
+</ul>
+<h4>Edit Project</h4>
+<ul>
+<li>Name and Subtitle. Type: Client (paid work), Internal (your own work, like a portfolio chapter) or Pitch.</li>
+<li>Client, Decision-Maker and Due Date. Feedback Rounds Included per Phase (empty uses the default in Settings).</li>
+<li>Pricing (chapter 6), Weekly Schedule (labels for the calendar, optionally with a time), and Phase Order.</li>
+</ul>
+<h4>Phases</h4>
+<ul>
+<li>+ Phase on the Board, or <span class="k">Shift+Enter</span>. Each phase has a name, a budget in hours, a color, an optional target date and a default item template.</li>
+<li>Bonus Phase: counts toward the ceiling, not the main budget.</li>
+<li>Edit Phase also has the Weekly Schedule, Order (rows and items, with a menu to move an item to another row), Send Items, Save as Template, Load Template and Delete.</li>
+</ul>
+<h4>Items</h4>
+<ul>
+<li>+ Item asks for a name and a row, and where its steps start from: an item template, a copy of the last item's steps, or no steps.</li>
+<li>Save as Template (in the item pop-up) stores its steps and checklist. Load Template replaces them; logged hours are never erased.</li>
+</ul>
+<h4>Moving an Item to the Next Phase</h4>
+<p>There are two ways, and they do different things.</p>
+<ul>
+<li>Send Items (Edit Phase > Send Items to Another Phase): tick the items going forward, pick the phase and the template its steps come from, and tap Send Items. Each copy keeps its name and row and starts at zero hours. The originals stay where they were, with their hours. This is the normal way to move characters from Broad Exploration into Refined Designs.</li>
+<li>Move to Phase (item pop-up): moves the item itself, with its steps, notes, attachments and logged hours.</li>
+<li>Linked Character Names (Settings > Advanced > Board, on by default): sent copies share one name, so renaming one renames all of them, and a character can only appear once per phase.</li>
+</ul>
+<h4>Phase Templates and Pipeline Templates</h4>
+<ul>
+<li>Phase template (Edit Phase > Save as Template): budget, color, schedule, default item template and items. Load it into any phase.</li>
+<li>Pipeline template (Projects > Save as Template): the whole project structure, ready for New Project from This.</li>
+</ul>`},
+{id:"m3",h:"3. The Timer",html:`
+[[fig:timer|The timer bar during a stage]]
+<ul>
+<li>Start a step from the item pop-up, or from a block (Start Timer). Pick a stage to start from, or a standard sprint (25 + 5 by default).</li>
+<li>Stages up to 90 minutes each. After each stage comes a break: 5 minutes under 45 minutes of work, 10 minutes for 45 to 89, 15 minutes for 90. After 3 hours of staged work you get a 30-minute long break. All of these are in Settings > Advanced > Timer.</li>
+<li>Buttons: Pause, Finish Stage Now, Stop (logs the time so far), Skip Break, Start Next Stage. <span class="k">Space</span> pauses, <span class="k">Shift+T</span> stops.</li>
+<li>Each finished stage is logged as a session. The timer survives closing the app or a reload.</li>
+<li>Still Working?: after 30 minutes with no taps, the timer asks. Yes, Keep Going, or No, Remove Idle Time (logs up to your last activity).</li>
+<li>Sounds: a built-in chime, or your own .mp3 or .wav up to 1 MB for Stage End, Break End and Still Working?.</li>
+<li>Calendar Alerts (per device): stage-end and break-end events go into a "Project Tracker Timer" calendar, so Google Calendar alerts you even with Procreate full screen. Needs the Google Calendar app with notifications on.</li>
+<li>Time Log (on each step) fixes a session's date, start and length, or deletes it. + Add Time adds work you did without the timer.</li>
+</ul>`},
+{id:"m4",h:"4. Notes and Attachments",html:`
+[[fig:notes|Phase notes with attachments]]
+<h4>Notes</h4>
+<ul>
+<li>Projects and phases have a Notes button; items have a Notes box inside the item pop-up. Notes save as you type, and links you type show up as tappable links underneath.</li>
+</ul>
+<h4>Adding Files</h4>
+<ul>
+<li>+ Add Files: any file up to 15 MB. It's saved in Google Drive > Project Tracker Files, in a folder named after the project. The original on your device is never changed.</li>
+<li>+ From Drive: files already in your Drive. Paste a Drive link, open your Project Tracker Files folders, or search your whole Drive by name, then tick files and tap Add. Nothing is copied or uploaded.</li>
+<li>+ Add Link: web pages, or big files in Dropbox, Drive or Proton Drive. Drive file links become normal Drive cards automatically.</li>
+<li>Offline, a new file waits on the device ("Waiting to Upload") and goes to Drive when you're back online.</li>
+</ul>
+<h4>Opening Files</h4>
+<ul>
+<li>JPG, PNG and PDF open in the tracker's viewer: pinch or + and − to zoom (double-click on a laptop), swipe sideways or use the arrow keys for the next file, swipe down or Close to go back.</li>
+<li>Other files (PSD, Procreate, AI and so on) and Dropbox or Proton links: the first time, the tracker asks how to open that type on this device: Open in App (Google Drive app), Open in Browser, Download or Copy Link. Keep Remember ticked and that type opens straight away next time. Change it in Settings > Advanced > Data > Link and File Actions.</li>
+<li>Web pages (ArtStation, Pinterest and so on) always open in the browser.</li>
+</ul>
+<h4>The ⋯ Menu: Move, Copy, Download, Remove</h4>
+[[fig:menu|The ⋯ menu and the Copy To list]]
+<ul>
+<li>Move To…: moves the card to Project Notes, another phase's notes or any item in the same project.</li>
+<li>Copy To…: adds a second card for the same Drive file somewhere else. Both cards show 2x next to the file size. Nothing is duplicated in Drive or on your device.</li>
+<li>Download: Drive files up to 50 MB save to Downloads on a laptop or Android; on iPad the share sheet opens (Save to Files, or send to Photoshop or Procreate). With an offline copy it works without internet. Dropbox links start Dropbox's direct download. Proton Drive links can only be opened.</li>
+<li>Copy Link copies the file's link.</li>
+<li>Remove (tap twice): if the file is in another place too, only this card goes. If it was the last card for a file the tracker uploaded, the file moves to the Drive trash a few seconds later (Undo first if it was a mistake). Files you added with From Drive always stay in Drive.</li>
+<li>Deleting an item, phase or project moves the files the tracker uploaded for it to the Drive trash. Drive keeps trashed files for 30 days.</li>
+</ul>
+<h4>Order</h4>
+<ul>
+<li>Hold a card and drag it (on a laptop, just drag). Sort puts them in order by Name, Newest First or Oldest First; you can drag afterward.</li>
+<li>The viewer's arrows and the Client Report thumbnails follow this order.</li>
+</ul>
+<h4>Offline Copies</h4>
+<ul>
+<li>Keep All Attachments Offline (Settings > Advanced > Data, per device, on by default) saves a copy of every attached Drive file on that device. The same spot shows the space used and has Clear Offline Copies. Links aren't downloaded.</li>
+</ul>`},
+{id:"m5",h:"5. Colors",html:`
+[[fig:colors|Edit Phase Colors]]
+<ul>
+<li>Phase Colors (Settings > General, or Edit Colors in a phase): 12 colors, each with a Light Theme and a Dark Theme version. Pick a swatch, then adjust Hue, Saturation and Value or type a hex code. Drag the ≡ handle to reorder; phases keep their colors when you do. Save as Default makes Reset to Defaults return to your set.</li>
+<li>Life Block Colors work the same way for life blocks and your Daily Routine.</li>
+<li>Pick a phase's color in Edit Phase, or from a Project Work block (it recolors the whole phase).</li>
+<li>Appearance (Settings > Advanced): page, calendar, review and board backgrounds and cards, each for Light and Dark. Text on a light background switches automatically so it stays readable. Default resets one color.</li>
+<li>Budget Meter colors: Hours Used, Hours Left, Warning Bar, Over Budget and Warning Text. Warning Colors and Over Budget Colors can be switched off so everything stays teal.</li>
+<li>Board: Phase Colors on Phase Bars and Phase Colors on Items. Off, they're teal.</li>
+<li>Light/Dark in the top bar switches the theme on this device.</li>
+</ul>`},
+{id:"m6",h:"6. Value, Rates, Rounds and Deadlines",html:`
+[[fig:pricing|Edit Project: type, client and pricing]]
+<h4>Rates</h4>
+<ul>
+<li>Settings > General > Rates and Value: Default Hourly Rate ($150), Hours per Day for day rates (6), Rate Floor, Feedback Rounds Included per Phase (1), and MXN per 1 USD with Show MXN Next to USD.</li>
+<li>Edit Project > Pricing: Hourly, Day Rate, Fixed Fee per Phase or Fixed Project Fee, with this project's own rate or fee. Edit Phase can set a different rate for one phase, or holds the phase fee.</li>
+<li>Bill Hours Past the Budget (hourly and day rate): off by default, so hours over budget earn nothing and the effective rate drops.</li>
+</ul>
+<h4>What the Numbers Mean</h4>
+<ul>
+<li>Estimated Value: budget hours times the rate, or the fee. A project fee is split across phases by budget hours.</li>
+<li>Earned So Far: billable hours times the rate, or the fee times how much of the phase is done (Approved and Done items, weighted by their estimates).</li>
+<li>Effective Rate: what you actually earn per hour logged. For fixed fees, On Pace For shows the hourly rate you'll end at if the rest goes like it has so far.</li>
+<li>Internal and Pitch projects show Shadow Value and Worth So Far: what the work is worth at your rate.</li>
+<li>With a Rate Floor set, Client projects below it show an amber Below Your Floor chip.</li>
+</ul>
+<h4>Feedback Rounds</h4>
+<ul>
+<li>Open a phase and tap Feedback Rounds to log a round with its date and a note. When you set an item to Feedback Received, the tracker offers to log the round for you.</li>
+<li>Past the included rounds, the phase shows Over Scope · Round 2 of 1. Set the number per project in Edit Project; 0 counts rounds without a limit.</li>
+</ul>
+<h4>Deadline Forecast</h4>
+<ul>
+<li>With a due date, the Board shows hours left (the larger of budget or estimate, minus what's logged, for phases not finished), the projected finish based on your last 14 days of logged time on this project, and Running Late with the daily hours you'd need.</li>
+</ul>
+<h4>Client Report</h4>
+[[fig:creport|Client Report options]]
+<ul>
+<li>On the Board or in Projects: a clean PDF with phases, item status, progress, revision rounds and image thumbnails. Hours, Rates and Value, and Private Notes stay out unless you tick them. Pick the phases to include, then Create PDF.</li>
+<li>A file shared in several places appears once.</li>
+</ul>`},
+{id:"m7",h:"7. Exports and Backups",html:`
+<ul>
+<li>Excel Report (Projects > Export Report): Summary by phase (budget, estimated, actual, value, earned, effective rate, rounds), Items + Steps, and an optional Session Log.</li>
+<li>Reviews: PDF of one review, or Excel of a date range (Review > Export).</li>
+<li>Client Report: PDF (chapter 6).</li>
+<li>Export Everything (Settings > Advanced > Data): one backup file of all your data. Import Backup restores it, with Undo. The Sunday banner offers the same.</li>
+<li>Backups hold your data, not attachment files. Those live in Google Drive, which keeps them safe on its own.</li>
+<li>Download (Projects) saves one project with its logged time; Load from File brings it back as a copy.</li>
+</ul>`},
+{id:"m8",h:"8. Keyboard Shortcuts",html:`
+<ul>
+<li><span class="k">1</span>–<span class="k">5</span> pages · <span class="k">←</span> <span class="k">→</span> previous and next week, month or day · <span class="k">T</span> this week, month or today · <span class="k">N</span> new block</li>
+<li><span class="k">Space</span> pause or resume the timer · <span class="k">Shift+T</span> stop · <span class="k">Cmd/Ctrl+Z</span> undo · <span class="k">P</span> Projects · <span class="k">Cmd/Ctrl+,</span> Settings · <span class="k">Shift+D</span> theme · <span class="k">Shift+S</span> sync · <span class="k">?</span> list of shortcuts</li>
+<li>In pop-ups: <span class="k">Enter</span> confirms (in writing boxes, <span class="k">Cmd/Ctrl+Enter</span>), <span class="k">Backspace</span> twice deletes, <span class="k">Esc</span> closes. <span class="k">Shift+Enter</span> adds a phase on the Board. Shift+click a phase opens or closes all.</li>
+<li>Change any of them in Settings > Advanced > Keyboard Shortcuts. ✕ clears a shortcut to Empty. Extra actions (open this week's review, project notes, backup and so on) start Empty.</li>
+</ul>`},
+{id:"m9",h:"9. Using It Offline",html:`
+<p>The tracker opens, saves and runs the timer without internet. Changes wait on the device (the chip shows X Waiting) and sync when you're back online. When traveling where Google is blocked, that means when your VPN is on.</p>
+<h4>Before You Travel</h4>
+<ul>
+<li>Open the installed tracker on every device while online, so the latest version is stored.</li>
+<li>Export one Excel report and open one PDF attachment on each device. That stores the Excel tool and the PDF viewer for offline use.</li>
+<li>Leave Keep All Attachments Offline on and let the copies download. Settings > Advanced > Data shows how many files are saved.</li>
+<li>Upload big files before you go.</li>
+</ul>
+<h4>While Offline</h4>
+<ul>
+<li>Files you attach wait on the device and upload later. Files with offline copies open and download as normal.</li>
+<li>Calendar Alerts need internet when you start a stage. Once the events reach the device, the alerts ring offline.</li>
+<li>If you edit the same project on two devices while both are offline, the last one to sync wins for that project. Logged sessions never overwrite each other.</li>
+</ul>`},
+{id:"m10",h:"10. Troubleshooting",html:`
+<ul>
+<li>"Sorry, unable to open the file at this time" (Google): you're signed into more than one Google account. Use an Incognito window with only the Sheet's account.</li>
+<li>"Couldn't reach that URL": the web app URL must end in /exec, and the deployment's access must be Anyone.</li>
+<li>"That key doesn't match": run setupKey in Apps Script and copy the key again.</li>
+<li>"Update your Google Sheet script first": paste the newest Code.gs, run the setup it names, then Deploy > Manage deployments > New version.</li>
+<li>"Google Drive access isn't allowed yet": in Apps Script, run setupDrive and approve it.</li>
+<li>A device doesn't show a new feature: compare the Version in Settings on each device. Close the app fully and open it again while online.</li>
+<li>A Drive or Dropbox file opens a blank page on iPad: choose Open in App or Copy Link for that type (Settings > Advanced > Data > Link and File Actions).</li>
+<li>"Too Big to Download Here": Drive files over 50 MB open in the Google Drive app instead.</li>
+<li>A file stays "Waiting to Upload": go online (VPN), then tap the sync chip.</li>
+<li>Stuck pop-up or viewer: <span class="k">Esc</span>, the Close button, or the back gesture closes it.</li>
+</ul>`},
+{id:"m11",h:"11. Advanced Settings",html:`
+[[fig:adv|Settings > Advanced]]
+<h4>Branding</h4>
+<ul><li>App Name (header, browser tab, file names) and Home Screen Name (up to 12 characters). Upload Logo (SVG, PNG or JPG), Reset to Default, and Accent Color on SVG Logos.</li>
+<li>Export Icon Files makes a zip with new home-screen icons and the name, using the icon colors you pick. Follow the instructions inside it to put them on GitHub.</li></ul>
+<h4>Appearance</h4><ul><li>Background and card colors for Light and Dark, and Text Size (Small, Medium, Large).</li></ul>
+<h4>Budget Meter</h4><ul><li>Budget colors, Warning Threshold (70% to 90%), Warning Colors, Over Budget Colors, Show Percentages, Week View Warnings and Budget Alerts on Review Pages.</li></ul>
+<h4>Board</h4><ul><li>Phase Colors on Phase Bars, Phase Colors on Items, Include Bonus Hours in Project Totals, Linked Character Names.</li></ul>
+<h4>Flags</h4><ul><li>Rate Floor Warning, Revisions Over Scope, Deadline Running Late, Missing Decision-Maker. Each switches its amber chip on or off.</li></ul>
+<h4>Calendar</h4><ul><li>Week Starts On, Day Starts, Day Ends, and the 12-Hour or 24-Hour Clock.</li></ul>
+<h4>Timer</h4><ul><li>Sprint presets (up to 5), break rules, Timer Sound and Volume, your own sounds, Timer Notifications, Calendar Alerts (This Device), and the Still Working? prompt with its minutes.</li></ul>
+<h4>Data</h4><ul><li>Export Everything, Import Backup, Sunday Backup Reminder.</li>
+<li>Attachments (This Device): Keep All Attachments Offline, space used, Clear Offline Copies.</li>
+<li>Link and File Actions (This Device): what each file type or link does when tapped. Reset makes it ask again.</li>
+<li>Check Google Drive Access, Clear All Data (projects, sessions, plans, notes and reviews; settings and templates stay; Undo for a few seconds).</li>
+<li>Google Sheet: Copy Connection Link (for another device; treat it like a password), Show Link, Sync Now and Disconnect.</li></ul>
+<h4>Keyboard Shortcuts</h4><ul><li>The button at the bottom left of the Advanced tab (chapter 8).</li></ul>`}
+]};
+
+function guideModal(tab="quick",back){
+  const clean=h=>h.replace(/\[\[fig:[^\]]*\]\]/g,"");
+  const body=()=>tab==="quick"?GUIDE.quick.map(x=>`<section id="g-${x.id}"><h3>${x.h}</h3>${clean(x.html)}</section>`).join("")
+    :`<div class="toc">${GUIDE.manual.map(x=>`<button data-gto="${x.id}">${x.h}</button>`).join("")}</div>`+GUIDE.manual.map(x=>`<section id="g-${x.id}"><h3>${x.h}</h3>${clean(x.html)}</section>`).join("");
+  modal(`<div class="row"><h2 class="grow">Guide</h2><span class="ver">Version ${APP_VERSION}</span></div>
+    <div class="seg-ctl"><button data-gt="quick" aria-pressed="${tab==="quick"}">Quick Start</button><button data-gt="manual" aria-pressed="${tab==="manual"}">User's Manual</button></div>
+    <div class="guide" id="g-body">${body()}</div>
+    <div class="m-actions">${back?`<button class="btn" id="g-back">Back to Settings</button>`:""}<button class="btn primary" data-close>Close</button></div>`,root=>{
+    root.querySelectorAll("[data-gt]").forEach(b=>b.onclick=()=>guideModal(b.dataset.gt,back));
+    root.querySelectorAll("[data-gto]").forEach(b=>b.onclick=()=>{const e=root.querySelector("#g-"+b.dataset.gto);if(e)e.scrollIntoView({block:"start",behavior:"smooth"})});
+    const bk=root.querySelector("#g-back");if(bk)bk.onclick=back;
+  },"wide");
 }
 
 /* ===================== modal + toast ===================== */
 const effTheme=()=>S.ui.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
 function restoreTheme(){if(S.ui.theme)document.documentElement.setAttribute("data-theme",S.ui.theme);else document.documentElement.removeAttribute("data-theme")}
-function closeModal(){document.getElementById("modal-root").innerHTML="";restoreTheme();applyPalette();applyAdv();Sync.afterModal()}
+function closeModal(){document.getElementById("modal-root").innerHTML="";document.getElementById("ov2")?.remove();restoreTheme();applyPalette();applyAdv();Sync.afterModal()}
 /* Back (Android swipe, mouse back button, Alt+Left, Cmd+[) closes a pop-up instead of leaving the app */
 let histArmed=false;
-addEventListener("popstate",()=>{if(vwPop){vwPop=false;return}if(VW){closeViewer(true);return}histArmed=false;if(document.getElementById("ov"))closeModal()});
+addEventListener("popstate",()=>{if(vwPop){vwPop=false;return}if(VW){closeViewer(true);return}document.getElementById("ov2")?.remove();histArmed=false;if(document.getElementById("ov"))closeModal()});
 function grow(t){if(!t||(!t.offsetParent&&!t.offsetHeight))return;t.style.height="auto";t.style.height=(t.scrollHeight+2)+"px"}
 document.addEventListener("input",e=>{if(e.target.matches&&e.target.matches("textarea.inp"))grow(e.target)});
 const growAll=root=>requestAnimationFrame(()=>(root||document).querySelectorAll("textarea.inp").forEach(grow));
@@ -2738,6 +3253,7 @@ document.addEventListener("click",e=>{
 document.addEventListener("keydown",e=>{
   if(kbRecording||e.isComposing)return;
   const st=S.settings,t=e.target,ov=document.getElementById("ov"),mod=IS_APPLE?e.metaKey:e.ctrlKey;
+  if(document.getElementById("ov2")){if((e.key==="Backspace"||e.key==="Delete")&&!isField(t))e.preventDefault();return}
   if(ov){
     if(e.key==="Escape"||(e.altKey&&e.key==="ArrowLeft")||(e.metaKey&&e.key==="[")){e.preventDefault();return closeModal()}
     if(e.key==="Enter"&&st.kbEnter&&!e.defaultPrevented&&!e.shiftKey&&!e.altKey){
