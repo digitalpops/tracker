@@ -446,6 +446,60 @@ details.sec[open]{padding-bottom:12px}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13px;z-index:50;max-width:calc(100% - 32px)}
 body.timing .toast{bottom:calc(130px + env(safe-area-inset-bottom,0px))}
 @media (prefers-reduced-motion:no-preference){.btn,.segbar,.blk,.vblk{transition:background .15s,border-color .15s}}
+
+/* round 6: branding, value, flags, attachments, viewer */
+.brand img{height:30px;width:auto;max-width:120px;object-fit:contain;flex:none}
+.brand svg.tint *:not([fill="none"]){fill:var(--accent)!important}
+.brand svg.tint [stroke]:not([stroke="none"]){stroke:var(--accent)!important}
+.pc.plain,.pct-p{color:var(--ink);font-weight:800}
+.chip.flag{background:color-mix(in srgb,var(--amber) 16%,var(--surface));color:var(--amber);border:1px solid color-mix(in srgb,var(--amber) 45%,transparent)}
+.chip.neutral{background:var(--stat);color:var(--ink)}
+.chip.type{background:var(--stat);color:var(--muted);font-weight:700;letter-spacing:.02em}
+.val{display:flex;flex-wrap:wrap;align-items:center;gap:2px 6px}
+.val .low,.val .low b{color:var(--amber)}
+.mx{color:var(--faint);font-weight:600;font-size:.92em}
+.fc{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
+.ph-name .chip{margin-left:4px}
+.rnd{display:grid;gap:6px}
+.rnd-i{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:start;background:var(--stat);border-radius:9px;padding:8px 10px}
+.rnd-i b{font-size:13px}
+.rnd-i .sub{white-space:pre-wrap}
+.att-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px}
+.att{position:relative;min-width:0}
+.att-open{display:grid;gap:3px;width:100%;border:1px solid var(--line2);background:var(--btn);border-radius:10px;padding:6px;text-align:left;color:var(--ink)}
+.att-open:hover{border-color:var(--accent)}
+.att .th{position:relative;display:grid;place-items:center;height:78px;border-radius:7px;background:var(--stat);overflow:hidden}
+.att .th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.att .bdg{position:relative;z-index:1;font-size:10px;font-weight:800;letter-spacing:.04em;color:#fff;background:var(--bc);padding:3px 7px;border-radius:5px;max-width:92%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.att .th img+.bdg,.att .th.has .bdg{position:absolute;left:5px;bottom:5px;font-size:9px;padding:2px 5px}
+.att .nm{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.att .sz{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.att.pending .att-open{border-style:dashed}
+.att.pending .sz{color:var(--amber);font-weight:700}
+.att-x{position:absolute;top:2px;right:2px;z-index:2;min-width:24px;height:24px;border-radius:12px;border:1px solid var(--line2);background:var(--surface);color:var(--muted);font-size:11px;font-weight:700;padding:0 6px;line-height:1}
+.att-x.armed{background:var(--over);border-color:var(--over);color:#fff}
+.att-wrap{display:grid;gap:8px}
+.brand-prev{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:var(--bg);border:1px solid var(--line);min-width:0}
+.brand-prev svg{height:30px;width:auto;fill:var(--accent);flex:none}
+.brand-prev b{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.inl input[type="color"]{width:44px;height:30px;border:1px solid var(--line2);border-radius:7px;padding:2px;background:var(--field)}
+#viewer-root .vw{position:fixed;inset:0;z-index:60;background:rgba(8,10,16,.97);display:grid;grid-template-rows:auto 1fr;color:#E9ECF2}
+.vw-top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px}
+.vw-t{margin-right:auto;min-width:0;display:grid}
+.vw-t b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vw-t span{font-size:12px;color:#A5ADC0}
+.vw .btn{background:#2E394E;border-color:#3A4763;color:#E9ECF2}
+.vw-stage{position:relative;overflow:auto;touch-action:pan-x pan-y;overscroll-behavior:contain;cursor:grab}
+.vw-stage.dragging{cursor:grabbing}
+.vw-in{min-width:100%;min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:12px;box-sizing:border-box;width:max-content}
+.vw-in img{display:block;user-select:none;-webkit-user-drag:none;max-width:none}
+.vw-in canvas{display:block;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.4)}
+.vw-msg{color:#CDD2DD;text-align:center;padding:30px;max-width:420px}
+.vw-nav{position:fixed;top:50%;transform:translateY(-50%);z-index:61;width:44px;height:64px;border-radius:10px;border:1px solid #3A4763;background:rgba(46,57,78,.85);color:#fff;font-size:24px}
+.vw-nav.prev{left:10px}.vw-nav.next{right:10px}
+.pr .thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:6px 0 10px}.pr .thumbs figure{margin:0}.pr .thumbs img{width:100%;height:120px;object-fit:cover;border:1px solid #ccc;border-radius:4px}.pr .thumbs figcaption{font-size:10.5px;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crx label.check{font-size:13.5px;font-weight:500;color:var(--ink);letter-spacing:0}
+.pr .meta{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12.5px;margin-top:6px}.pr .ph{break-inside:avoid-page}.pr .note{white-space:pre-wrap;font-size:12.5px;color:#333;border-left:3px solid #ccc;padding-left:8px;margin:4px 0}
 @media (max-width:560px){.brand b{font-size:15px}.brand .tag{display:none}.two,.three{grid-template-columns:1fr}.hrow{grid-template-columns:110px 1fr 86px}}
 </style>
 
@@ -474,6 +528,7 @@ body.timing .toast{bottom:calc(130px + env(safe-area-inset-bottom,0px))}
 <div id="timer-root"></div>
 <div id="modal-root"></div>
 <div id="print-root"></div>
+<div id="viewer-root"></div>
 <input type="file" id="upload" accept="application/json,.json" hidden>
 <input type="file" id="upload-bk" accept="application/json,.json" hidden>
 
@@ -495,7 +550,7 @@ const uid=()=>Math.random().toString(36).slice(2,10);
 const fmtHM=m=>{m=Math.round(m);if(m<60)return m+"m";const h=Math.floor(m/60),r=m%60;return r?`${h}h ${r}m`:`${h}h`};
 const fmtH=m=>{const v=Math.round(m/6)/10;return (Number.isInteger(v)?v:v.toFixed(1))+"h"};
 const fmtN=m=>{const v=Math.round(m/6)/10;return String(Number.isInteger(v)?v:v.toFixed(1))};
-const AE=(a,e,f=fmtHM,ov=false)=>`<span class="num"><span class="a ${ov&&a>e?"over":""}">${f(a)}</span> / <span class="e">${f(e)}</span></span>`;
+const AE=(a,e,f=fmtHM,ov=false)=>`<span class="num"><span class="a ${ov&&a>e&&OC()?"over":""}">${f(a)}</span> / <span class="e">${f(e)}</span></span>`;
 const c24=()=>typeof S!=="undefined"&&S&&S.settings&&S.settings.clock24;
 const clock=min=>{min=Math.round(min);let h=Math.floor(min/60),m=min%60;if(c24())return `${h}:${pad(m)}`;const ap=h<12||h===24?"am":"pm";h=h%12||12;return m?`${h}:${pad(m)}${ap}`:`${h}${ap}`};
 const hourLbl=(H,suf)=>c24()?String(H):(H%12||12)+(suf?(H<12||H===24?"am":"pm"):"");
@@ -509,8 +564,16 @@ function applyPalette(pal,lpal){pal=pal||S.settings.palette||PAL_DEF;lpal=lpal||
 const LIFE=["lf1","lf2","lf3","lf4","lf5","lf6","lf7","lf8","lf9","lf10","lf11","lf12"];
 const LPAL_DEF={light:["#CEFBD0","#D5ECC2","#FAF6B7","#F2E3B3","#EDE6D8","#F7D9C4","#F9CDD8","#E6D7F5","#D7DEE8","#C9E4F0","#DCE6E8","#BEF5FC"],dark:["#587A62","#4E6B3A","#7A7851","#7A6A35","#5A5242","#8A5E45","#7A4656","#5E4E7A","#46536A","#3E6A7E","#3D4B55","#3D6C8F"]};
 const LIFE_ORDER=[1,7,2,11,10,5,8,6,12,9,4,3]; /* October 2026 reorder: new slot k shows old slot LIFE_ORDER[k-1] */
-const STATUSES=[["Not Started","--faint"],["In Progress","--accent"],["Submitted","--amber"],["Feedback Received","--p7"],["Revising","--act"],["Done","--ok"]];
+const STATUSES=[["Not Started","--faint"],["In Progress","--accent"],["Submitted","--amber"],["Feedback Received","--p7"],["Revising","--act"],["Approved","--p3"],["Done","--ok"]];
 const SC=Object.fromEntries(STATUSES);
+const isDone=it=>it.status==="Done"||it.status==="Approved";
+const DEF_NAME="Blue Blaze Project Tracker";
+const appName=()=>((typeof S!=="undefined"&&S&&S.settings&&S.settings.brandName)||"").trim()||DEF_NAME;
+const shortName=()=>{const st=(typeof S!=="undefined"&&S&&S.settings)||{};return (st.brandShort||"").trim()||((st.brandName||"").trim()?st.brandName.trim().slice(0,12):"Project Tracker")};
+const numv=v=>{const n=Number(v);return v===""||v==null||!isFinite(n)||n<=0?null:n};
+const money=(v,cur)=>v==null||!isFinite(v)?"—":(cur==="MXN"?"MX$":"$")+Math.round(v).toLocaleString("en-US");
+const moneyX=v=>money(v)+(S.settings.showMXN&&S.settings.mxn>0&&v!=null&&isFinite(v)?` <span class="mx">${money(v*S.settings.mxn,"MXN")}</span>`:"");
+const daysBetween=(a,b)=>Math.round((parse(b)-parse(a))/86400000);
 
 /* ===================== keyboard shortcuts ===================== */
 const IS_APPLE=/Mac|iPhone|iPad|iPod/.test(navigator.platform||"")||/Macintosh/.test(navigator.userAgent);
@@ -535,6 +598,8 @@ const isField=t=>t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tag
 
 /* ===================== advanced settings ===================== */
 const ADV_DEF={kbEnter:true,kbDelete:true,kbShiftEnter:true,kbShiftClick:true,notify:false,linkNames:true,weekStart:0,clock24:false,warnAt:80,showPct:true,weekWarn:true,reviewAlerts:true,itemPhaseColors:true,phaseBarColors:false,includeBonus:false,textSize:"m",
+  warnColors:true,overColors:true,flagRate:true,flagScope:true,flagLate:true,flagDM:true,showValue:true,rate:150,hpd:6,rateFloor:0,mxn:0,showMXN:false,roundsIncl:1,
+  brandName:"",brandShort:"",brandTint:true,iconBg:"#19212F",iconFg:"#38B2C3",
   sound:true,volume:70,idlePrompt:true,idleMin:30,sprints:[{w:25,b:5},{w:30,b:5}],breaks:{short:5,mid:10,long:15,afterMin:180,longMin:30},colors:{}};
 const CKEYS=[
   {k:"page",l:"Page Background",sub:"Behind Month, Week, Day and Review. The Board has its own.",v:"--bg",d:["#D7D7DB","#19212F"],bg:1,grp:"ap"},
@@ -570,7 +635,7 @@ function applyAdv(st){st=st||S.settings;
     if(all)css+=`${mq}{${all}}}${at}{${all}}`;
     if(mm)css+=`${mq} body.pg-board{${mm}}}${at} body.pg-board{${mm}}`});
   let el=document.getElementById("adv");if(!el){el=document.createElement("style");el.id="adv";document.body.appendChild(el)}el.textContent=css}
-function ensureSettings(){const d=JSON.parse(JSON.stringify(ADV_DEF));for(const k in d)if(S.settings[k]===undefined)S.settings[k]=d[k];S.itemTemplates=S.itemTemplates||{};S.sounds=S.sounds||{};S.settings.keys={...KEY_DEF,...(S.settings.keys||{})};S.phaseTemplates=S.phaseTemplates||{}}
+function ensureSettings(){const d=JSON.parse(JSON.stringify(ADV_DEF));for(const k in d)if(S.settings[k]===undefined)S.settings[k]=d[k];S.itemTemplates=S.itemTemplates||{};S.sounds=S.sounds||{};S.settings.keys={...KEY_DEF,...(S.settings.keys||{})};S.phaseTemplates=S.phaseTemplates||{};S.brand=S.brand||{}}
 
 /* ===================== color slot moves ===================== */
 /* Blocks and phases remember a color by slot (p1…p12, lf1…lf12). When colors move to new slots,
@@ -602,7 +667,7 @@ function chapterTemplate(){
   const brief=it("Character Brief","Brief",[st("Character Brief",120),st("Keywords + References",180)],["Pitch","Type of game","Base source material","Where it's located","Time period","Protagonist vs antagonists, factions, civilizations","Compatibility with target studios","Why this is fun","Design-heavy twists + design problems to solve","Keywords: fundamentals, personality, function / gameplay","Keywords: cultural influence, 3 archetypes, signature element, story anecdote","1–3 image references per keyword"]);
   const broad=[];["A","B","C"].forEach(g=>[1,2,3,4].forEach(n=>broad.push(it(g+n,"Archetype "+g,std()))));
   broad.push(it("Sidekick","Sidekick",[sketch(),st("Revisions",40,[["Corrections",40]]),st("Micro-Revisions",20,[["Micro-Corrections",20]])]));
-  return{name:"Anáuac",subtitle:"Portfolio Chapter 02 · Notable Characters",phases:[ph("Brainstorm + References",5,"p1",[brief]),ph("Broad Exploration",50,"p2",broad),ph("Refined Designs",25,"p3"),ph("Callout + Production Pages",30,"p4"),ph("Gameplay Pages",30,"p5"),ph("Mock-Up Screenshot",20,"p6"),ph("Lineup Page + Rendering",45,"p7"),ph("Paging + Presentation",5,"p8"),ph("Bonus: Skins + Costumes",20,"p9",[],true)]};
+  return{name:"Anáuac",subtitle:"Portfolio Chapter 02 · Notable Characters",type:"Internal",phases:[ph("Brainstorm + References",5,"p1",[brief]),ph("Broad Exploration",50,"p2",broad),ph("Refined Designs",25,"p3"),ph("Callout + Production Pages",30,"p4"),ph("Gameplay Pages",30,"p5"),ph("Mock-Up Screenshot",20,"p6"),ph("Lineup Page + Rendering",45,"p7"),ph("Paging + Presentation",5,"p8"),ph("Bonus: Skins + Costumes",20,"p9",[],true)]};
 }
 function defaultSettings(){return{...JSON.parse(JSON.stringify(ADV_DEF)),dayStart:5,dayEnd:22,target:6,days:6,sprint:25,backupReminder:true,palette:JSON.parse(JSON.stringify(PAL_DEF)),lifePalette:JSON.parse(JSON.stringify(LPAL_DEF)),
   routine:{wk:[{id:uid(),life:"Morning Routine",color:"lf1",start:300,dur:90},{id:uid(),life:"Walk + Read",color:"lf3",start:420,dur:60},{id:uid(),life:"Lunch",color:"lf12",start:720,dur:60},{id:uid(),life:"Dinner",color:"lf12",start:1080,dur:60}],
@@ -612,14 +677,14 @@ function seed(){
   const tdata=chapterTemplate();
   const P=fromStructure(tdata,"Anáuac");
   const st={projects:[P],templates:[{id:"tpl1",name:"Stylized Character · Notable Characters",note:"3 archetypes × 4 variations + Sidekick, 210h + 20h bonus",archived:false,data:tdata}],
-    sessions:[],plans:[],settings:defaultSettings(),routineSkip:{},notes:{},weekly:{},weekMeta:{},monthly:{},itemTemplates:{},phaseTemplates:{},sounds:{}};
+    sessions:[],plans:[],settings:defaultSettings(),routineSkip:{},notes:{},weekly:{},weekMeta:{},monthly:{},itemTemplates:{},phaseTemplates:{},sounds:{},brand:{}};
   st.ui=defaultUI(st);if(P.phases[1])st.ui.open[P.phases[1].id]=true;return st;
 }
 
 /* ===================== state ===================== */
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
 const K_CONN="bbst-conn",K_CACHE="bbst-cache",K_SNAP="bbst-snap",K_OUT="bbst-outbox",K_UI="bbst-ui",K_T="bbst-timer";
-const COLS=["projects","templates","sessions","plans","kv"],KVP={note:"notes",weekly:"weekly",wm:"weekMeta",mo:"monthly",itpl:"itemTemplates",ptpl:"phaseTemplates",snd:"sounds"};
+const COLS=["projects","templates","sessions","plans","kv"],KVP={note:"notes",weekly:"weekly",wm:"weekMeta",mo:"monthly",itpl:"itemTemplates",ptpl:"phaseTemplates",snd:"sounds",brand:"brand"};
 function docsOf(st){
   const d={projects:{},templates:{},sessions:{},plans:{},kv:{}};
   st.projects.forEach((p,i)=>d.projects[p.id]={...p,_o:i});
@@ -631,7 +696,7 @@ function docsOf(st){
 }
 function stateFrom(d,ui){
   const ord=o=>Object.values(o||{}).sort((a,b)=>(a._o??0)-(b._o??0)).map(x=>{const y={...x};delete y._o;return y});
-  const st={projects:ord(d.projects),templates:ord(d.templates),sessions:Object.values(d.sessions||{}),plans:Object.values(d.plans||{}),settings:null,routineSkip:{},notes:{},weekly:{},weekMeta:{},itemTemplates:{},phaseTemplates:{},sounds:{},monthly:{}};
+  const st={projects:ord(d.projects),templates:ord(d.templates),sessions:Object.values(d.sessions||{}),plans:Object.values(d.plans||{}),settings:null,routineSkip:{},notes:{},weekly:{},weekMeta:{},itemTemplates:{},phaseTemplates:{},sounds:{},monthly:{},brand:{}};
   Object.entries(d.kv||{}).forEach(([k,v])=>{if(k==="settings")st.settings=v;else if(k==="routineSkip")st.routineSkip=v||{};else{const i=k.indexOf(":"),f=KVP[k.slice(0,i)];if(f)st[f][k.slice(i+1)]=v}});
   if(!st.settings)st.settings=defaultSettings();
   st.ui=ui||defaultUI(st);return st;
@@ -643,7 +708,8 @@ const strs=d=>{const m={};COLS.forEach(c=>Object.keys(d[c]||{}).forEach(id=>{con
 const lean=d=>{const o={...d,kv:{}};Object.keys(d.kv||{}).forEach(k=>{if(!k.startsWith("snd:"))o.kv[k]=d.kv[k]});return o};
 const IDB=(()=>{let p;const db=()=>p=p||new Promise((res,rej)=>{try{const r=indexedDB.open("bbst",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}catch(e){rej(e)}});
   return{get:k=>db().then(d=>new Promise(res=>{const q=d.transaction("kv").objectStore("kv").get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>res(undefined)})).catch(()=>undefined),
-    set:(k,v)=>db().then(d=>new Promise(res=>{const tx=d.transaction("kv","readwrite");tx.objectStore("kv").put(v,k);tx.oncomplete=()=>res();tx.onerror=()=>res()})).catch(()=>{})}})();
+    set:(k,v)=>db().then(d=>new Promise(res=>{const tx=d.transaction("kv","readwrite");tx.objectStore("kv").put(v,k);tx.oncomplete=()=>res();tx.onerror=()=>res()})).catch(()=>{}),
+    del:k=>db().then(d=>new Promise(res=>{const tx=d.transaction("kv","readwrite");tx.objectStore("kv").delete(k);tx.oncomplete=()=>res();tx.onerror=()=>res()})).catch(()=>{})}})();
 const sndRemoved=new Set();let lastSndSig=null,sndReady=false;
 let S=(()=>{const c=LS.get(K_CACHE,null);return c?stateFrom(c,null):seed()})();
 S.ui={...defaultUI(S),...S.ui,...(LS.get(K_UI,null)||{})};
@@ -717,7 +783,7 @@ const Sync=(()=>{
       LS.set(K_SNAP,snap);offline=false;
     }catch(e){if(e.message==="BAD_KEY"){busy=false;return badKey()}offline=true}
     finally{busy=false;status()}
-    if(!offline&&conn&&!modalOpen())migrateColors();
+    if(!offline&&conn&&!modalOpen())afterSync();
   }
   function badKey(){conn=null;LS.del(K_CONN);status();connectScreen("The saved key no longer matches your Google Sheet. Paste the current connection details.")}
   function decodeLink(text){
@@ -783,7 +849,7 @@ function indexAll(){
   return{idx,act};
 }
 let IX=indexAll();
-function commit(){IX=indexAll();save();render()}
+function commit(){IX=indexAll();save();render();if(typeof refreshAttViews==="function")refreshAttViews()}
 const proj=()=>S.projects.find(p=>p.id===S.ui.project&&!p.archived)||S.projects.find(p=>!p.archived)||S.projects[0];
 const itemStats=it=>{const est=it.steps.reduce((a,s)=>a+s.est,0),act=it.steps.reduce((a,s)=>a+(IX.act[s.id]||0),0);return{est,act}};
 const phaseStats=ph=>{let est=0,act=0;ph.items.forEach(it=>{const s=itemStats(it);est+=s.est;act+=s.act});return{est,act,budget:ph.budget}};
@@ -806,22 +872,87 @@ const blockLabel=b=>{if(b.sched)return b.life;if(b.life)return b.life;const r=IX
 
 /* ===================== bars ===================== */
 const WA=()=>(S.settings.warnAt||80)/100;
+/* Budget color switches (Settings > Advanced > Budget Meter): off = no yellow / no pink, bars stay teal (or the phase color) */
+function WC(){return S.settings.warnColors!==false}
+function OC(){return S.settings.overColors!==false}
 function bar(act,est,budget,h=22,col){
-  const b=Math.max(budget,1),r=act/b,w=WA(),over=Math.max(0,act-b),overW=Math.min(over/b,.22)*100;
-  const base=Math.min(r,w)*100,yel=r>w&&r<=1?(r-w)*100:0;
+  const b=Math.max(budget,1),r=act/b,w=WC()?WA():2,over=Math.max(0,act-b),overW=Math.min(over/b,.22)*100;
+  const base=Math.min(r,w)*100,yel=r>w&&r<=1?(r-w)*100:0,fc=col?"var(--bc)":"var(--act)";
   return `<div class="bar ${col?"tint":""}" style="--h:${h}px;${col?`--bc:var(--${col})`:""}"><div class="track">
-    ${act>b?`<div class="fill full is-over" style="width:100%"></div><div class="overf" style="width:${overW}%"></div>`:
+    ${act>b?(OC()?`<div class="fill full is-over" style="width:100%"></div><div class="overf" style="width:${overW}%"></div>`:`<div class="fill" style="width:100%;background:${fc};border-radius:6px 0 0 6px"></div><div class="overf" style="width:${overW}%;background:${fc}"></div>`):
       `<div class="fill ${r>=1&&!yel?"full":""}" style="width:${base}%;${col?"background:var(--bc)":""}"></div>${yel?`<div class="yel ${r>=1?"end":""}" style="left:${base}%;width:${yel}%"></div>`:""}`}
     ${est?`<div class="est" style="left:calc(${Math.min(est/b,1.2)*100}% - 1px)" title="Estimated ${fmtH(est)}"></div>`:""}
   </div></div>`;
 }
 const pctOf=(a,b)=>Math.round(a/Math.max(b,1)*100);
-const pctTag=(a,b)=>{if(!S.settings.showPct||!b)return"";const r=a/b;return a>b?`<span class="pc over">${pctOf(a,b)}%</span>`:r>=WA()?`<span class="pc warn">${pctOf(a,b)}%</span>`:""};
-const budgetChip=(act,budget)=>{const r=act/Math.max(budget,1);return act>budget&&budget?`<span class="chip over">Over Budget</span>${S.settings.showPct?` <span class="pct-o">${pctOf(act,budget)}%</span>`:""}`:r>=WA()?`<span class="pct-w">${pctOf(act,budget)}% of Budget</span>`:""};
-const numsLine=(b,e,a)=>`<b>${fmtH(b)}</b> Budget · <b>${fmtH(e)}</b> Estimated · <b class="a ${a>b?"over":""}">${fmtH(a)}</b> Actual`;
+const pcSpan=(a,b,title)=>{if(!b)return"";const r=a/b,t=title?` title="${title}"`:"";return a>b?`<span class="pc ${OC()?"over":"plain"}"${t}>${pctOf(a,b)}%</span>`:r>=WA()?`<span class="pc ${WC()?"warn":"plain"}"${t}>${pctOf(a,b)}%</span>`:""};
+const pctTag=(a,b)=>S.settings.showPct?pcSpan(a,b):"";
+const pctCls=over=>over?(OC()?"pct-o":"pct-p"):(WC()?"pct-w":"pct-p");
+const budgetChip=(act,budget)=>{const r=act/Math.max(budget,1);return act>budget&&budget?`<span class="chip ${OC()?"over":"neutral"}">Over Budget</span>${S.settings.showPct?` <span class="${pctCls(1)}">${pctOf(act,budget)}%</span>`:""}`:r>=WA()?`<span class="${pctCls(0)}">${pctOf(act,budget)}% of Budget</span>`:""};
+const numsLine=(b,e,a)=>`<b>${fmtH(b)}</b> Budget · <b>${fmtH(e)}</b> Estimated · <b class="a ${a>b&&OC()?"over":""}">${fmtH(a)}</b> Actual`;
+
+/* ===================== value, rounds, forecast ===================== */
+const HPD=()=>S.settings.hpd||6;
+const ptype=p=>p.type||"Internal";
+const isShadow=p=>ptype(p)!=="Client";
+const counted=ph=>!ph.bonus||S.settings.includeBonus;
+function priceOf(p){const pr=p.pricing||{},rate=numv(pr.rate)||numv(S.settings.rate)||150;return{mode:pr.mode||"hourly",rate,day:numv(pr.dayRate)||rate*HPD(),fee:numv(pr.fee)||0,billOver:!!pr.billOver}}
+function progressOf(ph){
+  if(ph.items.length){let te=0,de=0;ph.items.forEach(it=>{const e=Math.max(itemStats(it).est,1);te+=e;if(isDone(it))de+=e});return te?de/te:0}
+  const s=phaseStats(ph);return Math.min(s.act/Math.max(s.budget,1),1)}
+function phaseFee(p,ph,P){if(P.mode==="phaseFee")return numv(ph.fee)||0;const tot=p.phases.filter(counted).reduce((a,x)=>a+(x.budget||0),0);return counted(ph)&&tot?P.fee*(ph.budget||0)/tot:0}
+function phaseVal(p,ph,P=priceOf(p)){
+  const s=phaseStats(ph),ah=s.act/60,bh=(s.budget||s.est)/60;
+  if(P.mode==="hourly"||P.mode==="day"){const H=P.mode==="day"?(numv(ph.dayRate)||P.day)/HPD():(numv(ph.rate)||P.rate);
+    const bill=P.billOver||!bh?ah:Math.min(ah,bh),earned=bill*H;return{est:bh*H,earned,eff:ah?earned/ah:null,pace:null,rate:H,ah,fee:0}}
+  const fee=phaseFee(p,ph,P),pr=progressOf(ph);
+  return{est:fee,earned:fee*pr,eff:ah&&fee?fee/ah:null,pace:ah&&fee&&pr>0&&pr<1?fee*pr/ah:null,prog:pr,ah,fee}}
+function projectVal(p){const P=priceOf(p);let est=0,earned=0,ah=0;
+  p.phases.filter(counted).forEach(ph=>{const v=phaseVal(p,ph,P);est+=v.est;earned+=v.earned;ah+=v.ah});
+  if(P.mode==="projectFee")est=P.fee;
+  const fee=P.mode==="projectFee"||P.mode==="phaseFee"?est:0,pr=est?earned/est:0;
+  return{P,est,earned,ah,eff:!ah?null:fee?fee/ah:earned/ah,pace:fee&&ah&&pr>0&&pr<1?fee*pr/ah:null}}
+const lowRate=(p,v)=>!isShadow(p)&&S.settings.flagRate!==false&&S.settings.rateFloor>0&&v!=null&&v<S.settings.rateFloor;
+const rateTxt=v=>v==null?"—":money(v)+"/h";
+const MODES=[["hourly","Hourly"],["day","Day Rate"],["phaseFee","Fixed Fee per Phase"],["projectFee","Fixed Project Fee"]];
+function valueLine(p,v,isPhase){
+  if(!S.settings.showValue)return"";const sh=isShadow(p);
+  if(isPhase&&!v.est&&!v.earned&&v.ah===0)return"";
+  const low=x=>lowRate(p,x)?"low":"";
+  const parts=[`${sh?"Shadow Value":"Estimated Value"} <b>${moneyX(v.est)}</b>`];
+  if(isPhase&&!v.ah)return `<span class="nums val">${parts[0]}</span>`;
+  parts.push(`${sh?"Worth So Far":"Earned So Far"} <b>${moneyX(v.earned)}</b>`);
+  if(!sh){parts.push(`<span class="${low(v.eff)}">Effective Rate <b>${rateTxt(v.eff)}</b></span>`);if(v.pace!=null)parts.push(`<span class="${low(v.pace)}">On Pace for <b>${rateTxt(v.pace)}</b></span>`)}
+  return `<span class="nums val">${parts.join(" · ")}${lowRate(p,v.eff)||lowRate(p,v.pace)?` <span class="chip flag">Below Your ${money(S.settings.rateFloor)}/h Floor</span>`:""}</span>`}
+const roundsIncl=p=>{const v=p.roundsIncl;return v===0||v>0?v:(S.settings.roundsIncl??1)};
+const roundsOf=ph=>ph.rounds||[];
+const overScope=(p,ph)=>roundsIncl(p)>0&&roundsOf(ph).length>roundsIncl(p);
+function roundsTxt(p,ph){const n=roundsOf(ph).length,inc=roundsIncl(p);if(!n)return"";
+  if(overScope(p,ph)&&S.settings.flagScope!==false)return ` <span class="chip flag">Over Scope · Round ${n} of ${inc}</span>`;
+  return inc>0?` · Round ${n} of ${inc}`:` · ${n} Feedback Round${n>1?"s":""}`}
+const dmMissing=p=>ptype(p)==="Client"&&!(p.dm||"").trim()&&S.settings.flagDM!==false;
+function forecast(p){
+  let rem=0;p.phases.filter(counted).forEach(ph=>{if(ph.items.length&&ph.items.every(isDone))return;const s=phaseStats(ph);rem+=Math.max(0,Math.max(s.budget,s.est)-s.act)});
+  const ids=new Set();p.phases.forEach(ph=>ph.items.forEach(it=>it.steps.forEach(st=>ids.add(st.id))));
+  const from=iso(addDays(new Date(),-13)),td=TODAY(),pace=S.sessions.filter(x=>ids.has(x.step)&&x.date>=from&&x.date<=td).reduce((a,x)=>a+x.dur,0)/14;
+  const days=rem&&pace?Math.ceil(rem/pace):null,fin=days!=null?iso(addDays(new Date(),days)):null;
+  const late=!!(p.due&&rem&&(fin?fin>p.due:p.due<td)),left=p.due?daysBetween(td,p.due)+1:0;
+  return{rem,pace,fin,late,lateBy:fin&&p.due?daysBetween(p.due,fin):0,need:p.due&&rem&&left>0?rem/left:null}}
+function forecastLine(p){
+  const f=forecast(p);if(!p.due&&!f.rem)return"";
+  const parts=[];if(p.due)parts.push(`Due <b>${short(p.due)}</b>`);
+  if(!f.rem)parts.push("All Phases Done");
+  else{parts.push(`<b>${fmtH(f.rem)}</b> Left`);parts.push(f.fin?`Projected Finish <b>${short(f.fin)}</b> at ${fmtN(f.pace)}h/Day`:"Log Time to See a Projected Finish");
+    if(f.late&&f.need)parts.push(`Needs ${fmtN(f.need)}h/Day to Finish on Time`)}
+  const flag=f.late&&S.settings.flagLate!==false?` <span class="chip flag">Running Late${f.lateBy>0?` · ${f.lateBy} Day${f.lateBy>1?"s":""}`:""}</span>`:"";
+  return `<span class="nums val">${parts.join(" · ")}${flag}</span>`}
+function clientLine(p){const t=ptype(p);
+  return `<div class="fc"><span class="chip type">${t==="Pitch"?"Pitch":t}</span>${p.client?`<span class="sub">Client <b>${esc(p.client)}</b></span>`:""}${p.dm?`<span class="sub">Decision-Maker <b>${esc(p.dm)}</b></span>`:""}${dmMissing(p)?`<span class="chip flag">No Decision-Maker Named</span>`:""}</div>`}
+const hasNotes=o=>!!((o.notes&&o.notes.trim())||(o.files&&o.files.length));
 
 /* ===================== header ===================== */
 function renderHeader(){
+  renderBrand();
   document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.view===S.ui.view));
   document.body.classList.toggle("pg-board",S.ui.view==="board");
   const t=S.settings.target*60,done=S.sessions.filter(s=>s.date===TODAY()).reduce((a,s)=>a+s.dur,0)+(T&&T.kind==="work"?T.elapsed/60000:0);
@@ -835,45 +966,50 @@ function renderHeader(){
 /* ===================== board ===================== */
 function viewBoard(){
   const p=proj();
+  if(!p)return `<section class="panel"><p class="empty">No projects yet. Open Projects to start one.</p><div class="row" style="margin-top:10px"><button class="btn primary" id="btn-lib2" data-openlib="1">Projects</button></div></section>`;
   let tb=0,te=0,ta=0,cb=0,ca=0;
   p.phases.forEach(ph=>{const s=phaseStats(ph);cb+=s.budget;ca+=s.act;if(!ph.bonus||S.settings.includeBonus){tb+=s.budget;te+=s.est;ta+=s.act}});
-  const projOpts=S.projects.filter(x=>!x.archived).map(x=>`<option value="${x.id}" ${x.id===p.id?"selected":""}>${esc(x.name)}</option>`).join("");
+  const live=S.projects.filter(x=>!x.archived);
+  const projOpts=[["Client","Client Projects"],["Internal","Internal Projects"],["Pitch","Pitches"]].map(([t,l])=>{const L=live.filter(x=>ptype(x)===t);return L.length?`<optgroup label="${l}">${L.map(x=>`<option value="${x.id}" ${x.id===p.id?"selected":""}>${esc(x.name)}</option>`).join("")}</optgroup>`:""}).join("");
   return `
   <section class="panel proj-head">
     <div class="row"><div class="grow t"><b>${esc(p.name)}</b><span class="sub">${esc(p.subtitle||"")}</span></div>
       <select class="inp" id="proj-pick" style="width:auto" aria-label="Switch project">${projOpts}</select>
-      <button class="btn" data-notes-proj="${p.id}">Notes${p.notes&&p.notes.trim()?`<i class="ndot"></i>`:""}</button><button class="btn" data-edit-proj="${p.id}">Edit</button><button class="btn" data-act="add-phase">+ Phase</button></div>
+      <button class="btn" data-notes-proj="${p.id}">Notes${hasNotes(p)?`<i class="ndot"></i>`:""}</button><button class="btn" data-edit-proj="${p.id}">Edit</button><button class="btn" data-creport="${p.id}">Client Report</button><button class="btn" data-act="add-phase">+ Phase</button></div>
+    ${clientLine(p)}
     ${bar(ta,te,tb,26)}
     <div class="row"><span class="nums grow">${numsLine(tb,te,ta)} ${budgetChip(ta,tb)}</span>
       ${S.settings.includeBonus?"":`<span class="nums">With Bonus: <b class="a">${fmtH(ca)}</b> of <b>${fmtH(cb)}</b> Ceiling</span>`}</div>
+    ${valueLine(p,projectVal(p))}
+    ${forecastLine(p)}
   </section>
-  <div class="legend"><span><i style="--c:var(--act)"></i>Hours Used</span><span><i style="--c:var(--left)"></i>Hours Left in Budget</span><span><i style="--c:var(--warn)"></i>${S.settings.warnAt||80}% Budget Used</span><span><i style="--c:var(--over)"></i>Over Budget</span><span><i class="mark"></i>Estimated Total</span></div>
+  <div class="legend"><span><i style="--c:var(--act)"></i>Hours Used</span><span><i style="--c:var(--left)"></i>Hours Left in Budget</span>${WC()?`<span><i style="--c:var(--warn)"></i>${S.settings.warnAt||80}% Budget Used</span>`:""}${OC()?`<span><i style="--c:var(--over)"></i>Over Budget</span>`:""}<span><i class="mark"></i>Estimated Total</span></div>
   <div class="phases">${p.phases.length?p.phases.map(phaseCard).join(""):`<section class="panel"><p class="empty">This project has no phases yet. Tap + Phase to add the first one, with its hour budget.</p></section>`}</div>`;
 }
 function phaseCard(ph){
-  const s=phaseStats(ph),open=!!S.ui.open[ph.id],n=ph.items.length;
+  const s=phaseStats(ph),open=!!S.ui.open[ph.id],n=ph.items.length,p=IX.idx.phase[ph.id].p;
   return `<section class="phase ${open?"open":""} ${ph.bonus?"bonus":""}">
     <button class="ph-head" data-toggle-phase="${ph.id}" aria-expanded="${open}">
       <span class="ph-name"><b><span class="caret">▶</span><span class="dot" style="--c:var(--${ph.color})"></span>${esc(ph.name)}</b>
-        <span class="sub">${n?`${n} Item${n>1?"s":""}`:"No Items Yet"}${ph.due?` · <span class="${ph.due<TODAY()&&(!n||ph.items.some(it=>it.status!=="Done"))?"late":""}">Target ${short(ph.due)}${ph.due<TODAY()&&(!n||ph.items.some(it=>it.status!=="Done"))?" · Past Due":""}</span>`:""}${ph.bonus?" · Bonus, Outside the Main Budget":""}</span></span>
-      <span class="ph-bar">${bar(s.act,s.est,s.budget,22,S.settings.phaseBarColors?ph.color:null)}<span class="nums">${numsLine(s.budget,s.est,s.act)} ${budgetChip(s.act,s.budget)}</span></span>
+        <span class="sub">${n?`${n} Item${n>1?"s":""}`:"No Items Yet"}${ph.due?` · <span class="${ph.due<TODAY()&&(!n||ph.items.some(it=>!isDone(it)))?"late":""}">Target ${short(ph.due)}${ph.due<TODAY()&&(!n||ph.items.some(it=>!isDone(it)))?" · Past Due":""}</span>`:""}${ph.bonus?" · Bonus, Outside the Main Budget":""}${roundsTxt(p,ph)}</span></span>
+      <span class="ph-bar">${bar(s.act,s.est,s.budget,22,S.settings.phaseBarColors?ph.color:null)}<span class="nums">${numsLine(s.budget,s.est,s.act)} ${budgetChip(s.act,s.budget)}</span>${valueLine(p,phaseVal(p,ph),true)}</span>
     </button>
     ${open?`<div class="ph-body">${phaseBody(ph)}</div>`:""}
   </section>`;
 }
 function phaseBody(ph){
-  const done=ph.items.filter(it=>it.status==="Done").length,vis=ph.hideDone?ph.items.filter(it=>it.status!=="Done"):ph.items;
+  const done=ph.items.filter(isDone).length,vis=ph.hideDone?ph.items.filter(it=>!isDone(it)):ph.items;
   const groups=[];vis.forEach(it=>{let g=groups.find(x=>x.name===(it.group||""));if(!g){g={name:it.group||"",items:[]};groups.push(g)}g.items.push(it)});
   const rows=groups.map(g=>{
     let ge=0,ga=0;g.items.forEach(it=>{const s=itemStats(it);ge+=s.est;ga+=s.act});
     return `<div class="grp"><div class="grp-l"><button class="grp-name" data-rgrp="${ph.id}" data-g="${esc(g.name)}" title="Rename This Row">${esc(g.name||"Items")}</button><span>${AE(ga,ge,fmtHM,true)}${pctTag(ga,ge)}</span></div>
-      <div class="segs">${g.items.map(it=>{const s=itemStats(it),e=Math.max(s.est,1),r=s.act/e,w=WA(),ov=s.act>e,f=ov?100:Math.min(r,w)*100,y=!ov&&r>w?(r-w)*100:0,o=ov?Math.min((s.act-e)/e,.5)*100:0;
+      <div class="segs">${g.items.map(it=>{const s=itemStats(it),e=Math.max(s.est,1),r=s.act/e,w=WC()?WA():2,ov=s.act>e,f=ov?100:Math.min(r,w)*100,y=!ov&&r>w?(r-w)*100:0,o=ov&&OC()?Math.min((s.act-e)/e,.5)*100:0;
         return `<button class="segbox ${S.settings.itemPhaseColors?"tint":""}" style="flex-grow:${e};--bc:var(--${ph.color})" data-open-item="${it.id}" title="${esc(it.name)} · ${esc(it.status)}">
-          <span class="segbar"><span class="f ${ov?"over":""}" style="width:${f}%"></span>${y?`<span class="y" style="left:${f}%;width:${y}%"></span>`:""}${o?`<span class="o" style="width:${o}%"></span>`:""}<span class="lab">${esc(it.name)}</span></span>
+          <span class="segbar"><span class="f ${ov&&OC()?"over":""}" style="width:${f}%"></span>${y?`<span class="y" style="left:${f}%;width:${y}%"></span>`:""}${o?`<span class="o" style="width:${o}%"></span>`:""}<span class="lab">${esc(it.name)}</span></span>
           <span class="m"><span class="st-dot" style="--sc:var(${SC[it.status]})"></span>${AE(s.act,s.est,fmtHM,true)}${pctTag(s.act,s.est)}</span></button>`}).join("")}</div></div>`;
   }).join("");
   return `${rows||(ph.items.length?`<p class="empty">All items in this phase are done. Tap Show Done to see them.</p>`:`<p class="empty">Add the pages or proposals for this phase. Each item gets steps with estimates, and the timer logs time to them.</p>`)}
-    <div class="row"><button class="btn sm" data-act="add-item" data-ph="${ph.id}">+ Item</button><button class="btn sm ghost" data-act="edit-phase" data-ph="${ph.id}">Edit Phase</button><button class="btn sm ghost" data-notes-ph="${ph.id}">Notes${ph.notes&&ph.notes.trim()?`<i class="ndot"></i>`:""}</button>
+    <div class="row"><button class="btn sm" data-act="add-item" data-ph="${ph.id}">+ Item</button><button class="btn sm ghost" data-act="edit-phase" data-ph="${ph.id}">Edit Phase</button><button class="btn sm ghost" data-notes-ph="${ph.id}">Notes${hasNotes(ph)?`<i class="ndot"></i>`:""}</button><button class="btn sm ghost" data-rounds="${ph.id}">Feedback Rounds${roundsOf(ph).length?` (${roundsOf(ph).length})`:""}</button>
     ${done?`<button class="btn sm ghost" data-hidedone="${ph.id}">${ph.hideDone?`Show Done (${done})`:`Hide Done (${done})`}</button>`:""}
     <span class="sub grow" style="text-align:right">Tap an Item to See Its Steps and Start the Timer</span></div>`;
 }
@@ -905,16 +1041,37 @@ function bindSched(box,list){
 }
 function projectModal(id,isNew){
   const p=S.projects.find(x=>x.id===id),sched=JSON.parse(JSON.stringify(p.schedule||[]));let phOrd=p.phases.slice();
+  let type=ptype(p);const pr={mode:"hourly",...(p.pricing||{})};
+  const TH={Client:"Paid client work. Rates, the rate floor and the decision-maker check apply.",Internal:"Your own work, like a portfolio chapter. Shows a shadow value at your rate.",Pitch:"A pitch or proposal you're not paid for yet. Shows a shadow value at your rate."};
   const dayOpts=sel=>DOW.map((d,i)=>`<option value="${i}" ${i===sel?"selected":""}>${["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"][i]}</option>`).join("");
   modal(`<h2>${isNew?"New Project":"Edit Project"}</h2>
     <div class="field"><label for="pj-name">Project Name</label><input class="inp" id="pj-name" value="${esc(isNew?"":p.name)}" placeholder="e.g. Anáuac"></div>
     <div class="field"><label for="pj-sub">Subtitle</label><input class="inp" id="pj-sub" value="${esc(isNew?"":p.subtitle)}" placeholder="e.g. Portfolio Chapter 01 · Protagonist"></div>
+    <div class="field"><span class="lbl">TYPE</span><div class="seg-ctl" style="width:auto">${["Client","Internal","Pitch"].map(t=>`<button data-ptype="${t}" aria-pressed="${type===t}">${t}</button>`).join("")}</div><span class="sub" id="pj-th">${TH[type]}</span></div>
+    <div class="two"><div class="field"><label for="pj-client">Client</label><input class="inp" id="pj-client" value="${esc(p.client||"")}" placeholder="Company or studio"></div>
+      <div class="field"><label for="pj-dm">Decision-Maker</label><input class="inp" id="pj-dm" value="${esc(p.dm||"")}" placeholder="The person who signs off"></div></div>
+    <div class="two"><div class="field"><label for="pj-due">Due Date</label><input class="inp" type="date" id="pj-due" value="${p.due||""}"></div>
+      <div class="field"><label for="pj-rounds">Feedback Rounds Included per Phase</label><input class="inp" type="number" min="0" step="1" id="pj-rounds" value="${p.roundsIncl??""}" placeholder="Default: ${S.settings.roundsIncl??1}"><span class="sub">0 Counts Rounds Without a Limit</span></div></div>
+    <details class="sec" open><summary>PRICING</summary><div style="display:grid;gap:10px">
+      <div class="seg-ctl" id="pj-modes" style="width:auto;flex-wrap:wrap">${MODES.map(([m,l])=>`<button data-pmode="${m}" aria-pressed="${pr.mode===m}">${l}</button>`).join("")}</div>
+      <div id="pj-price" style="display:grid;gap:8px"></div></div></details>
     <div class="field"><span class="lbl">WEEKLY SCHEDULE</span><div id="pj-sched"></div>
       <span class="sub">Shows on the Month view. Timed entries also show as blocks on the Week and Day views. To skip one date, open that day and tap Skip.</span></div>
     ${!isNew&&p.phases.length>1?`<details class="sec"><summary>PHASE ORDER</summary><div class="ord" id="pj-ord"></div></details>`:""}
     <div class="m-actions"><button class="btn" id="pj-cancel">Cancel</button><button class="btn primary" id="pj-save">${isNew?"Create Project":"Save"}</button></div>`,
   root=>{const nm=root.querySelector("#pj-name");if(isNew)setTimeout(()=>nm.focus(),30);
     bindSched(root.querySelector("#pj-sched"),sched);
+    root.querySelectorAll("[data-ptype]").forEach(b=>b.onclick=()=>{type=b.dataset.ptype;root.querySelectorAll("[data-ptype]").forEach(x=>x.setAttribute("aria-pressed",x===b));root.querySelector("#pj-th").textContent=TH[type]});
+    const pb=root.querySelector("#pj-price"),R=numv(S.settings.rate)||150;
+    const drawPrice=()=>{const bo=`<label class="check"><input type="checkbox" data-pbo ${pr.billOver?"checked":""}><span>Bill Hours Past the Budget (Off: Hours Over Budget Earn Nothing, So the Effective Rate Drops)</span></label>`;
+      pb.innerHTML=pr.mode==="hourly"?`<div class="field"><label for="pr-v">Hourly Rate ($)</label><input class="inp" type="number" min="0" step="5" id="pr-v" data-pk="rate" value="${pr.rate??""}" placeholder="Default: $${R}" style="max-width:200px"></div>${bo}`
+        :pr.mode==="day"?`<div class="field"><label for="pr-v">Day Rate ($)</label><input class="inp" type="number" min="0" step="25" id="pr-v" data-pk="dayRate" value="${pr.dayRate??""}" placeholder="Default: $${Math.round((numv(pr.rate)||R)*HPD())}" style="max-width:200px"><span class="sub">One Day = ${HPD()} Hours (Settings > General)</span></div>${bo}`
+        :pr.mode==="projectFee"?`<div class="field"><label for="pr-v">Project Fee ($)</label><input class="inp" type="number" min="0" step="100" id="pr-v" data-pk="fee" value="${pr.fee??""}" placeholder="e.g. 12000" style="max-width:200px"><span class="sub">Split Across Phases by Budget Hours</span></div>`
+        :`<span class="sub">Set each phase's fee in Edit Phase. Phase fees add up to the project value.</span>`;
+      pb.querySelectorAll("[data-pk]").forEach(i=>i.oninput=()=>{pr[i.dataset.pk]=i.value===""?null:Number(i.value)});
+      const c=pb.querySelector("[data-pbo]");if(c)c.onchange=()=>{pr.billOver=c.checked}};
+    drawPrice();
+    root.querySelectorAll("[data-pmode]").forEach(b=>b.onclick=()=>{pr.mode=b.dataset.pmode;root.querySelectorAll("[data-pmode]").forEach(x=>x.setAttribute("aria-pressed",x===b));drawPrice()});
     const ob=root.querySelector("#pj-ord");
     const drawOrd=()=>{if(!ob)return;ob.innerHTML=`<div class="ord-g">${phOrd.map((x,i)=>`<div class="ord-i"><span class="dot" style="--c:var(--${x.color})"></span><span class="nm">${esc(x.name)}</span><button class="ar" data-pu="${i}" ${i?"":"disabled"} aria-label="Move up">▲</button><button class="ar" data-pd="${i}" ${i<phOrd.length-1?"":"disabled"} aria-label="Move down">▼</button></div>`).join("")}</div>`;
       ob.querySelectorAll("[data-pu]").forEach(b=>b.onclick=()=>{const i=+b.dataset.pu;[phOrd[i-1],phOrd[i]]=[phOrd[i],phOrd[i-1]];drawOrd()});
@@ -922,14 +1079,17 @@ function projectModal(id,isNew){
     drawOrd();
     root.querySelector("#pj-cancel").onclick=()=>{if(isNew){S.projects=S.projects.filter(x=>x.id!==id);commit()}closeModal()};
     root.querySelector("#pj-save").onclick=()=>{p.name=nm.value.trim()||"Untitled Project";p.subtitle=root.querySelector("#pj-sub").value.trim();
+      p.type=type;p.client=root.querySelector("#pj-client").value.trim();p.dm=root.querySelector("#pj-dm").value.trim();p.due=root.querySelector("#pj-due").value;
+      const rv=root.querySelector("#pj-rounds").value;if(rv===""||isNaN(+rv))delete p.roundsIncl;else p.roundsIncl=Math.max(0,Math.round(+rv));
+      p.pricing={mode:pr.mode,rate:numv(pr.rate),dayRate:numv(pr.dayRate),fee:numv(pr.fee),billOver:!!pr.billOver};
       p.schedule=sched.filter(e=>e.label.trim());if(!isNew)p.phases=phOrd.filter(x=>p.phases.includes(x));
       closeModal();commit();if(isNew)phaseModal(null)}},"wide");
 }
 function itemModal(id){
   const {p,ph,it}=IX.idx.item[id];const s=itemStats(it);
-  modal(`<div style="display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:start"><div style="min-width:0"><input class="inp title-inp" id="it-name" value="${esc(it.name)}" aria-label="Item name" title="Tap to Rename"><span class="sub">${esc(p.name)} · ${esc(ph.name)} · ${esc(it.group||"")}${it.linkId&&S.settings.linkNames?" · Linked Name":""}</span></div><button class="btn" id="it-notes">Notes${it.notes&&it.notes.trim()?`<i class="ndot"></i>`:""}</button><button class="btn ghost" data-close>Close</button></div>
+  modal(`<div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:start"><div style="min-width:0"><input class="inp title-inp" id="it-name" value="${esc(it.name)}" aria-label="Item name" title="Tap to Rename"><span class="sub">${esc(p.name)} · ${esc(ph.name)} · ${esc(it.group||"")}${it.linkId&&S.settings.linkNames?" · Linked Name":""}</span></div><button class="btn ghost" data-close>Close</button></div>
     ${bar(s.act,s.est,s.est,14)}
-    <span class="nums"><b>${fmtHM(s.est)}</b> Estimated · <b class="a ${s.act>s.est?"over":""}">${fmtHM(s.act)}</b> Actual${pctTag(s.act,s.est)}${s.act>s.est?` · <span style="color:var(--over);font-weight:700">${fmtHM(s.act-s.est)} Over</span>`:""}</span>
+    <span class="nums"><b>${fmtHM(s.est)}</b> Estimated · <b class="a ${s.act>s.est&&OC()?"over":""}">${fmtHM(s.act)}</b> Actual${pctTag(s.act,s.est)}${s.act>s.est?` · <span style="color:${OC()?"var(--over)":"var(--ink)"};font-weight:700">${fmtHM(s.act-s.est)} Over</span>`:""}</span>
     <div class="field"><span class="lbl">STATUS</span><div class="status-row">${STATUSES.map(([n,c])=>`<button style="--sc:var(${c})" aria-pressed="${it.status===n}" data-status="${n}">${n}</button>`).join("")}</div></div>
     <div class="field"><label for="it-week">TARGET WEEK</label><input class="inp" type="date" id="it-week" value="${it.week||""}" style="width:auto"></div>
     <div class="field"><span class="lbl">STEPS</span><div class="steps">${it.steps.map(st=>{const a=IX.act[st.id]||0;
@@ -942,12 +1102,16 @@ function itemModal(id){
       <div class="row"><input class="inp" id="chk-new" placeholder="Add a Checklist Item" style="flex:1"><button class="btn sm" id="chk-add">Add</button></div></div>
     <div class="field"><span class="lbl">FEEDBACK</span>${it.feedback.length?it.feedback.map(f=>`<div class="fb"><span class="d">${short(f.d)}</span><span>${esc(f.t)}</span></div>`).join(""):`<p class="empty">Feedback notes for this item land here.</p>`}
       <div class="row"><input class="inp" id="fb-new" placeholder="Add Feedback" style="flex:1"><button class="btn sm" id="fb-add">Add</button></div></div>
-    <div class="field"><label for="it-links">LINKS TO FILES</label><input class="inp" id="it-links" value="${esc(it.links)}" placeholder="Google Drive or Dropbox link"></div>
+    <div class="field"><div class="row"><label for="it-nt" class="grow">NOTES</label><span class="sub" id="it-nst">Saves as You Type</span></div><textarea class="inp" id="it-nt" rows="3" placeholder="Notes for This Item…">${esc(it.notes||"")}</textarea><div class="nt-links" id="it-ntl">${linkList(it.notes)}</div><div id="it-att" class="att-wrap"></div></div>
     <div class="m-actions"><button class="btn danger left" id="it-del">Delete</button><button class="btn" id="it-move">Move to Phase</button><button class="btn" id="it-stpl">Save as Template</button><button class="btn" id="it-ltpl">Load Template</button><button class="btn" data-close>Close</button></div>`,
   root=>{
-    root.querySelectorAll("[data-status]").forEach(b=>b.onclick=()=>{it.status=b.dataset.status;commit();itemModal(id)});
+    root.querySelectorAll("[data-status]").forEach(b=>b.onclick=()=>{const was=it.status;it.status=b.dataset.status;commit();itemModal(id);
+      if(it.status==="Feedback Received"&&was!==it.status){const L=roundsOf(ph),last=L[L.length-1];
+        if(!last||daysBetween(last.d,TODAY())>3)toastAct(`Log feedback round ${L.length+1} for ${ph.name}?`,"Log Round",()=>undoable(()=>{ph.rounds=[...roundsOf(ph),{id:uid(),d:TODAY(),note:""}]},`Round ${L.length+1} logged for ${ph.name}`))}});
     const nmI=root.querySelector("#it-name");nmI.onchange=()=>{renameItem(it,nmI.value);itemModal(id)};nmI.onkeydown=e=>{if(e.key==="Enter")nmI.blur()};
-    root.querySelector("#it-notes").onclick=()=>notesModal("item",it,it.name,()=>itemModal(id));
+    {const nt=root.querySelector("#it-nt"),nst=root.querySelector("#it-nst");let ntT;
+      nt.oninput=()=>{const o=ownerOf({kind:"item",id})||it;o.notes=nt.value;root.querySelector("#it-ntl").innerHTML=linkList(nt.value);nst.textContent="Saving…";clearTimeout(ntT);ntT=setTimeout(()=>{save();nst.textContent="Saved"},500)};
+      mountAtt(root.querySelector("#it-att"),{kind:"item",id})}
     const mvStep=(sid,d)=>{const i=it.steps.findIndex(x=>x.id===sid),j=i+d;if(j<0||j>=it.steps.length)return;[it.steps[i],it.steps[j]]=[it.steps[j],it.steps[i]];commit();itemModal(id)};
     root.querySelectorAll("[data-sup]").forEach(b=>b.onclick=()=>mvStep(b.dataset.sup,-1));
     root.querySelectorAll("[data-sdn]").forEach(b=>b.onclick=()=>mvStep(b.dataset.sdn,1));
@@ -955,7 +1119,6 @@ function itemModal(id){
     root.querySelector("#it-stpl").onclick=()=>askText("Save as Item Template","Template Name",it.name,v=>{const tid=uid();S.itemTemplates[tid]={id:tid,name:v,steps:tplSteps(it.steps),checklist:it.checklist.map(c=>({t:c.t}))};commit();itemModal(id);toast("Item template saved")},()=>itemModal(id));
     root.querySelector("#it-ltpl").onclick=()=>tplPicker("item",t=>{closeModal();undoable(()=>applyItemTemplate(it,t),`${t.name} loaded`);itemModal(id)},()=>itemModal(id));
     root.querySelector("#it-week").onchange=e=>{it.week=e.target.value;commit()};
-    root.querySelector("#it-links").oninput=e=>{it.links=e.target.value;save()};
     root.querySelectorAll("[data-chk]").forEach(c=>c.onchange=()=>{const x=it.checklist.find(k=>k.id===c.dataset.chk);x.d=c.checked;c.parentElement.classList.toggle("done",c.checked);save()});
     [["#chk-new","#chk-add"],["#fb-new","#fb-add"]].forEach(([i,b])=>root.querySelector(i).onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();root.querySelector(b).click()}});
     root.querySelector("#chk-add").onclick=()=>{const v=root.querySelector("#chk-new").value.trim();if(v){it.checklist.push({id:uid(),t:v,d:false});commit();itemModal(id)}};
@@ -965,7 +1128,7 @@ function itemModal(id){
     root.querySelectorAll("[data-editstep]").forEach(b=>b.onclick=()=>stepModal(it.id,b.dataset.editstep));
     root.querySelector("[data-addstep]").onclick=()=>stepModal(it.id,null);
     const sids=it.steps.map(x=>x.id);
-    armDelete(root.querySelector("#it-del"),()=>{closeModal();undoable(()=>{ph.items=ph.items.filter(x=>x.id!==id);S.sessions=S.sessions.filter(x=>!sids.includes(x.step));S.plans=S.plans.filter(x=>!sids.includes(x.step))},`${it.name} deleted`)},s.act?`Delete Item and ${fmtHM(s.act)} of Logged Time`:"Tap Again to Delete");
+    armDelete(root.querySelector("#it-del"),()=>{closeModal();const dIds=driveIdsIn(it);undoable(()=>{ph.items=ph.items.filter(x=>x.id!==id);S.sessions=S.sessions.filter(x=>!sids.includes(x.step));S.plans=S.plans.filter(x=>!sids.includes(x.step))},`${it.name} deleted`);queueTrash(dIds)},s.act?`Delete Item and ${fmtHM(s.act)} of Logged Time`:"Tap Again to Delete");
   },"wide");
 }
 function stepModal(itemId,stepId){
@@ -1042,12 +1205,17 @@ function phaseModal(phId){
     <div class="field"><div class="row"><span class="lbl grow">COLOR</span><button class="btn sm" id="ph-pal">Edit Colors</button></div>${swatchGrid(COLORS,color)}</div>
     <div class="two"><div class="field"><label for="ph-due">Target Date (Optional)</label><input class="inp" type="date" id="ph-due" value="${ph.due||""}"></div>
     <div class="field"><label for="ph-dt">Default Item Template</label><select class="inp" id="ph-dt">${itplOpts(ph.defTpl)}</select></div></div>
+    ${(()=>{const P=priceOf(p);
+      if(P.mode==="hourly")return `<div class="field"><label for="ph-rate">Hourly Rate for This Phase ($)</label><input class="inp" type="number" min="0" step="5" id="ph-rate" value="${ph.rate??""}" placeholder="Project Rate: $${Math.round(P.rate)}" style="max-width:220px"></div>`;
+      if(P.mode==="day")return `<div class="field"><label for="ph-dayrate">Day Rate for This Phase ($)</label><input class="inp" type="number" min="0" step="25" id="ph-dayrate" value="${ph.dayRate??""}" placeholder="Project Day Rate: $${Math.round(P.day)}" style="max-width:220px"></div>`;
+      if(P.mode==="phaseFee")return `<div class="field"><label for="ph-fee">Phase Fee ($)</label><input class="inp" type="number" min="0" step="50" id="ph-fee" value="${ph.fee??""}" placeholder="e.g. 2500" style="max-width:220px"></div>`;
+      return `<span class="sub">This phase's share of the ${money(P.fee)} project fee: ${money(phaseFee(p,ph,P))}, by budget hours.</span>`})()}
     <label class="check"><input type="checkbox" id="ph-bonus" ${ph.bonus?"checked":""}><span>Bonus Phase (Counts Toward the Ceiling, Not the Main Budget)</span></label>
     <details class="sec"><summary>WEEKLY SCHEDULE${sched.length?` (${sched.length})`:""}</summary><div id="ph-sched"></div></details>
     ${phId&&ph.items.length?`<details class="sec"><summary>ORDER · ROWS AND ITEMS</summary><div class="ord" id="ph-ord"></div><span class="sub">Rename a row by typing in its box. Use the menu next to an item to move it to another row.</span></details>`:""}
     ${phId&&ph.items.length&&others.length?`<details class="sec"><summary>SEND ITEMS TO ANOTHER PHASE</summary><div style="display:grid;gap:8px">
       <span class="sub">Tick the items going forward. Each copy keeps its name and row, starts at zero hours, and gets the steps you pick below.${S.settings.linkNames?" Copies share their name with the original.":""}</span>
-      <div style="display:grid;gap:4px">${ph.items.map(x=>`<label class="check"><input type="checkbox" data-snd="${x.id}"><span>${esc(x.name)} <span class="sub">${esc(x.group||"")}${x.status==="Done"?" · Done":""}</span></span></label>`).join("")}</div>
+      <div style="display:grid;gap:4px">${ph.items.map(x=>`<label class="check"><input type="checkbox" data-snd="${x.id}"><span>${esc(x.name)} <span class="sub">${esc(x.group||"")}${isDone(x)?" · "+x.status:""}</span></span></label>`).join("")}</div>
       <div class="two"><div class="field"><label for="sd-ph">To Phase</label><select class="inp" id="sd-ph">${others.map(x=>`<option value="${x.id}" ${x===nextPh?"selected":""}>${esc(x.name)}</option>`).join("")}</select></div>
       <div class="field"><label for="sd-tpl">Steps From</label><select class="inp" id="sd-tpl">${itplOpts(nextPh&&nextPh.defTpl)}</select></div></div>
       <button class="btn primary" id="sd-go" style="justify-self:start">Send Items</button></div></details>`:""}
@@ -1070,7 +1238,8 @@ function phaseModal(phId){
         const gs2=groupsOf();ord=ord.filter(o=>o!==x);x.group=v;const last=ord.map(o=>o.group).lastIndexOf(v);if(last<0)ord.push(x);else ord.splice(last+1,0,x);rebuild(gs2.includes(v)?gs2:[...gs2,v]);drawOrd()});
     };drawOrd();
     const sdPh=root.querySelector("#sd-ph");if(sdPh)sdPh.onchange=()=>{const t=p.phases.find(x=>x.id===sdPh.value);root.querySelector("#sd-tpl").innerHTML=itplOpts(t&&t.defTpl)};
-    const form=()=>({name:root.querySelector("#ph-name").value.trim()||"Phase",budget:Math.round((Number(root.querySelector("#ph-b").value)||0)*60),color,bonus:root.querySelector("#ph-bonus").checked,due:root.querySelector("#ph-due").value,defTpl:root.querySelector("#ph-dt").value||"",schedule:sched.filter(e=>e.label.trim())});
+    const form=()=>({name:root.querySelector("#ph-name").value.trim()||"Phase",budget:Math.round((Number(root.querySelector("#ph-b").value)||0)*60),color,bonus:root.querySelector("#ph-bonus").checked,due:root.querySelector("#ph-due").value,defTpl:root.querySelector("#ph-dt").value||"",schedule:sched.filter(e=>e.label.trim()),
+      ...(()=>{const o={},g=(sel,k)=>{const e=root.querySelector(sel);if(e)o[k]=numv(e.value)};g("#ph-rate","rate");g("#ph-dayrate","dayRate");g("#ph-fee","fee");return o})()});
     const apply=(d=form())=>{if(phId){Object.assign(ph,d);if(ord.length){const byId=Object.fromEntries(ph.items.map(x=>[x.id,x]));ph.items=ord.map(o=>{const x=byId[o.id];if(x)x.group=o.group;return x}).filter(Boolean)}return ph}const n={id:uid(),items:[],...d};p.phases.push(n);return n};
     root.querySelector("#ph-save").onclick=()=>{const d=form();closeModal();undoable(()=>{apply(d)},phId?"Phase saved":"Phase added")};
     const go=root.querySelector("#sd-go");if(go)go.onclick=()=>{const ids=[...root.querySelectorAll("[data-snd]:checked")].map(c=>c.dataset.snd);if(!ids.length)return toast("Tick at least one item to send");
@@ -1082,8 +1251,239 @@ function phaseModal(phId){
     root.querySelector("#ph-ltpl").onclick=()=>tplPicker("phase",t=>{const D=t.data;closeModal();undoable(()=>{let tgt=ph;if(!phId){tgt={id:uid(),name:D.name,items:[],budget:0,color:D.color};p.phases.push(tgt)}
         Object.assign(tgt,{budget:D.budget,color:D.color,bonus:!!D.bonus,defTpl:D.defTpl&&S.itemTemplates[D.defTpl]?D.defTpl:"",schedule:(D.schedule||[]).map(e=>({...e,id:uid(),skip:[]}))});
         D.items.forEach(x=>tgt.items.push({id:uid(),name:x.name,group:x.group||"",status:"Not Started",week:"",steps:freshSteps(x.steps),checklist:freshChecklist(x.checklist),feedback:[],links:"",notes:""}));S.ui.open[tgt.id]=true},`${t.name} loaded`)},()=>phaseModal(phId));
-    if(phId)armDelete(root.querySelector("#ph-del"),()=>{closeModal();undoable(()=>{p.phases=p.phases.filter(x=>x.id!==phId)},"Phase deleted")},phaseStats(ph).act?"Delete Phase and Its Logged Time":"Tap Again to Delete");},"wide");
+    if(phId)armDelete(root.querySelector("#ph-del"),()=>{closeModal();const dIds=driveIdsIn(ph);undoable(()=>{p.phases=p.phases.filter(x=>x.id!==phId)},"Phase deleted");queueTrash(dIds)},phaseStats(ph).act?"Delete Phase and Its Logged Time":"Tap Again to Delete");},"wide");
 }
+
+function roundsModal(phId){
+  const r=IX.idx.phase[phId];if(!r)return;const{p,ph}=r,L=roundsOf(ph),inc=roundsIncl(p),fl=S.settings.flagScope!==false;
+  modal(`<h2>${esc(ph.name)} · Feedback Rounds</h2>
+    <p class="sub" style="margin:0">Log one round each time the client sends combined feedback on this phase. ${inc>0?`${esc(p.name)} includes ${inc} round${inc>1?"s":""} per phase (change it in Edit Project).`:`${esc(p.name)} has no limit, so rounds are only counted.`}</p>
+    <div class="rnd">${L.map((x,i)=>`<div class="rnd-i"><b>Round ${i+1}</b><span><span class="sub">${short(x.d)}${inc>0&&i>=inc&&fl?" · Over Scope":""}</span>${x.note?`<br><span class="sub" style="color:var(--ink)">${esc(x.note)}</span>`:""}</span><button class="btn sm ghost danger" data-rx="${x.id}">Remove</button></div>`).join("")||`<p class="empty">No feedback rounds logged yet.</p>`}</div>
+    <div class="field"><span class="lbl">LOG ROUND ${L.length+1}</span><input class="inp" type="date" id="rd-d" value="${TODAY()}" style="width:auto"><textarea class="inp" id="rd-n" rows="2" placeholder="What the Feedback Asked For (Optional)"></textarea></div>
+    ${inc>0&&L.length>=inc&&fl?`<p class="sub" style="margin:0;color:var(--amber);font-weight:700">Round ${L.length+1} Goes Past the ${inc} Included. Worth Agreeing on Extra Rounds With the Client Before Starting.</p>`:""}
+    <div class="m-actions"><button class="btn" data-close>Close</button><button class="btn primary" id="rd-add">Log Round ${L.length+1}</button></div>`,root=>{
+    root.querySelectorAll("[data-rx]").forEach(b=>armDelete(b,()=>{undoable(()=>{ph.rounds=roundsOf(ph).filter(x=>x.id!==b.dataset.rx)},"Round removed");roundsModal(phId)},"Tap Again"));
+    root.querySelector("#rd-add").onclick=()=>{const d=root.querySelector("#rd-d").value||TODAY(),n=root.querySelector("#rd-n").value.trim();closeModal();
+      undoable(()=>{ph.rounds=[...roundsOf(ph),{id:uid(),d,note:n}].sort((a,b)=>a.d.localeCompare(b.d))},`Round ${L.length+1} logged for ${ph.name}`)}});
+}
+function toastAct(m,label,fn,ms=7000){const t=toast(m,ms),b=document.createElement("button");b.className="undo";b.textContent=label;b.onclick=()=>{t.remove();fn()};t.appendChild(b);return t}
+
+/* ===================== attachments ===================== */
+/* Files live in your Google Drive ("Project Tracker Files"). The Sheet only keeps each file's name, type and Drive ID.
+   This device keeps its own copies in IndexedDB (Keep All Attachments Offline), plus a queue of files waiting to upload. */
+const K_OFF="bbst-offline",K_FIDX="bbst-fidx",K_UPQ="bbst-upq",K_TRASH="bbst-trash",MAX_UP=15*1048576;
+const keepOffline=()=>LS.get(K_OFF,true)!==false;
+const fileURLs={},memFiles={},inflight={},memUp={};
+const extOf=n=>{const m=String(n||"").toLowerCase().split(/[?#]/)[0].match(/\.([a-z0-9]{1,10})$/);return m?m[1]:""};
+const MIMES={jpg:"image/jpeg",jpeg:"image/jpeg",png:"image/png",gif:"image/gif",webp:"image/webp",pdf:"application/pdf",psd:"image/vnd.adobe.photoshop",svg:"image/svg+xml",zip:"application/zip",mp4:"video/mp4",mov:"video/quicktime",txt:"text/plain"};
+const mimeOf=n=>MIMES[extOf(n)]||"application/octet-stream";
+const kindOf=a=>{if(a.kind==="link")return"other";const e=extOf(a.name),m=a.mime||"";if(/^image\/(jpeg|png|gif|webp)$/.test(m)||["jpg","jpeg","png","gif","webp"].includes(e))return"img";if(m==="application/pdf"||e==="pdf")return"pdf";return"other"};
+const BADGE_C={psd:"#2F7FD9",psb:"#2F7FD9",procreate:"#4A4A55",ai:"#E07B00",eps:"#E07B00",pdf:"#D33A3A",jpg:"#2E9E6A",jpeg:"#2E9E6A",png:"#2E9E6A",gif:"#2E9E6A",webp:"#2E9E6A",heic:"#2E9E6A",tif:"#2E9E6A",tiff:"#2E9E6A",svg:"#C79A00",zip:"#6F7482",rar:"#6F7482",mp4:"#8A4FD8",mov:"#8A4FD8",blend:"#E87D0D",clip:"#C0457A",kra:"#3A6FD8",fig:"#A259FF",doc:"#2B5FB4",docx:"#2B5FB4",xls:"#1F7A45",xlsx:"#1F7A45",ppt:"#C4502A",pptx:"#C4502A",key:"#2B6BD8",txt:"#6F7482",drive:"#1A73E8",dropbox:"#0061FE"};
+function badgeOf(a){let e=a.kind==="link"?(extOf(a.name)||extOf(a.url)):extOf(a.name);
+  if(!e&&a.kind==="link"){const u=String(a.url||"");e=/drive\.google|docs\.google/.test(u)?"drive":/dropbox\./.test(u)?"dropbox":"link"}
+  return{t:(e||"file").toUpperCase(),c:BADGE_C[e]||"#5A6378"}}
+const fsize=b=>!b?"":b<1048576?Math.max(1,Math.round(b/1024))+" KB":(b/1048576).toFixed(b<10485760?1:0)+" MB";
+const attOwners=()=>{const o=[];S.projects.forEach(p=>{o.push(p);p.phases.forEach(ph=>{o.push(ph);ph.items.forEach(it=>o.push(it))})});return o};
+function findAtt(id){for(const o of attOwners())for(const a of o.files||[])if(a.id===id)return{o,a};return null}
+const allDriveIds=()=>{const s=new Set();attOwners().forEach(o=>(o.files||[]).forEach(a=>{if(a.driveId)s.add(a.driveId)}));return s};
+const driveIdsIn=o=>{const out=[],walk=x=>{(x.files||[]).forEach(a=>{if(a.driveId)out.push(a.driveId)});(x.phases||[]).forEach(walk);(x.items||[]).forEach(walk)};walk(o);return out};
+const ownerOf=ref=>ref.kind==="project"?S.projects.find(p=>p.id===ref.id):ref.kind==="phase"?(IX.idx.phase[ref.id]||{}).ph:(IX.idx.item[ref.id]||{}).it;
+const projOfRef=ref=>ref.kind==="project"?ownerOf(ref):ref.kind==="phase"?(IX.idx.phase[ref.id]||{}).p:(IX.idx.item[ref.id]||{}).p;
+const FIDX=()=>LS.get(K_FIDX,{});
+async function cacheGet(id){if(memFiles[id])return memFiles[id];if(!FIDX()[id])return null;const b=await IDB.get("file:"+id);return b instanceof Blob?b:null}
+async function cachePut(id,blob){if(keepOffline()){await IDB.set("file:"+id,blob);const x=FIDX();x[id]=blob.size;LS.set(K_FIDX,x)}else memFiles[id]=blob}
+async function cacheDel(id){delete memFiles[id];const x=FIDX();if(x[id]!==undefined){delete x[id];LS.set(K_FIDX,x)}await IDB.del("file:"+id)}
+async function clearOffline(){await Promise.all(Object.keys(FIDX()).map(k=>IDB.del("file:"+k)));LS.set(K_FIDX,{});Object.keys(fileURLs).forEach(k=>{URL.revokeObjectURL(fileURLs[k]);delete fileURLs[k]});refreshAttViews()}
+const offlineLine=()=>{const n=Object.keys(FIDX()).length,b=Object.values(FIDX()).reduce((a,v)=>a+v,0);return n?`${n} File${n>1?"s":""} Saved on This Device · ${fsize(b)}`:"No Attachments Saved on This Device Yet"};
+const b64ToBytes=t=>{const bin=atob(t),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return u};
+const blobB64=b=>readURL(b).then(u=>String(u).slice(String(u).indexOf(",")+1));
+function driveErr(x){const m=String(x&&x.message||x);
+  return /Unknown action/i.test(m)?"Update your Google Sheet script first: paste the new Code.gs, run setupDrive, then deploy a new version."
+    :m==="NO_DRIVE"||/permission|authoriz/i.test(m)?"Google Drive access isn't allowed yet. In Apps Script, run setupDrive once and approve it."
+    :m==="NOT_CONNECTED"?"Connect this device to your Google Sheet first."
+    :m==="NO_FILE"?"That file is no longer in your Google Drive."
+    :"Couldn't reach Google Drive. Check your connection (VPN in China) and try again."}
+async function driveFetch(a){const parts=[];let n=1,mime=a.mime;
+  for(let i=0;i<n;i++){const r=await Sync.call("download",{id:a.driveId,part:i});n=r.parts||1;mime=r.mime||mime;parts.push(b64ToBytes(r.data||""))}
+  return new Blob(parts,{type:mime||"application/octet-stream"})}
+async function getBlob(a){
+  if(a.kind==="link")return null;
+  if(a.pending){const u=memUp[a.id]||await IDB.get("up:"+a.id);if(u&&u.blob)return u.blob;throw new Error("ELSEWHERE")}
+  let b=await cacheGet(a.driveId);if(b)return b;
+  if(!Sync.connected())throw new Error("NOT_CONNECTED");
+  b=await(inflight[a.driveId]=inflight[a.driveId]||driveFetch(a).finally(()=>delete inflight[a.driveId]));
+  await cachePut(a.driveId,b);return b}
+async function localURL(a){if(fileURLs[a.id])return fileURLs[a.id];let b=null;
+  if(a.pending){const u=memUp[a.id]||await IDB.get("up:"+a.id);b=u&&u.blob}else if(a.driveId)b=await cacheGet(a.driveId);
+  return b?(fileURLs[a.id]=URL.createObjectURL(b)):null}
+function refreshAttViews(){document.querySelectorAll("[data-attgrid]").forEach(e=>{if(e._draw)e._draw()})}
+/* add files: they wait on this device until they reach Drive, so attaching works offline too */
+async function addFiles(ref,list){
+  const files=[...list],big=files.filter(f=>f.size>MAX_UP),ok=files.filter(f=>f.size<=MAX_UP&&f.size>0);
+  if(big.length)toast(`${big.map(f=>f.name).join(", ")} ${big.length>1?"are":"is"} over 15 MB. Use Add Link for big files.`,5500);
+  if(!ok.length)return;const p=projOfRef(ref),folder=p?p.name:"";
+  const added=[];for(const f of ok){const a={id:uid(),kind:"drive",name:f.name,mime:f.type||mimeOf(f.name),size:f.size,added:TODAY(),pending:true};
+    const rec={blob:f.slice(0,f.size,f.type||mimeOf(f.name)),folder};memUp[a.id]=rec;await IDB.set("up:"+a.id,rec);added.push(a)}
+  const o=ownerOf(ref);if(!o)return;o.files=[...(o.files||[]),...added];
+  LS.set(K_UPQ,[...LS.get(K_UPQ,[]),...added.map(a=>a.id)]);commit();runUploads();
+}
+let upRun=false,upWarned=0;
+async function runUploads(){
+  if(upRun||!Sync.connected())return;upRun=true;let did=0;
+  try{let q=LS.get(K_UPQ,[]);
+    while(q.length){const id=q[0],f=findAtt(id),u=memUp[id]||await IDB.get("up:"+id);
+      if(!f||!f.a.pending||!u){q=LS.get(K_UPQ,[]).filter(x=>x!==id);LS.set(K_UPQ,q);if(!f)await IDB.del("up:"+id);continue}
+      let r;try{r=await Sync.call("upload",{name:f.a.name,mime:f.a.mime||"application/octet-stream",folder:u.folder||"",data:await blobB64(u.blob)})}
+      catch(x){if(Date.now()-upWarned>60000){upWarned=Date.now();toast(/Unknown action|NO_DRIVE|permission/i.test(x.message)?driveErr(x):"Files are saved on this device and upload when you're back online.",6000)}break}
+      const g=findAtt(id);
+      if(g){Object.assign(g.a,{driveId:r.id,url:r.url,size:r.size||g.a.size});delete g.a.pending;await cachePut(r.id,u.blob);did++;commit()}
+      else queueTrash([r.id],0);
+      delete memUp[id];await IDB.del("up:"+id);q=LS.get(K_UPQ,[]).filter(x=>x!==id);LS.set(K_UPQ,q)}}
+  finally{upRun=false}
+  if(did){refreshAttViews();toast(did>1?`${did} files saved to Google Drive`:"Saved to Google Drive")}
+}
+/* removed files go to the Drive trash a few seconds later, after the Undo window */
+function queueTrash(ids,delay=9000){ids=ids.filter(Boolean);if(!ids.length)return;const at=Date.now()+delay,q=LS.get(K_TRASH,[]);ids.forEach(id=>{if(!q.some(x=>x.id===id))q.push({id,at})});LS.set(K_TRASH,q);setTimeout(runTrash,delay+300)}
+let trRun=false;
+async function runTrash(){
+  if(trRun)return;const q=LS.get(K_TRASH,[]);if(!q.length)return;const live=allDriveIds(),now=Date.now();
+  const back=q.filter(x=>live.has(x.id)),due=q.filter(x=>!live.has(x.id)&&x.at<=now);
+  if(back.length)LS.set(K_TRASH,q.filter(x=>!live.has(x.id)));
+  if(!due.length||!Sync.connected())return;trRun=true;
+  try{await Sync.call("trash",{ids:due.map(x=>x.id)});const ids=new Set(due.map(x=>x.id));LS.set(K_TRASH,LS.get(K_TRASH,[]).filter(x=>!ids.has(x.id)));for(const id of ids)await cacheDel(id)}
+  catch(x){}finally{trRun=false}
+}
+/* Keep All Attachments Offline: download anything this device doesn't have yet, one file at a time */
+let offRun=false;
+async function syncOffline(){
+  if(offRun||!keepOffline()||!Sync.connected()||!navigator.onLine)return;offRun=true;
+  try{if(navigator.storage&&navigator.storage.persist&&!syncOffline.asked){syncOffline.asked=1;navigator.storage.persist().catch(()=>{})}}catch(x){}
+  try{const live=allDriveIds(),idx=FIDX();
+    for(const id of Object.keys(idx))if(!live.has(id)&&!LS.get(K_TRASH,[]).some(x=>x.id===id))await cacheDel(id);
+    for(const o of attOwners())for(const a of (o.files||[]).slice()){
+      if(a.kind!=="drive"||!a.driveId||FIDX()[a.driveId])continue;
+      try{const b=await driveFetch(a);await cachePut(a.driveId,b);refreshAttViews()}catch(x){if(x.message==="NO_FILE")continue;return}}}
+  finally{offRun=false}
+}
+function afterSync(){migrateColors();migrateFiles();runUploads().then(()=>{runTrash();syncOffline()})}
+addEventListener("online",()=>setTimeout(()=>{runUploads();runTrash()},1500));
+/* One-time update (Oct 2026): item "Links to Files" move into the item's notes. */
+function migrateFiles(){
+  if(S.settings.filesV1)return;let n=0;
+  S.projects.forEach(p=>p.phases.forEach(ph=>ph.items.forEach(it=>{const l=String(it.links||"").trim();if(l){it.notes=(it.notes&&it.notes.trim()?it.notes.replace(/\s+$/,"")+"\n\n":"")+l;n++}it.links=""})));
+  S.settings.filesV1=true;commit();
+}
+function attCard(a){
+  const k=kindOf(a),bd=badgeOf(a),st=a.pending?"Waiting to Upload":a.kind==="link"?"Link":fsize(a.size);
+  return `<div class="att ${a.pending?"pending":""}"><button class="att-open" data-att-open="${a.id}" title="${esc(a.name)}"><span class="th" ${k==="img"?`data-th="${a.id}"`:""}><span class="bdg" style="--bc:${bd.c}">${esc(bd.t)}</span></span><span class="nm">${esc(a.name)}</span><span class="sz">${st}</span></button><button class="att-x" data-att-del="${a.id}" aria-label="Remove ${esc(a.name)}">✕</button></div>`}
+function mountAtt(el,ref){
+  el.setAttribute("data-attgrid","1");
+  const draw=()=>{const o=ownerOf(ref);if(!o){el.innerHTML="";return}const L=o.files||[];
+    el.innerHTML=`${L.length?`<div class="att-grid">${L.map(attCard).join("")}</div>`:""}
+      <div class="row"><button class="btn sm" data-att-add>+ Add Files</button><button class="btn sm ghost" data-att-link>+ Add Link</button><span class="sub grow">${L.length?"":"JPG, PNG and PDF Open Here. Other Files Open in Google Drive. Up to 15 MB Each."}</span></div>
+      <input type="file" multiple hidden data-att-file>`;
+    el.querySelectorAll("[data-th]").forEach(t=>{const a=L.find(x=>x.id===t.dataset.th);if(a)localURL(a).then(u=>{if(u&&t.isConnected){t.insertAdjacentHTML("afterbegin",`<img src="${u}" alt="">`);t.classList.add("has")}}).catch(()=>{})});
+    const fi=el.querySelector("[data-att-file]");
+    el.querySelector("[data-att-add]").onclick=()=>fi.click();
+    fi.onchange=()=>{const fl=[...fi.files];fi.value="";if(fl.length)addFiles(ref,fl)};
+    el.querySelector("[data-att-link]").onclick=()=>linkModal(ref,el);
+    el.querySelectorAll("[data-att-open]").forEach(b=>b.onclick=()=>openAtt(ref,b.dataset.attOpen));
+    el.querySelectorAll("[data-att-del]").forEach(b=>armDelete(b,()=>removeAtt(ref,b.dataset.attDel),"Remove?"));
+  };
+  el._draw=draw;draw();
+}
+function removeAtt(ref,id){const o=ownerOf(ref);if(!o)return;const a=(o.files||[]).find(x=>x.id===id);if(!a)return;
+  undoable(()=>{o.files=o.files.filter(x=>x.id!==id)},a.kind==="drive"&&!a.pending?`${a.name} removed and moved to the Drive trash`:`${a.name} removed`);
+  if(a.driveId)queueTrash([a.driveId]);refreshAttViews()}
+function linkModal(ref,el){
+  const host=document.createElement("div");host.className="ov";host.id="ov2";host.style.zIndex=45;
+  host.innerHTML=`<div class="modal" role="dialog" aria-modal="true"><h2>Add a Link</h2><p class="sub" style="margin:0">For big files, like a Procreate or PSD file in Dropbox or Google Drive. The card shows the file type from the name.</p>
+    <div class="field"><label for="lk-u">Link</label><input class="inp" id="lk-u" placeholder="https://…"></div>
+    <div class="field"><label for="lk-n">Name</label><input class="inp" id="lk-n" placeholder="e.g. Lineup Final.procreate"></div>
+    <p class="sub" id="lk-e" style="color:var(--over);margin:0" hidden></p>
+    <div class="m-actions"><button class="btn" id="lk-c">Cancel</button><button class="btn primary" id="lk-ok">Add Link</button></div></div>`;
+  document.body.appendChild(host);const u=host.querySelector("#lk-u"),n=host.querySelector("#lk-n");setTimeout(()=>u.focus(),30);
+  const close=()=>host.remove();
+  host.addEventListener("mousedown",e=>{if(e.target===host)close()});host.querySelector("#lk-c").onclick=close;
+  const go=()=>{let url=u.value.trim();if(url&&!/^https?:\/\//i.test(url))url="https://"+url;
+    if(!/^https?:\/\/[^\s]+\.[^\s]+/i.test(url)){const e=host.querySelector("#lk-e");e.hidden=false;e.textContent="Paste a full link, starting with https://";return}
+    let nm=n.value.trim();if(!nm){try{const x=new URL(url);nm=decodeURIComponent(x.pathname.split("/").filter(Boolean).pop()||x.hostname)}catch(e){nm=url}}
+    const o=ownerOf(ref);if(!o)return close();close();o.files=[...(o.files||[]),{id:uid(),kind:"link",name:nm,url,added:TODAY()}];commit();toast("Link added")};
+  host.querySelector("#lk-ok").onclick=go;[u,n].forEach(i=>i.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();e.stopPropagation();go()}else if(e.key==="Escape"){e.preventDefault();e.stopPropagation();close()}});
+}
+function openAtt(ref,id){
+  const o=ownerOf(ref),a=o&&(o.files||[]).find(x=>x.id===id);if(!a)return;
+  if(a.kind==="link")return void window.open(a.url,"_blank","noopener");
+  if(kindOf(a)!=="other")return openViewer(ref,id);
+  if(a.pending)return toast("This file is waiting to upload. It opens in Google Drive once it's there.",4000);
+  window.open(a.url||`https://drive.google.com/file/d/${a.driveId}/view`,"_blank","noopener");
+}
+
+/* ===================== viewer (images + PDF) ===================== */
+const PDFJS="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+const loadScript=src=>new Promise((res,rej)=>{const sc=document.createElement("script");sc.src=src;sc.onload=()=>res();sc.onerror=()=>{sc.remove();rej(new Error("load"))};document.head.appendChild(sc)});
+let PDFp=null;
+/* the worker runs on the page itself, so PDFs still open offline from the cached copy */
+const loadPDF=()=>PDFp=PDFp||(async()=>{if(!window.pdfjsLib)await loadScript(PDFJS+"pdf.min.js");if(!window.pdfjsWorker)await loadScript(PDFJS+"pdf.worker.min.js");window.pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+"pdf.worker.min.js";return window.pdfjsLib})().catch(e=>{PDFp=null;throw e});
+let VW=null,vwPop=false;
+function openViewer(ref,id){
+  const o=ownerOf(ref);if(!o)return;const list=(o.files||[]).filter(a=>kindOf(a)!=="other");let i=Math.max(0,list.findIndex(a=>a.id===id));
+  const root=document.getElementById("viewer-root");
+  root.innerHTML=`<div class="vw" id="vw" role="dialog" aria-modal="true" aria-label="File viewer"><div class="vw-top"><span class="vw-t"><b id="vw-n"></b><span id="vw-c"></span></span>
+    <span class="row" style="gap:6px"><button class="btn sm" id="vw-out" aria-label="Zoom out">−</button><button class="btn sm" id="vw-fit">Fit</button><button class="btn sm" id="vw-zin" aria-label="Zoom in">+</button><button class="btn sm" id="vw-drive">Open in Drive</button><button class="btn sm" id="vw-x">Close</button></span></div>
+    <div class="vw-stage" id="vw-stage"><div class="vw-in" id="vw-box"></div></div>
+    ${list.length>1?`<button class="vw-nav prev" id="vw-prev" aria-label="Previous">‹</button><button class="vw-nav next" id="vw-next" aria-label="Next">›</button>`:""}</div>`;
+  const st=root.querySelector("#vw-stage"),box=root.querySelector("#vw-box");
+  VW={ref,list,i,zoom:1,base:null,kind:null,pdf:null,rT:null,tok:0};
+  const q=x=>root.querySelector(x);
+  const setW=(keepX,keepY)=>{if(!VW.base)return;const r=st.getBoundingClientRect(),fx=keepX??r.width/2,fy=keepY??r.height/2,ox=(st.scrollLeft+fx)/Math.max(box.scrollWidth,1),oy=(st.scrollTop+fy)/Math.max(box.scrollHeight,1);
+    box.querySelectorAll("img,canvas").forEach(c=>{c.style.width=Math.round(VW.base.w*VW.zoom*(c.dataset.k?+c.dataset.k:1))+"px"});
+    st.scrollLeft=ox*box.scrollWidth-fx;st.scrollTop=oy*box.scrollHeight-fy;
+    if(VW.kind==="pdf"){clearTimeout(VW.rT);VW.rT=setTimeout(renderPDF,250)}};
+  const zoomTo=(z,fx,fy)=>{VW.zoom=Math.min(8,Math.max(.25,z));setW(fx,fy)};
+  async function renderPDF(){const tok=VW.tok,doc=VW.pdf;if(!doc)return;const cs=[...box.querySelectorAll("canvas")];
+    for(let n=0;n<cs.length;n++){if(tok!==VW.tok)return;const pg=await doc.getPage(n+1),w=parseFloat(cs[n].style.width)||VW.base.w,vp1=pg.getViewport({scale:1}),sc=w/vp1.width*Math.min(2,window.devicePixelRatio||1),vp=pg.getViewport({scale:sc});
+      if(Math.abs(cs[n].width-vp.width)<2&&cs[n].dataset.r)continue;const c=document.createElement("canvas");c.width=vp.width;c.height=vp.height;await pg.render({canvasContext:c.getContext("2d"),viewport:vp}).promise;
+      if(tok!==VW.tok)return;const t=cs[n].getContext("2d");cs[n].width=vp.width;cs[n].height=vp.height;t.drawImage(c,0,0);cs[n].dataset.r=1}}
+  async function show(){
+    const a=VW.list[VW.i];VW.tok++;VW.pdf=null;VW.zoom=1;VW.base=null;VW.kind=kindOf(a);const tok=VW.tok;
+    q("#vw-n").textContent=a.name;q("#vw-c").textContent=`${VW.list.length>1?`${VW.i+1} of ${VW.list.length} · `:""}${a.pending?"Waiting to Upload":fsize(a.size)}`;
+    q("#vw-drive").hidden=!a.driveId;box.innerHTML=`<div class="vw-msg">Opening…</div>`;
+    let b;try{b=await getBlob(a)}catch(x){if(tok===VW.tok)box.innerHTML=`<div class="vw-msg">${x.message==="ELSEWHERE"?"This file was added on another device and hasn't reached Google Drive yet. It opens once that device is back online.":x.message==="NOT_CONNECTED"||!navigator.onLine?"This file isn't saved on this device yet. Open it once while online (VPN in China), or turn on Keep All Attachments Offline in Settings > Advanced.":esc(driveErr(x))}</div>`;return}
+    if(tok!==VW.tok)return;const r=st.getBoundingClientRect(),aw=r.width-24,ah=r.height-24;
+    if(VW.kind==="img"){const u=fileURLs[a.id]||(fileURLs[a.id]=URL.createObjectURL(b));const im=await loadImg(u).catch(()=>null);if(tok!==VW.tok)return;
+      if(!im){box.innerHTML=`<div class="vw-msg">This image couldn't be shown.</div>`;return}
+      const k=Math.min(1,aw/im.naturalWidth,ah/im.naturalHeight);VW.base={w:im.naturalWidth*k};box.innerHTML="";im.draggable=false;box.appendChild(im);setW()}
+    else{let lib;try{lib=await loadPDF()}catch(x){if(tok===VW.tok)box.innerHTML=`<div class="vw-msg">The PDF viewer needs the internet the first time. Open one PDF while online (VPN in China), and after that PDFs open offline too.</div>`;return}
+      try{const doc=await lib.getDocument({data:new Uint8Array(await b.arrayBuffer()),isEvalSupported:false}).promise;if(tok!==VW.tok)return;VW.pdf=doc;
+        const n=Math.min(doc.numPages,80),p1=(await doc.getPage(1)).getViewport({scale:1});VW.base={w:Math.max(160,Math.min(aw,ah*p1.width/p1.height))};
+        box.innerHTML="";for(let j=0;j<n;j++){const c=document.createElement("canvas");c.style.width=VW.base.w+"px";c.style.aspectRatio=`${p1.width}/${p1.height}`;box.appendChild(c)}
+        if(doc.numPages>n)box.insertAdjacentHTML("beforeend",`<div class="vw-msg">Showing the first ${n} pages. Open in Drive for the rest.</div>`);
+        setW();await renderPDF()}catch(x){if(tok===VW.tok)box.innerHTML=`<div class="vw-msg">This PDF couldn't be opened.</div>`}}
+  }
+  const go=d=>{if(VW.list.length<2)return;VW.i=(VW.i+d+VW.list.length)%VW.list.length;show()};
+  q("#vw-x").onclick=()=>closeViewer();q("#vw-zin").onclick=()=>zoomTo(VW.zoom*1.4);q("#vw-out").onclick=()=>zoomTo(VW.zoom/1.4);q("#vw-fit").onclick=()=>zoomTo(1);
+  q("#vw-drive").onclick=()=>{const a=VW.list[VW.i];if(a.driveId)window.open(a.url||`https://drive.google.com/file/d/${a.driveId}/view`,"_blank","noopener")};
+  if(q("#vw-prev")){q("#vw-prev").onclick=()=>go(-1);q("#vw-next").onclick=()=>go(1)}
+  st.addEventListener("wheel",e=>{if(e.ctrlKey||e.metaKey||VW.kind==="img"){e.preventDefault();const r=st.getBoundingClientRect();zoomTo(VW.zoom*Math.exp(-e.deltaY*(e.ctrlKey?.01:.002)),e.clientX-r.left,e.clientY-r.top)}},{passive:false});
+  st.addEventListener("dblclick",e=>{const r=st.getBoundingClientRect();zoomTo(VW.zoom>1.05?1:2.5,e.clientX-r.left,e.clientY-r.top)});
+  let pz=null,pan=null;
+  const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
+  st.addEventListener("touchstart",e=>{if(e.touches.length===2){const r=st.getBoundingClientRect();pz={d0:Math.max(dist(e.touches),20),z0:VW.zoom,fx:(e.touches[0].clientX+e.touches[1].clientX)/2-r.left,fy:(e.touches[0].clientY+e.touches[1].clientY)/2-r.top}}},{passive:true});
+  st.addEventListener("touchmove",e=>{if(pz&&e.touches.length===2){e.preventDefault();zoomTo(pz.z0*dist(e.touches)/pz.d0,pz.fx,pz.fy)}},{passive:false});
+  st.addEventListener("touchend",e=>{if(e.touches.length<2)pz=null},{passive:true});
+  let sx=0;st.addEventListener("touchstart",e=>{if(e.touches.length===1)sx=e.touches[0].clientX},{passive:true});
+  st.addEventListener("touchend",e=>{if(VW.zoom<=1.02&&e.changedTouches.length===1&&!pz){const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>70&&st.scrollWidth<=st.clientWidth+2)go(dx<0?1:-1)}},{passive:true});
+  st.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"||e.button!==0)return;pan={x:e.clientX,y:e.clientY,l:st.scrollLeft,t:st.scrollTop};st.classList.add("dragging")});
+  addEventListener("pointermove",e=>{if(pan){st.scrollLeft=pan.l-(e.clientX-pan.x);st.scrollTop=pan.t-(e.clientY-pan.y)}});
+  addEventListener("pointerup",()=>{pan=null;st.classList.remove("dragging")});
+  VW.key=e=>{if(!VW)return;if(e.key==="Escape"){e.preventDefault();e.stopImmediatePropagation();closeViewer()}else if(e.key==="ArrowRight"){e.preventDefault();e.stopImmediatePropagation();go(1)}else if(e.key==="ArrowLeft"){e.preventDefault();e.stopImmediatePropagation();go(-1)}
+    else if(e.key==="+"||e.key==="="){e.preventDefault();e.stopImmediatePropagation();zoomTo(VW.zoom*1.4)}else if(e.key==="-"){e.preventDefault();e.stopImmediatePropagation();zoomTo(VW.zoom/1.4)}else if(e.key==="0"){e.preventDefault();e.stopImmediatePropagation();zoomTo(1)}else e.stopImmediatePropagation()};
+  document.addEventListener("keydown",VW.key,true);
+  try{history.pushState({bbv:1},"")}catch(x){}
+  show();
+}
+function closeViewer(fromPop){if(!VW)return;document.removeEventListener("keydown",VW.key,true);VW.tok++;VW=null;document.getElementById("viewer-root").innerHTML="";if(!fromPop){vwPop=true;try{history.back()}catch(x){vwPop=false}}}
 
 /* ===================== templates, notes, renames, moves ===================== */
 const tplSteps=steps=>steps.map(s=>({name:s.name,est:s.est,stages:(s.stages||[]).map(x=>({...x}))}));
@@ -1139,15 +1539,19 @@ function moveItemModal(id){const {p,ph,it}=IX.idx.item[id];const opts=p.phases.f
       if(hasLinked(to,it.linkId,it.id)){const e=root.querySelector("#mv-err");e.hidden=false;e.textContent=`${to.name} already has an item for ${it.name}. Each character can only appear once per phase.`;return}
       closeModal();undoable(()=>{ph.items=ph.items.filter(x=>x.id!==id);to.items.push(it);S.ui.open[to.id]=true},`${it.name} moved to ${to.name}`)}});
 }
+const linkList=text=>{const u=[...new Set((String(text||"").match(/https?:\/\/[^\s<>"')\]]+/g)||[]))];return u.length?`<span class="lbl">LINKS</span>${u.map(x=>`<a href="${esc(x)}" target="_blank" rel="noopener">${esc(x)}</a>`).join("")}`:""};
 function notesModal(kind,obj,title,back){
+  const ref={kind,id:obj.id},cur=()=>ownerOf(ref)||obj;
   const ph={project:"Lore, references, links to resources…",phase:"Process reminders and workflow notes for this phase…",item:"Notes for this item…"}[kind];
   modal(`<h2>${esc(title)} · Notes</h2><textarea class="inp" id="nt" rows="6" placeholder="${ph}">${esc(obj.notes||"")}</textarea>
     <div id="nt-links" class="nt-links"></div>
+    <div class="field"><span class="lbl">ATTACHMENTS</span><div id="nt-att" class="att-wrap"></div></div>
     <div class="m-actions"><span class="sub left" id="nt-st">Saves as You Type</span><button class="btn primary" id="nt-done">Done</button></div>`,root=>{
     const t=root.querySelector("#nt"),L=root.querySelector("#nt-links");let tm;
-    const links=()=>{const u=[...new Set((t.value.match(/https?:\/\/[^\s<>"')\]]+/g)||[]))];L.innerHTML=u.length?`<span class="lbl">LINKS</span>${u.map(x=>`<a href="${esc(x)}" target="_blank" rel="noopener">${esc(x)}</a>`).join("")}`:""};
-    links();t.oninput=()=>{obj.notes=t.value;links();root.querySelector("#nt-st").textContent="Saving…";clearTimeout(tm);tm=setTimeout(()=>{save();root.querySelector("#nt-st").textContent="Saved"},500)};
-    root.querySelector("#nt-done").onclick=()=>{clearTimeout(tm);obj.notes=t.value;commit();back?back():closeModal()};
+    const links=()=>{L.innerHTML=linkList(t.value)};
+    links();t.oninput=()=>{cur().notes=t.value;links();root.querySelector("#nt-st").textContent="Saving…";clearTimeout(tm);tm=setTimeout(()=>{save();root.querySelector("#nt-st").textContent="Saved"},500)};
+    mountAtt(root.querySelector("#nt-att"),ref);
+    root.querySelector("#nt-done").onclick=()=>{clearTimeout(tm);cur().notes=t.value;commit();back?back():closeModal()};
   },"wide");
 }
 const swatchGrid=(list,sel,attr="data-sw")=>`<div class="swatches">${list.map((c,i)=>`<button style="--c:var(--${c})" ${attr}="${c}" aria-pressed="${c===sel}" aria-label="Color ${i+1}"><span>${i+1}</span></button>`).join("")}</div>`;
@@ -1385,7 +1789,7 @@ function viewWeek(){
   S.plans.filter(p=>p.date>=ws&&p.date<=we&&!p.life).forEach(p=>{const r=IX.idx.step[p.step];if(!r)return;const k=r.ph.id;byPh[k]=byPh[k]||{a:0,p:0};byPh[k].p+=p.dur});
   const max=Math.max(1,...Object.values(byPh).map(x=>Math.max(x.a,x.p)));
   const hp=S.projects.filter(p=>!p.archived).map(p=>{const rs=p.phases.filter(ph=>byPh[ph.id]).map(ph=>{const x=byPh[ph.id];
-      return `<div class="hrow" style="--c:var(--${ph.color})"><span class="l"><span class="dot"></span><span>${esc(ph.name)}</span></span><div class="htrack"><span class="pl" style="width:${x.p/max*100}%"></span><span class="ac" style="width:${x.a/max*100}%"></span></div><span class="v">${AE(x.a,x.p,fmtH)}${S.settings.weekWarn?(()=>{const t=phaseStats(ph);return t.act>t.budget?`<span class="pc over" title="Phase budget used">${pctOf(t.act,t.budget)}%</span>`:t.act/Math.max(t.budget,1)>=WA()?`<span class="pc warn" title="Phase budget used">${pctOf(t.act,t.budget)}%</span>`:""})():""}</span></div>`}).join("");
+      return `<div class="hrow" style="--c:var(--${ph.color})"><span class="l"><span class="dot"></span><span>${esc(ph.name)}</span></span><div class="htrack"><span class="pl" style="width:${x.p/max*100}%"></span><span class="ac" style="width:${x.a/max*100}%"></span></div><span class="v">${AE(x.a,x.p,fmtH)}${S.settings.weekWarn?(()=>{const t=phaseStats(ph);return pcSpan(t.act,t.budget,"Phase budget used")})():""}</span></div>`}).join("");
     return rs?`<div style="display:grid;gap:8px"><span class="sub" style="font-weight:700">${esc(p.name)}</span>${rs}</div>`:""}).join("");
   const tasks=[];S.projects.filter(p=>!p.archived).forEach(p=>p.phases.forEach(ph=>ph.items.forEach(it=>{if(it.week===ws)tasks.push({ph,it})})));
   const meta=S.weekMeta[ws]=S.weekMeta[ws]||{priorities:[],achievements:[]};
@@ -1563,7 +1967,7 @@ function bindPinch(){
 }
 
 /* ===================== month ===================== */
-const monthMarks=ds=>{const out=schedOn(ds).map(({e,ph})=>({t:e.label,c:ph?ph.color:"accent"}));S.projects.filter(p=>!p.archived).forEach(p=>p.phases.forEach(ph=>{if(ph.due===ds)out.push({t:"Target · "+ph.name,c:ph.color,due:1})}));return out};
+const monthMarks=ds=>{const out=schedOn(ds).map(({e,ph})=>({t:e.label,c:ph?ph.color:"accent"}));S.projects.filter(p=>!p.archived).forEach(p=>{if(p.due===ds)out.push({t:"Due · "+p.name,c:"accent",due:1});p.phases.forEach(ph=>{if(ph.due===ds)out.push({t:"Target · "+ph.name,c:ph.color,due:1})})});return out};
 const dayPhase=ds=>{const by={};S.sessions.filter(s=>s.date===ds).forEach(s=>{const r=IX.idx.step[s.step];if(r)by[r.ph.id]=(by[r.ph.id]||0)+s.dur});const top=Object.entries(by).sort((x,y)=>y[1]-x[1])[0];return top?IX.idx.phase[top[0]].ph:null};
 const monthRec=mk=>S.monthly[mk]=S.monthly[mk]||{focus:"",wins:[""],improve:[""],goals:[{g:"",w:"",r:""}],notes:""};
 function viewMonth(){
@@ -1599,12 +2003,12 @@ function alertsRow(from,to){
   if(!S.settings.reviewAlerts)return"";const seen=new Set();
   S.sessions.filter(s=>s.date>=from&&s.date<=to).forEach(s=>{const r=IX.idx.step[s.step];if(r)seen.add(r.ph.id)});
   const out=[...seen].map(id=>IX.idx.phase[id]).filter(Boolean).map(({p,ph})=>{const t=phaseStats(ph);return{p,ph,t,r:t.act/Math.max(t.budget,1)}}).filter(x=>x.r>=WA()).sort((a,b)=>b.r-a.r);
-  return out.length?`<div class="alerts"><span class="k">Budget Alerts</span>${out.map(x=>`<span class="al" title="${esc(x.p.name)}"><span class="dot" style="--c:var(--${x.ph.color})"></span>${esc(x.ph.name)}<span class="${x.t.act>x.t.budget?"pct-o":"pct-w"}">${x.t.act>x.t.budget?"Over ":""}${pctOf(x.t.act,x.t.budget)}%</span></span>`).join("")}</div>`:"";
+  return out.length?`<div class="alerts"><span class="k">Budget Alerts</span>${out.map(x=>`<span class="al" title="${esc(x.p.name)}"><span class="dot" style="--c:var(--${x.ph.color})"></span>${esc(x.ph.name)}<span class="${pctCls(x.t.act>x.t.budget)}">${x.t.act>x.t.budget?"Over ":""}${pctOf(x.t.act,x.t.budget)}%</span></span>`).join("")}</div>`:"";
 }
 function weeklyReview(){
   const ws=S.ui.rweek,we=iso(addDays(parse(ws),6)),r=S.weekly[ws]=S.weekly[ws]||{};
   const l=S.sessions.filter(s=>s.date>=ws&&s.date<=we).reduce((a,s)=>a+s.dur,0);
-  let sub=0,its=0;S.projects.forEach(p=>p.phases.forEach(ph=>ph.items.forEach(it=>{if(it.week===ws){its++;if(["Submitted","Feedback Received","Revising","Done"].includes(it.status))sub++}})));
+  let sub=0,its=0;S.projects.forEach(p=>p.phases.forEach(ph=>ph.items.forEach(it=>{if(it.week===ws){its++;if(["Submitted","Feedback Received","Revising","Approved","Done"].includes(it.status))sub++}})));
   let ba=0,bb=0;proj().phases.forEach(ph=>{if(!ph.bonus){const s=phaseStats(ph);ba+=s.act;bb+=s.budget}});
   const f=(k,l,ph)=>`<section class="panel field"><label for="wr-${k}">${l}</label><textarea class="inp" id="wr-${k}" data-wr="${k}" rows="5" placeholder="${ph}">${esc(r[k]||"")}</textarea></section>`;
   return `<div class="row"><h2 class="grow">Week of ${short(ws)} – ${short(we)}</h2>
@@ -1642,7 +2046,7 @@ function monthlyReview(){
 /* ===================== review export ===================== */
 function weekInfo(ws){const we=iso(addDays(parse(ws),6)),r=S.weekly[ws]||{};
   const l=S.sessions.filter(s=>s.date>=ws&&s.date<=we).reduce((a,s)=>a+s.dur,0);
-  let sub=0,its=0;S.projects.forEach(p=>p.phases.forEach(ph=>ph.items.forEach(it=>{if(it.week===ws){its++;if(["Submitted","Feedback Received","Revising","Done"].includes(it.status))sub++}})));
+  let sub=0,its=0;S.projects.forEach(p=>p.phases.forEach(ph=>ph.items.forEach(it=>{if(it.week===ws){its++;if(["Submitted","Feedback Received","Revising","Approved","Done"].includes(it.status))sub++}})));
   return{ws,we,r,l,target:S.settings.target*S.settings.days*60,sub,its,alerts:alertsList(ws,we)}}
 function monthInfo(mk){const [y,m]=mk.split("-").map(Number),from=iso(new Date(y,m-1,1)),to=iso(new Date(y,m,0)),r=S.monthly[mk]||{focus:"",wins:[],improve:[],goals:[],notes:""};
   const ses=S.sessions.filter(s=>s.date>=from&&s.date<=to),l=ses.reduce((a,s)=>a+s.dur,0),per={};
@@ -1655,20 +2059,71 @@ function printReview(kind){
   const P=document.getElementById("print-root"),e=esc,para=t=>t&&String(t).trim()?`<p>${e(t)}</p>`:`<p class="sub">Nothing written.</p>`;
   let h="";
   if(kind==="weekly"){const w=weekInfo(S.ui.rweek);
-    h=`<h1>Weekly Review · ${short(w.ws)} – ${short(w.we)}</h1><div class="sub">Blue Blaze Project Tracker · Exported ${short(TODAY())}</div>
+    h=`<h1>Weekly Review · ${short(w.ws)} – ${short(w.we)}</h1><div class="sub">${esc(appName())} · Exported ${short(TODAY())}</div>
       <div class="st"><span>Logged <b>${fmtH(w.l)}</b> of ${fmtH(w.target)}</span><span>Items Submitted <b>${w.sub}</b> / ${w.its}</span>${w.alerts.length?`<span>Budget Alerts: ${e(alertsText(w.alerts))}</span>`:""}</div>
       <h2>What Worked</h2>${para(w.r.worked)}<h2>What to Improve</h2>${para(w.r.improve)}<h2>Feedback Summary</h2>${para(w.r.mentor)}<h2>Next Week's Focus</h2>${para(w.r.focus)}`}
   else{const m=monthInfo(S.ui.month),li=a=>(a||[]).filter(x=>String(x).trim()).length?`<ol>${a.filter(x=>String(x).trim()).map(x=>`<li>${e(x)}</li>`).join("")}</ol>`:`<p class="sub">Nothing written.</p>`;
     const goals=(m.r.goals||[]).filter(g=>g.g||g.w||g.r);
-    h=`<h1>Monthly Review · ${e(m.title)}</h1><div class="sub">Blue Blaze Project Tracker · Exported ${short(TODAY())}</div>
+    h=`<h1>Monthly Review · ${e(m.title)}</h1><div class="sub">${esc(appName())} · Exported ${short(TODAY())}</div>
       ${m.r.focus?`<h2>Focus</h2><p>${e(m.r.focus)}</p>`:""}
       <div class="st"><span>Logged <b>${fmtH(m.l)}</b></span>${Object.entries(m.per).map(([n,v])=>`<span>${e(n)} <b>${fmtH(v)}</b></span>`).join("")}${m.alerts.length?`<span>Budget Alerts: ${e(alertsText(m.alerts))}</span>`:""}</div>
       <h2>Wins</h2>${li(m.r.wins)}<h2>Improvements</h2>${li(m.r.improve)}
       <h2>Goals</h2>${goals.length?`<table><tr><th>#</th><th>Goal</th><th>Why / How</th><th>Rewards</th></tr>${goals.map((g,i)=>`<tr><td>${i+1}</td><td>${e(g.g)}</td><td>${e(g.w)}</td><td>${e(g.r)}</td></tr>`).join("")}</table>`:`<p class="sub">No goals set.</p>`}
       <h2>Notes</h2>${para(m.r.notes)}`}
-  P.innerHTML=`<div class="pr">${h}</div>`;document.body.classList.add("printing");
+  printHTML(h);
+}
+function printHTML(h){
+  const P=document.getElementById("print-root");P.innerHTML=`<div class="pr">${h}</div>`;document.body.classList.add("printing");
   const done=()=>{document.body.classList.remove("printing");P.innerHTML="";removeEventListener("afterprint",done)};addEventListener("afterprint",done);
-  setTimeout(()=>{try{window.print()}catch(x){toast("Printing isn't available here.")}setTimeout(()=>{if(!matchMedia("print").matches)done()},1500)},60);
+  const imgs=[...P.querySelectorAll("img")];
+  Promise.all(imgs.map(i=>i.complete?0:new Promise(r=>{i.onload=i.onerror=r}))).then(()=>setTimeout(()=>{try{window.print()}catch(x){toast("Printing isn't available here.")}setTimeout(()=>{if(!matchMedia("print").matches)done()},1500)},60));
+}
+/* ===================== client report (PDF) ===================== */
+const phaseStatus=ph=>{const s=phaseStats(ph);if(ph.items.length&&ph.items.every(isDone))return"Complete";if(s.act>0||ph.items.some(it=>it.status!=="Not Started"))return"In Progress";return"Not Started"};
+function clientReportModal(pid){
+  const p=S.projects.find(x=>x.id===pid)||proj();if(!p)return;let sel=new Set(p.phases.map(ph=>ph.id));
+  const o={rounds:true,sched:true,thumbs:true,hours:false,value:false,notes:false,...(S.ui.crOpts||{})};
+  const OPTS=[["rounds","Revision Rounds"],["sched","Due Date and Projected Finish"],["thumbs","Attachment Thumbnails (JPG and PNG)"],["hours","Hours"],["value","Rates and Value"],["notes","Private Notes (Project and Phase Notes)"]];
+  const list=()=>p.phases.map(ph=>`<label class="check"><input type="checkbox" data-crp="${ph.id}" ${sel.has(ph.id)?"checked":""}><span><span class="dot" style="--c:var(--${ph.color});margin-right:6px"></span>${esc(ph.name)} <span class="sub">· ${phaseStatus(ph)}</span></span></label>`).join("")||`<p class="empty">This project has no phases yet.</p>`;
+  modal(`<h2>Client Report · ${esc(p.name)}</h2>
+    <p class="sub" style="margin:0">A clean PDF for your client with phases, item status and progress. Hours, rates and private notes stay out unless you tick them. In the print window, choose "Save as PDF".</p>
+    <div class="field crx"><span class="lbl">INCLUDE</span>${OPTS.map(([k,l])=>`<label class="check"><input type="checkbox" data-cro="${k}" ${o[k]?"checked":""}><span>${l}</span></label>`).join("")}</div>
+    <div class="field"><div class="row"><span class="lbl grow">PHASES</span><button class="btn sm ghost" id="cr-all">Select All</button><button class="btn sm ghost" id="cr-none">Select None</button></div><div id="cr-list" class="crx" style="display:grid;gap:6px">${list()}</div></div>
+    <p class="sub" id="cr-msg" style="margin:0" hidden></p>
+    <div class="m-actions"><button class="btn" data-close>Cancel</button><button class="btn primary" id="cr-go">Create PDF</button></div>`,root=>{
+    const box=root.querySelector("#cr-list"),go=root.querySelector("#cr-go");
+    const bind=()=>{box.querySelectorAll("[data-crp]").forEach(c=>c.onchange=()=>{c.checked?sel.add(c.dataset.crp):sel.delete(c.dataset.crp);go.disabled=!sel.size});go.disabled=!sel.size};bind();
+    root.querySelector("#cr-all").onclick=()=>{sel=new Set(p.phases.map(ph=>ph.id));box.innerHTML=list();bind()};
+    root.querySelector("#cr-none").onclick=()=>{sel=new Set();box.innerHTML=list();bind()};
+    root.querySelectorAll("[data-cro]").forEach(c=>c.onchange=()=>{o[c.dataset.cro]=c.checked});
+    go.onclick=async()=>{S.ui.crOpts={...o};save();go.disabled=true;go.textContent="Preparing…";
+      const h=await clientReportHTML(p,p.phases.filter(ph=>sel.has(ph.id)),o);closeModal();setTimeout(()=>printHTML(h),120)};
+  },"wide");
+}
+async function clientReportHTML(p,phs,o){
+  const e=esc,P=priceOf(p),f=forecast(p),inc=roundsIncl(p);
+  let ni=0,nd=0,te=0,de=0;phs.forEach(ph=>ph.items.forEach(it=>{ni++;const x=Math.max(itemStats(it).est,1);te+=x;if(isDone(it)){nd++;de+=x}}));
+  const thumbs=async L=>{if(!o.thumbs)return"";const imgs=L.filter(a=>kindOf(a)==="img").slice(0,12),out=[];
+    for(const a of imgs){try{const b=await Promise.race([getBlob(a),new Promise((_,rej)=>setTimeout(()=>rej(new Error("T")),20000))]);const u=fileURLs[a.id]||(fileURLs[a.id]=URL.createObjectURL(b));out.push(`<figure><img src="${u}" alt=""><figcaption>${e(a.name)}</figcaption></figure>`)}catch(x){}}
+    return out.length?`<div class="thumbs">${out.join("")}</div>`:""};
+  let h=`<h1>${e(p.name)}</h1>${p.subtitle?`<div class="sub">${e(p.subtitle)}</div>`:""}
+    <div class="meta">${p.client?`<span>Client: <b>${e(p.client)}</b></span>`:""}${p.dm?`<span>Decision-Maker: <b>${e(p.dm)}</b></span>`:""}<span>Prepared by ${e(appName())}</span><span>${short(TODAY())}, ${new Date().getFullYear()}</span></div>
+    <div class="st"><span>Items Done or Approved <b>${nd}</b> of ${ni}</span><span>Progress <b>${te?Math.round(de/te*100):0}%</b></span>
+      ${o.sched&&p.due?`<span>Due <b>${short(p.due)}</b></span>`:""}${o.sched&&f.fin?`<span>Projected Finish <b>${short(f.fin)}</b></span>`:""}
+      ${o.hours?(()=>{let b=0,a=0;phs.forEach(ph=>{const s=phaseStats(ph);b+=s.budget;a+=s.act});return `<span>Hours <b>${fmtH(a)}</b> of ${fmtH(b)}</span>`})():""}
+      ${o.value?(()=>{let v=0,w=0;phs.forEach(ph=>{const x=phaseVal(p,ph,P);v+=x.est;w+=x.earned});return `<span>Project Value <b>${money(v)}</b></span><span>Value Completed <b>${money(w)}</b></span>${P.mode==="hourly"||P.mode==="day"?`<span>Rate <b>${P.mode==="day"?money(P.day)+"/Day":money(P.rate)+"/h"}</b></span>`:""}`})():""}</div>
+    ${o.notes&&p.notes&&p.notes.trim()?`<h2>Project Notes</h2><div class="note">${e(p.notes)}</div>`:""}
+    ${await thumbs(p.files||[])}`;
+  for(const ph of phs){const s=phaseStats(ph),n=roundsOf(ph).length,pv=phaseVal(p,ph,P),pr=Math.round(progressOf(ph)*100);
+    const all=[...(ph.files||[]),...ph.items.flatMap(it=>it.files||[])];
+    h+=`<div class="ph"><h2>${e(ph.name)}</h2><div class="meta"><span>Status: <b>${phaseStatus(ph)}</b></span><span>Progress <b>${pr}%</b></span>${ph.due?`<span>Target ${short(ph.due)}</span>`:""}
+      ${o.rounds?`<span>Feedback Rounds: <b>${n}</b>${inc>0?` (${inc} Included${n>inc?`, ${n-inc} Extra`:""})`:""}</span>`:""}
+      ${o.hours?`<span>Hours ${fmtH(s.act)} of ${fmtH(s.budget)}</span>`:""}${o.value&&(pv.est||pv.earned)?`<span>Value ${money(pv.est)}</span>`:""}</div>
+      ${ph.items.length?`<table><tr><th>Item</th><th>Row</th><th>Status</th>${o.hours?"<th>Hours</th>":""}</tr>${ph.items.map(it=>{const x=itemStats(it);return `<tr><td>${e(it.name)}</td><td>${e(it.group||"")}</td><td>${e(it.status)}</td>${o.hours?`<td>${fmtH(x.act)} of ${fmtH(x.est)}</td>`:""}</tr>`}).join("")}</table>`:`<p class="sub">No items in this phase yet.</p>`}
+      ${o.rounds&&n?`<p class="sub">${roundsOf(ph).map((r,i)=>`Round ${i+1}: ${short(r.d)}${r.note?` · ${e(r.note)}`:""}`).join("<br>")}</p>`:""}
+      ${o.notes&&ph.notes&&ph.notes.trim()?`<div class="note">${e(ph.notes)}</div>`:""}
+      ${await thumbs(all)}</div>`}
+  return h;
 }
 function reviewExportModal(kind){
   modal(`<h2>Export ${kind==="weekly"?"Weekly":"Monthly"} Review</h2>
@@ -1698,7 +2153,7 @@ function exportReviewsXLSX(X,range){
   const wb=X.utils.book_new(),sh=(rows,cols)=>{const ws=X.utils.aoa_to_sheet(rows);ws["!cols"]=cols.map(w=>({wch:w}));return ws};
   X.utils.book_append_sheet(wb,sh(wk,[12,12,10,10,15,13,28,40,40,40,40]),"Weekly");
   X.utils.book_append_sheet(wb,sh(mo,[16,36,10,30,28,40,40,50,50]),"Monthly");
-  downloadFile(`Project Tracker Reviews ${TODAY()}.xlsx`,new Blob([X.write(wb,{bookType:"xlsx",type:"array"})],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
+  downloadFile(`${shortName()} Reviews ${TODAY()}.xlsx`,new Blob([X.write(wb,{bookType:"xlsx",type:"array"})],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
 }
 
 /* ===================== projects & templates ===================== */
@@ -1709,8 +2164,9 @@ function fromStructure(st,name){
 function libModal(){
   modal(`<div class="row"><h2 class="grow">Projects & Templates</h2><button class="btn ghost" data-close>Close</button></div>
     <div class="row"><button class="btn primary" id="lib-blank">New Blank Project</button><button class="btn" id="lib-up">Load from File…</button></div>
-    <section style="display:grid"><h3 style="margin-bottom:4px">Projects</h3>${S.projects.map(p=>`<div class="tpl"><div><b>${esc(p.name)}</b> <span class="sub">${esc(p.subtitle||"")}${p.archived?" · Archived":""}</span></div>
-      <div class="row"><button class="btn sm" data-lib-open="${p.id}">Open</button><button class="btn sm" data-lib-edit="${p.id}">Rename</button><button class="btn sm" data-lib-tpl="${p.id}">Save as Template</button><button class="btn sm" data-lib-dl="${p.id}">Download</button><button class="btn sm ghost" data-lib-arch="${p.id}">${p.archived?"Unarchive":"Archive"}</button><button class="btn sm" data-lib-xp="${p.id}">Export Report</button><button class="btn sm ghost danger" data-lib-del="${p.id}">Delete</button></div></div>`).join("")}</section>
+    <section style="display:grid"><div class="row" style="margin-bottom:4px"><h3 class="grow">Projects</h3><div class="seg-ctl" style="width:auto">${["All","Client","Internal","Pitch"].map(t=>`<button data-ptf="${t}" aria-pressed="${(S.ui.ptf||"All")===t}">${t==="Pitch"?"Pitches":t}</button>`).join("")}</div></div>
+      ${S.projects.filter(p=>(S.ui.ptf||"All")==="All"||ptype(p)===S.ui.ptf).map(p=>`<div class="tpl"><div><b>${esc(p.name)}</b> <span class="chip type">${ptype(p)}</span> <span class="sub">${p.client?esc(p.client)+" · ":""}${esc(p.subtitle||"")}${p.archived?" · Archived":""}</span>${dmMissing(p)?` <span class="chip flag">No Decision-Maker Named</span>`:""}</div>
+      <div class="row"><button class="btn sm" data-lib-open="${p.id}">Open</button><button class="btn sm" data-lib-edit="${p.id}">Edit</button><button class="btn sm" data-lib-cr="${p.id}">Client Report</button><button class="btn sm" data-lib-tpl="${p.id}">Save as Template</button><button class="btn sm" data-lib-dl="${p.id}">Download</button><button class="btn sm ghost" data-lib-arch="${p.id}">${p.archived?"Unarchive":"Archive"}</button><button class="btn sm" data-lib-xp="${p.id}">Export Report</button><button class="btn sm ghost danger" data-lib-del="${p.id}">Delete</button></div></div>`).join("")||`<p class="empty">No ${S.ui.ptf==="Pitch"?"pitches":esc((S.ui.ptf||"").toLowerCase())+" projects"} yet.</p>`}</section>
     <section style="display:grid"><h3 style="margin-bottom:4px">Pipeline Templates</h3>${S.templates.map(t=>`<div class="tpl"><div><b>${esc(t.name)}</b> <span class="sub">${esc(t.note||"")}${t.archived?" · Archived":""}</span></div>
       <div class="row"><button class="btn sm primary" data-tpl-new="${t.id}">New Project from This</button><button class="btn sm" data-tpl-dl="${t.id}">Download</button><button class="btn sm ghost" data-tpl-arch="${t.id}">${t.archived?"Unarchive":"Archive"}</button><button class="btn sm ghost danger" data-tpl-del="${t.id}">Delete</button></div></div>`).join("")}</section>
     <p class="sub" style="margin:0">A template keeps phases, budgets, items, steps, stage timers and checklists, with no logged time. A project download includes its logged time. Load from File accepts either.</p>`,
@@ -1721,8 +2177,10 @@ function libModal(){
     root.querySelectorAll("[data-lib-edit]").forEach(b=>b.onclick=()=>projectModal(b.dataset.libEdit,false));
     root.querySelectorAll("[data-lib-tpl]").forEach(b=>b.onclick=()=>{const p=S.projects.find(x=>x.id===b.dataset.libTpl);S.templates.push({id:uid(),name:p.name+" Pipeline",note:`${p.phases.length} phases, saved ${short(TODAY())}`,archived:false,data:structureOf(p)});commit();libModal();toast("Template saved")});
     root.querySelectorAll("[data-lib-xp]").forEach(b=>b.onclick=()=>exportModal(b.dataset.libXp));
+    root.querySelectorAll("[data-ptf]").forEach(b=>b.onclick=()=>{S.ui.ptf=b.dataset.ptf;save();libModal()});
+    root.querySelectorAll("[data-lib-cr]").forEach(b=>b.onclick=()=>clientReportModal(b.dataset.libCr));
     root.querySelectorAll("[data-lib-arch]").forEach(b=>b.onclick=()=>{const p=S.projects.find(x=>x.id===b.dataset.libArch);p.archived=!p.archived;commit();libModal()});
-    root.querySelectorAll("[data-lib-del]").forEach(b=>armDelete(b,()=>{S.projects=S.projects.filter(x=>x.id!==b.dataset.libDel);S.ui.project=(S.projects[0]||{}).id;commit();libModal()},"Delete Project + Time"));
+    root.querySelectorAll("[data-lib-del]").forEach(b=>armDelete(b,()=>{const dp=S.projects.find(x=>x.id===b.dataset.libDel);if(dp)queueTrash(driveIdsIn(dp),3000);S.projects=S.projects.filter(x=>x.id!==b.dataset.libDel);S.ui.project=(S.projects[0]||{}).id;commit();libModal()},"Delete Project + Time"));
     root.querySelectorAll("[data-tpl-new]").forEach(b=>b.onclick=()=>{const t=S.templates.find(x=>x.id===b.dataset.tplNew);const p=fromStructure(t.data,"");S.projects.push(p);S.ui.project=p.id;S.ui.view="board";commit();projectModal(p.id,false);toast("Project created with zero hours logged. Give it a name.")});
     root.querySelectorAll("[data-tpl-arch]").forEach(b=>b.onclick=()=>{const t=S.templates.find(x=>x.id===b.dataset.tplArch);t.archived=!t.archived;commit();libModal()});
     root.querySelectorAll("[data-tpl-del]").forEach(b=>armDelete(b,()=>{S.templates=S.templates.filter(x=>x.id!==b.dataset.tplDel);commit();libModal()}));
@@ -1799,13 +2257,32 @@ function settingsModal(tab="general",D){
     <div class="field"><label for="st-d">Work Days per Week</label>${num("days",D.days,1,7,1).replace('style="width:76px"','id="st-d"')}</div></div>
     <div class="field"><div class="row"><span class="lbl grow">DAILY ROUTINE</span><button class="btn sm" id="st-rt">Edit Routine</button></div><span class="sub">Life blocks that fill in every week. Change any single day without touching the routine.</span></div>
     <div class="field"><div class="row"><span class="lbl grow">COLORS</span><button class="btn sm" id="st-pal">Phase Colors</button><button class="btn sm" id="st-lpal">Life Block Colors</button></div></div>
-    <p class="sub" style="margin:0">Backgrounds, Budget Meter Colors, Calendar, Timer and Data Options Are in Advanced.</p>`;
+    <div class="field" style="gap:10px"><span class="lbl">RATES AND VALUE (USD)</span>
+      <div class="two"><div class="field"><label for="st-rate">Default Hourly Rate ($)</label><input class="inp" type="number" id="st-rate" data-n="rate" min="0" step="5" value="${D.rate}"></div>
+        <div class="field"><label for="st-hpd">Hours per Day (for Day Rates)</label><input class="inp" type="number" id="st-hpd" data-n="hpd" min="1" max="24" step="0.5" value="${D.hpd}"></div></div>
+      <div class="two"><div class="field"><label for="st-floor">Rate Floor ($ per Hour)</label><input class="inp" type="number" id="st-floor" data-n="rateFloor" data-z min="0" step="5" value="${D.rateFloor||""}" placeholder="Empty = Off"><span class="sub">Effective Rates Below This Turn Amber</span></div>
+        <div class="field"><label for="st-rnd">Feedback Rounds Included per Phase</label><input class="inp" type="number" id="st-rnd" data-n="roundsIncl" data-z min="0" max="20" step="1" value="${D.roundsIncl??1}"><span class="sub">Default for Every Project. 0 Counts Without a Limit.</span></div></div>
+      <div class="two"><div class="field"><label for="st-mxn">MXN per 1 USD</label><input class="inp" type="number" id="st-mxn" data-n="mxn" data-z min="0" step="0.01" value="${D.mxn||""}" placeholder="e.g. 18.50"><span class="sub">You Set It, So It Works Offline</span></div>
+        <div class="field" style="align-content:center">${tgl("showMXN","Show MXN Next to USD")}</div></div>
+      ${tgl("showValue","Show Value on the Board","Estimated value, earned so far and effective rate under each bar.")}</div>
+    <p class="sub" style="margin:0">Branding, Backgrounds, Budget Meter Colors, Flags, Calendar, Timer, Attachments and Data Options Are in Advanced.</p>`;
   const advanced=()=>`<div class="adv">
+    <section><h3>Branding</h3>
+      <div class="brand-prev" id="br-prev"></div>
+      <div class="two"><div class="field"><label for="br-name">App Name</label><input class="inp" id="br-name" data-txt="brandName" value="${esc(D.brandName||"")}" placeholder="${DEF_NAME}"></div>
+        <div class="field"><label for="br-short">Home Screen Name</label><input class="inp" id="br-short" data-txt="brandShort" maxlength="12" value="${esc(D.brandShort||"")}" placeholder="Project Tracker"><span class="sub">Up to 12 Characters. Used by Export Icon Files.</span></div></div>
+      <div class="row"><button class="btn sm" id="br-up">Upload Logo</button><button class="btn sm ghost" id="br-reset">Reset to Default</button><span class="sub grow">SVG, PNG or JPG. A One-Color SVG Works Best.</span></div>
+      <input type="file" id="br-file" accept=".svg,.png,.jpg,.jpeg,image/svg+xml,image/png,image/jpeg" hidden>
+      ${tgl("brandTint","Accent Color on SVG Logos","Off: an SVG logo keeps its own colors. PNG and JPG logos always show as uploaded.")}
+      <div class="inl"><span class="sub">Home Screen Icon: Background</span><input type="color" data-col="iconBg" value="${D.iconBg||"#19212F"}" aria-label="Icon background color"><span class="sub">Logo Color</span><input type="color" data-col="iconFg" value="${D.iconFg||"#38B2C3"}" aria-label="Icon logo color"></div>
+      <div class="row"><button class="btn sm" id="br-icons">Export Icon Files</button><span class="sub grow">A zip with the home-screen icons and name. Upload its contents to your tracker repository on GitHub to change the installed icon.</span></div></section>
     <section><h3>Appearance</h3>${chead}${CKEYS.filter(K=>K.grp==="ap").map(crow).join("")}
       <div class="tgl"><span>Text Size</span>${seg("textSize",[["s","Small"],["m","Medium"],["l","Large"]])}</div></section>
     <section><h3>Budget Meter</h3>${chead}${CKEYS.filter(K=>K.grp==="bm").map(crow).join("")}
       <div class="tgl"><span>Warning Threshold<small>The bar turns yellow past this share of the budget.</small></span><select class="inp" data-sel="warnAt" style="width:auto">${[70,75,80,85,90].map(x=>`<option value="${x}" ${x===D.warnAt?"selected":""}>${x}%</option>`).join("")}</select></div>
-      ${tgl("showPct","Show Percentages","Yellow and pink percentages next to hours.")}
+      ${tgl("warnColors","Warning Colors","Yellow on bars and percentages past the threshold. Off: bars stay teal (or the phase color).")}
+      ${tgl("overColors","Over Budget Colors","Pink when hours pass the budget. Off: the overflow shows in teal and labels in your text color.")}
+      ${tgl("showPct","Show Percentages","Percentages next to hours once a budget passes the threshold.")}
       ${tgl("weekWarn","Week View Warnings","Percentages in Hours by Phase and This Week's Items.")}
       ${tgl("reviewAlerts","Budget Alerts on Review Pages","One line listing phases past the threshold.")}</section>
     <section><h3>Board</h3>
@@ -1813,6 +2290,11 @@ function settingsModal(tab="general",D){
       ${tgl("itemPhaseColors","Phase Colors on Items","Off: every item bar is teal.")}
       ${tgl("includeBonus","Include Bonus Hours in Project Totals","Off: the project meter shows the main budget only.")}
       ${tgl("linkNames","Linked Character Names","Items sent to another phase share one name. Renaming one renames them all. Copies made while this is off stay independent.")}</section>
+    <section><h3>Flags</h3>
+      ${tgl("flagRate","Rate Floor Warning","Amber when an effective rate drops below your floor. Set the floor in General.")}
+      ${tgl("flagScope","Revisions Over Scope","Amber when a phase has more feedback rounds than included.")}
+      ${tgl("flagLate","Deadline Running Late","Amber when a project's projected finish lands after its due date.")}
+      ${tgl("flagDM","Missing Decision-Maker","Amber on Client projects with no decision-maker named.")}</section>
     <section><h3>Calendar</h3>
       <div class="tgl"><span>Week Starts On</span><select class="inp" data-sel="weekStart" style="width:auto">${DN.map((d,i)=>`<option value="${i}" ${i===D.weekStart?"selected":""}>${d}</option>`).join("")}</select></div>
       <div class="tgl"><span>Day Starts</span><select class="inp" data-sel="dayStart" style="width:auto">${[4,5,6,7,8].map(h=>`<option ${h===D.dayStart?"selected":""} value="${h}">${D.clock24?h+":00":clock(h*60)}</option>`).join("")}</select></div>
@@ -1837,6 +2319,10 @@ function settingsModal(tab="general",D){
     <section><h3>Data</h3>
       <div class="row"><button class="btn sm" id="st-exp">Export Everything</button><button class="btn sm" id="st-imp">Import Backup</button></div>
       ${tgl("backupReminder","Sunday Backup Reminder")}
+      <span class="lbl">ATTACHMENTS (THIS DEVICE)</span>
+      <div class="tgl"><span>Keep All Attachments Offline<small>Saves a copy of every attached file on this device so it opens without internet, like in China without a VPN. Links aren't downloaded.</small></span><input type="checkbox" id="st-off" ${keepOffline()?"checked":""}></div>
+      <div class="row"><span class="sub grow" id="st-offsz">${offlineLine()}</span><button class="btn sm ghost danger" id="st-offclr">Clear Offline Copies</button></div>
+      <div class="row"><button class="btn sm ghost" id="st-drive">Check Google Drive Access</button><span class="sub grow">Files are saved in a "Project Tracker Files" folder in your Google Drive.</span></div>
       <div class="row"><button class="btn sm ghost danger" id="st-reset">Clear All Data</button><span class="sub">Removes every project, logged session, plan, note and review. Settings and templates stay. You get a few seconds to undo.</span></div>
       <span class="lbl">GOOGLE SHEET</span><div id="st-conn"></div></section>
   </div>`;
@@ -1847,10 +2333,28 @@ function settingsModal(tab="general",D){
   root=>{
     const body=root.querySelector("#st-body");
     const setPath=(path,val)=>{const k=path.split(".");let o=D;for(let i=0;i<k.length-1;i++)o=o[k[i]];o[k[k.length-1]]=val};
+    const on2=(id,fn)=>{const e=body.querySelector("#"+id);if(e)e.onclick=fn};
+    const brPrev=()=>{const e=body.querySelector("#br-prev");if(e)e.innerHTML=logoHTMLFor(D._logo===undefined?(S.brand||{}).logo:D._logo,D.brandTint!==false)+`<b>${esc((D.brandName||"").trim()||DEF_NAME)}</b>`};
     const draw=()=>{body.innerHTML=tab==="general"?general():advanced();bind()};
     const bind=()=>{
-      body.querySelectorAll("[data-t]").forEach(c=>c.onchange=()=>{D[c.dataset.t]=c.checked});
-      body.querySelectorAll("[data-n]").forEach(i=>i.oninput=()=>{const v=Number(i.value);if(i.value!==""&&!isNaN(v))setPath(i.dataset.n,v)});
+      body.querySelectorAll("[data-t]").forEach(c=>c.onchange=()=>{D[c.dataset.t]=c.checked;if(c.dataset.t==="brandTint")brPrev()});
+      body.querySelectorAll("[data-n]").forEach(i=>i.oninput=()=>{const v=Number(i.value);if(i.value===""&&i.hasAttribute("data-z"))setPath(i.dataset.n,0);else if(i.value!==""&&!isNaN(v))setPath(i.dataset.n,v)});
+      body.querySelectorAll("[data-txt]").forEach(i=>i.oninput=()=>{D[i.dataset.txt]=i.value;brPrev()});
+      body.querySelectorAll("[data-col]").forEach(i=>i.oninput=()=>{D[i.dataset.col]=i.value.toUpperCase()});
+      brPrev();
+      const bf=body.querySelector("#br-file");
+      on2("br-up",()=>bf.click());
+      if(bf)bf.onchange=async()=>{const f=bf.files[0];bf.value="";if(!f)return;
+        try{D._logo=await readLogo(f);brPrev();toast("Logo ready. Tap Save to keep it.")}
+        catch(x){toast(x.message==="BIG"?"That logo file is too big. Use one under 2 MB (SVG under 300 KB).":"That file couldn't be read as a logo. Try an SVG, PNG or JPG.",4500)}};
+      on2("br-reset",()=>{D._logo=null;brPrev();toast("Default logo. Tap Save to keep it.")});
+      on2("br-icons",async()=>{const b=body.querySelector("#br-icons");b.disabled=true;b.textContent="Preparing…";
+        try{await exportIcons(D);toast("Icon files downloaded")}catch(x){toast("Couldn't make the icon files on this device. Try Chrome on your laptop.",4500)}
+        finally{b.disabled=false;b.textContent="Export Icon Files"}});
+      const so=body.querySelector("#st-off");if(so)so.onchange=()=>{LS.set(K_OFF,so.checked);if(so.checked){toast("Downloading attachments for offline use");syncOffline().then(()=>{const e=body.querySelector("#st-offsz");if(e)e.textContent=offlineLine()})}else toast("Offline copies off on this device. Tap Clear Offline Copies to free space.",4500)};
+      on2("st-offclr",async()=>{await clearOffline();const e=body.querySelector("#st-offsz");if(e)e.textContent=offlineLine();toast("Offline copies cleared on this device")});
+      on2("st-drive",async()=>{const b=body.querySelector("#st-drive");if(!Sync.connected())return toast("Connect this device to your Google Sheet first.");b.disabled=true;
+        try{await Sync.call("driveTest");toast("Google Drive is ready for attachments")}catch(x){toast(driveErr(x),6000)}finally{b.disabled=false}});
       const vs=body.querySelector('[data-n="volume"]');if(vs)vs.onchange=()=>playSound("stage",true,+vs.value);
       const sb=body.querySelector("#snd-box");if(sb)soundRows(sb,()=>+(body.querySelector('[data-n="volume"]')||{}).value||D.volume);
       const ca=body.querySelector("#st-cal");if(ca)ca.onchange=async()=>{
@@ -1889,9 +2393,11 @@ function settingsModal(tab="general",D){
     root.querySelector("#st-save").onclick=()=>{
       ["routine","palette","lifePalette","palDefault","keys","kbEnter","kbDelete","kbShiftEnter","kbShiftClick"].forEach(k=>{if(S.settings[k]!==undefined)D[k]=S.settings[k]});
       D.target=D.target||6;D.days=Math.min(7,Math.max(1,D.days||6));if(D.dayEnd<=D.dayStart)D.dayEnd=22;
+      D.rate=numv(D.rate)||150;D.hpd=numv(D.hpd)||6;D.rateFloor=numv(D.rateFloor)||0;D.mxn=numv(D.mxn)||0;D.roundsIncl=Math.max(0,Math.round(Number(D.roundsIncl)||0));
+      D.brandName=(D.brandName||"").trim();D.brandShort=(D.brandShort||"").trim().slice(0,12);const lg=D._logo;delete D._logo;
       const wsChanged=D.weekStart!==S.settings.weekStart;
       const other=effTheme()==="light"?"dark":"light",chg=CKEYS.some(K=>((D.colors[K.k]||{})[other]||null)!==(((S.settings.colors||{})[K.k]||{})[other]||null));
-      closeModal();undoable(()=>{S.settings=D;if(wsChanged){S.ui.week=iso(weekOf(parse(S.ui.day)));S.ui.rweek=iso(weekOf(parse(S.ui.rweek)))}applyAdv()},chg?`Settings saved. ${other==="dark"?"Dark":"Light"} theme colors show when you switch to ${other==="dark"?"Dark":"Light"}.`:"Settings saved");
+      closeModal();undoable(()=>{S.settings=D;if(lg!==undefined){if(lg)S.brand.logo=lg;else delete S.brand.logo}if(wsChanged){S.ui.week=iso(weekOf(parse(S.ui.day)));S.ui.rweek=iso(weekOf(parse(S.ui.rweek)))}applyAdv()},chg?`Settings saved. ${other==="dark"?"Dark":"Light"} theme colors show when you switch to ${other==="dark"?"Dark":"Light"}.`:"Settings saved");
     };
     draw();
   },"wide");
@@ -1899,7 +2405,7 @@ function settingsModal(tab="general",D){
 
 /* ===================== files ===================== */
 function downloadFile(name,data,type="application/json"){const a=document.createElement("a");a.href=URL.createObjectURL(data instanceof Blob?data:new Blob([data],{type}));a.download=name.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^\x20-\x7E]/g,"").replace(/[\\/:*?"<>|]/g,"-");document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000)}
-const backupNow=()=>{downloadFile(`Project Tracker Backup ${TODAY()}.json`,JSON.stringify({kind:"bbst-backup",exported:new Date().toISOString(),data:docsOf(S)}));toast("Backup downloaded")};
+const backupNow=()=>{downloadFile(`${shortName()} Backup ${TODAY()}.json`,JSON.stringify({kind:"bbst-backup",exported:new Date().toISOString(),data:docsOf(S)}));toast("Backup downloaded")};
 function projectFile(p){const ids=new Set();p.phases.forEach(ph=>ph.items.forEach(it=>it.steps.forEach(st=>ids.add(st.id))));
   return {kind:"bbst-project",exported:new Date().toISOString(),project:p,sessions:S.sessions.filter(x=>ids.has(x.step)),plans:S.plans.filter(x=>ids.has(x.step))}}
 function importProject(f){
@@ -1912,8 +2418,64 @@ function importProject(f){
 document.getElementById("upload-bk").addEventListener("change",async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;
   let d;try{d=JSON.parse(await f.text())}catch(x){return toast("That file isn't a tracker backup.")}
   if(d.kind!=="bbst-backup"||!d.data)return toast("That file isn't a full tracker backup.");
-  closeModal();undoable(()=>{const n=stateFrom(d.data,S.ui);["projects","templates","sessions","plans","settings","routineSkip","notes","weekly","weekMeta","monthly","itemTemplates","phaseTemplates","sounds"].forEach(k=>S[k]=n[k]);ensureSettings();applyPalette();applyAdv()},"Backup restored");
+  closeModal();undoable(()=>{const n=stateFrom(d.data,S.ui);["projects","templates","sessions","plans","settings","routineSkip","notes","weekly","weekMeta","monthly","itemTemplates","phaseTemplates","sounds","brand"].forEach(k=>S[k]=n[k]);ensureSettings();applyPalette();applyAdv()},"Backup restored");
 });
+
+/* ===================== branding ===================== */
+const DEF_LOGO=(()=>{const e=document.querySelector(".brand svg");return e?e.outerHTML:""})();
+function sanitizeSVG(t){
+  let d;try{d=new DOMParser().parseFromString(String(t),"image/svg+xml")}catch(x){return null}
+  const sv=d.documentElement;if(!sv||sv.nodeName.toLowerCase()!=="svg"||d.getElementsByTagName("parsererror").length)return null;
+  sv.querySelectorAll("script,foreignObject,iframe,object,embed,audio,video,a").forEach(n=>n.remove());
+  [sv,...sv.querySelectorAll("*")].forEach(n=>[...n.attributes].forEach(at=>{const v=String(at.value||"");if(/^on/i.test(at.name)||(/href$/i.test(at.name)&&!/^#/.test(v)&&!/^data:image\/(png|jpe?g|gif|webp);/i.test(v))||/javascript:/i.test(v))n.removeAttribute(at.name)}));
+  if(!sv.getAttribute("viewBox")){const w=parseFloat(sv.getAttribute("width")),h=parseFloat(sv.getAttribute("height"));if(w&&h)sv.setAttribute("viewBox",`0 0 ${w} ${h}`)}
+  sv.removeAttribute("width");sv.removeAttribute("height");sv.removeAttribute("class");sv.removeAttribute("style");
+  return new XMLSerializer().serializeToString(sv)}
+function logoHTMLFor(L,tint){if(!L||!L.data)return DEF_LOGO;if(L.type==="svg")return L.data.replace(/^<svg\b/i,`<svg class="${tint?"tint":""}" aria-hidden="true" focusable="false"`);return `<img src="${L.data}" alt="">`}
+function renderBrand(){
+  const b=document.querySelector(".top .brand"),L=(S.brand||{}).logo,tint=S.settings.brandTint!==false;
+  if(b){const k=(L&&L.data?L.type+L.data.length+L.data.slice(-60):"")+"|"+tint+"|"+appName();if(b._k!==k){b.innerHTML=logoHTMLFor(L,tint)+`<b>${esc(appName())}</b>`;b._k=k}}
+  if(document.title!==appName())document.title=appName();
+  const m=document.querySelector('meta[name="apple-mobile-web-app-title"]');if(m&&m.getAttribute("content")!==shortName())m.setAttribute("content",shortName())}
+const loadImg=src=>new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>rej(new Error("IMG"));im.src=src});
+const readURL=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(f)});
+async function readLogo(f){
+  if(f.size>2*1048576)throw new Error("BIG");
+  if(/svg/.test(f.type)||/\.svg$/i.test(f.name)){const t=sanitizeSVG(await f.text());if(!t)throw new Error("BAD");if(t.length>300000)throw new Error("BIG");return{type:"svg",data:t,name:f.name}}
+  const im=await loadImg(await readURL(f)),sc=Math.min(1,512/Math.max(im.naturalWidth,im.naturalHeight,1));
+  const c=document.createElement("canvas");c.width=Math.max(1,Math.round(im.naturalWidth*sc));c.height=Math.max(1,Math.round(im.naturalHeight*sc));c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+  return{type:"img",data:c.toDataURL("image/png"),name:f.name}}
+async function logoImage(L,tint,fg){
+  if(L&&L.type!=="svg")return loadImg(L.data);
+  let t=L&&L.data||DEF_LOGO;if(!/xmlns=/.test(t.slice(0,300)))t=t.replace(/^<svg\b/i,'<svg xmlns="http://www.w3.org/2000/svg"');
+  const d=new DOMParser().parseFromString(t,"image/svg+xml"),sv=d.documentElement;sv.removeAttribute("class");
+  if(tint||!L){sv.setAttribute("fill",fg);sv.querySelectorAll("*").forEach(n=>{const f=n.getAttribute("fill"),k=n.getAttribute("stroke");if(f&&f!=="none")n.setAttribute("fill",fg);if(k&&k!=="none")n.setAttribute("stroke",fg);
+    const st=n.getAttribute("style");if(st)n.setAttribute("style",st.replace(/fill\s*:\s*(?!none)[^;]+/gi,"fill:"+fg).replace(/stroke\s*:\s*(?!none)[^;]+/gi,"stroke:"+fg))})}
+  const vb=(sv.getAttribute("viewBox")||"0 0 100 100").split(/[\s,]+/).map(Number),k=1024/Math.max(vb[2]||100,vb[3]||100);
+  sv.setAttribute("width",Math.round((vb[2]||100)*k));sv.setAttribute("height",Math.round((vb[3]||100)*k));
+  return loadImg("data:image/svg+xml;charset=utf-8,"+encodeURIComponent(new XMLSerializer().serializeToString(sv)))}
+const CRC_T=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+const crc32=u=>{let c=0xFFFFFFFF;for(let i=0;i<u.length;i++)c=CRC_T[(c^u[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0};
+async function makeZip(files){
+  const enc=new TextEncoder(),parts=[],central=[];let off=0;
+  for(const[name,data]of files){const nm=enc.encode(name),u=typeof data==="string"?enc.encode(data):new Uint8Array(await data.arrayBuffer()),c=crc32(u);
+    const h=new DataView(new ArrayBuffer(30));h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint16(12,0x21,true);h.setUint32(14,c,true);h.setUint32(18,u.length,true);h.setUint32(22,u.length,true);h.setUint16(26,nm.length,true);
+    parts.push(h,nm,u);
+    const cd=new DataView(new ArrayBuffer(46));cd.setUint32(0,0x02014b50,true);cd.setUint16(4,20,true);cd.setUint16(6,20,true);cd.setUint16(8,0x0800,true);cd.setUint16(14,0x21,true);cd.setUint32(16,c,true);cd.setUint32(20,u.length,true);cd.setUint32(24,u.length,true);cd.setUint16(28,nm.length,true);cd.setUint32(42,off,true);
+    central.push(cd,nm);off+=30+nm.length+u.length}
+  const csize=central.reduce((a,x)=>a+x.byteLength,0),e=new DataView(new ArrayBuffer(22));e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,csize,true);e.setUint32(16,off,true);
+  return new Blob([...parts,...central,e],{type:"application/zip"})}
+async function exportIcons(D){
+  const L=D._logo===undefined?(S.brand||{}).logo:D._logo,bg=D.iconBg||"#19212F",fg=D.iconFg||"#38B2C3",im=await logoImage(L,D.brandTint!==false,fg);
+  const png=(size,frac)=>new Promise((res,rej)=>{const c=document.createElement("canvas");c.width=c.height=size;const x=c.getContext("2d");x.fillStyle=bg;x.fillRect(0,0,size,size);
+    const w=im.naturalWidth||im.width,h=im.naturalHeight||im.height,k=size*frac/Math.max(w,h,1);x.drawImage(im,(size-w*k)/2,(size-h*k)/2,w*k,h*k);c.toBlob(b=>b?res(b):rej(new Error("PNG")),"image/png")});
+  const name=(D.brandName||"").trim()||DEF_NAME,sn=(D.brandShort||"").trim()||((D.brandName||"").trim()?name.slice(0,12):"Project Tracker");
+  const man={name,short_name:sn,description:"Project phases, hour budgets, stage timers and reviews.",id:"./",start_url:"./",scope:"./",display:"standalone",orientation:"any",background_color:bg,theme_color:bg,
+    icons:[{src:"icons/icon-192.png",sizes:"192x192",type:"image/png",purpose:"any"},{src:"icons/icon-512.png",sizes:"512x512",type:"image/png",purpose:"any"},{src:"icons/icon-maskable-512.png",sizes:"512x512",type:"image/png",purpose:"maskable"}]};
+  const how=`HOW TO USE THESE ICON FILES\r\n\r\n1. On github.com, open your tracker repository > Add file > Upload files.\r\n2. Drag in manifest.webmanifest and the icons folder from this zip. They replace the old ones. Click Commit changes.\r\n3. Wait 1-2 minutes, then open the tracker once on each device while online.\r\n4. iPad: press and hold the tracker icon > Remove App > Delete from Home Screen. Open the tracker in Safari, tap Share > Add to Home Screen, type "${sn}" as the name, and tap Add. Open the new icon and paste your connection link once. Your data stays in your Google Sheet.\r\n5. Android: the new icon usually appears within a day. To see it now, remove the app icon and install it again from Chrome (menu > Install app).\r\n6. Laptop (Chrome): the new icon appears after Chrome checks for updates, usually within a day. To see it now, uninstall the app (menu inside the app window > Uninstall) and install it again.\r\n`;
+  const files=[["manifest.webmanifest",JSON.stringify(man,null,2)],["icons/icon-192.png",await png(192,.86)],["icons/icon-512.png",await png(512,.86)],["icons/icon-maskable-512.png",await png(512,.7)],["icons/apple-touch-icon.png",await png(180,.86)],["HOW TO USE THESE FILES.txt",how]];
+  downloadFile(`${sn} Icon Files.zip`,await makeZip(files));
+}
 
 /* ===================== excel report ===================== */
 let XLSXp=null;
@@ -1923,14 +2485,18 @@ function buildReport(X,p,phIds,opts){
   const sheet=(rows,cols,fmt)=>{const ws=X.utils.aoa_to_sheet(rows);ws["!cols"]=cols.map(w=>({wch:w}));
     const r=X.utils.decode_range(ws["!ref"]);for(let R=1;R<=r.e.r;R++)for(let C=0;C<=r.e.c;C++){const c=ws[X.utils.encode_cell({r:R,c:C})];if(c&&fmt[C])c.z=fmt[C]}return ws};
   // summary
-  const head=[[`${p.name} · Time Report`],[`${p.subtitle||""}`],[`Exported ${today} · Warning at ${S.settings.warnAt}% of budget`],[]],o=head.length;
-  const sum=[["Phase","Budget (h)","Estimated (h)","Actual (h)","Hours Left (h)","% of Budget Used","Status","Target Date"]];
-  phs.forEach((ph,i)=>{const s=phaseStats(ph),r=o+i+2;sum.push([ph.name+(ph.bonus?" (Bonus)":""),H(s.budget),H(s.est),H(s.act),{f:`B${r}-D${r}`},{f:`IF(B${r}=0,0,D${r}/B${r})`},s.act>s.budget?"Over Budget":s.act/Math.max(s.budget,1)>=WA()?"Warning":"On Track",ph.due||""])});
-  const a=o+2,z=o+phs.length+1,t=z+1;
-  sum.push(["Total",{f:`SUM(B${a}:B${z})`},{f:`SUM(C${a}:C${z})`},{f:`SUM(D${a}:D${z})`},{f:`B${t}-D${t}`},{f:`IF(B${t}=0,0,D${t}/B${t})`},"",""]);
+  const P=priceOf(p),ML=Object.fromEntries(MODES),inc=roundsIncl(p),sh=isShadow(p);
+  const priceTxt=P.mode==="hourly"?`$${Math.round(P.rate)}/h`:P.mode==="day"?`$${Math.round(P.day)}/Day (${HPD()}h)`:P.mode==="projectFee"?`$${Math.round(P.fee).toLocaleString("en-US")} Project Fee`:"Fee per Phase";
+  const head=[[`${p.name} · Time Report`],[`${p.subtitle||""}`],[`${ptype(p)}${p.client?` · Client: ${p.client}`:""}${p.dm?` · Decision-Maker: ${p.dm}`:""}${p.due?` · Due ${p.due}`:""} · Pricing: ${ML[P.mode]}, ${priceTxt}${sh?" (Shadow Value)":""}`],[`Exported ${today} · Warning at ${S.settings.warnAt}% of budget`],[]],o=head.length;
+  const sum=[["Phase","Budget (h)","Estimated (h)","Actual (h)","Hours Left (h)","% of Budget Used","Status","Target Date",sh?"Shadow Value ($)":"Value ($)",sh?"Worth So Far ($)":"Earned ($)","Effective Rate ($/h)","Feedback Rounds"]];
+  let tv=0,tw=0,tah=0;
+  phs.forEach((ph,i)=>{const s=phaseStats(ph),r=o+i+2,v=phaseVal(p,ph,P),n=roundsOf(ph).length;tv+=v.est;tw+=v.earned;tah+=v.ah;
+    sum.push([ph.name+(ph.bonus?" (Bonus)":""),H(s.budget),H(s.est),H(s.act),{f:`B${r}-D${r}`},{f:`IF(B${r}=0,0,D${r}/B${r})`},s.act>s.budget?"Over Budget":s.act/Math.max(s.budget,1)>=WA()?"Warning":"On Track",ph.due||"",Math.round(v.est),Math.round(v.earned),v.eff!=null?Math.round(v.eff):"",inc>0?`${n} of ${inc}${n>inc?" (Over Scope)":""}`:String(n)])});
+  const a=o+2,z=o+phs.length+1,t=z+1,fee=P.mode==="projectFee"||P.mode==="phaseFee";
+  sum.push(["Total",{f:`SUM(B${a}:B${z})`},{f:`SUM(C${a}:C${z})`},{f:`SUM(D${a}:D${z})`},{f:`B${t}-D${t}`},{f:`IF(B${t}=0,0,D${t}/B${t})`},"","",{f:`SUM(I${a}:I${z})`},{f:`SUM(J${a}:J${z})`},tah?Math.round((fee?tv:tw)/tah):"",""]);
   const wsS=X.utils.aoa_to_sheet([...head,...sum]);
-  wsS["!cols"]=[30,12,14,12,15,17,13,13].map(w=>({wch:w}));
-  for(let R=o+1;R<o+sum.length;R++){[1,2,3,4].forEach(C=>{const c=wsS[X.utils.encode_cell({r:R,c:C})];if(c)c.z="0.00"});const c=wsS[X.utils.encode_cell({r:R,c:5})];if(c)c.z="0%"}
+  wsS["!cols"]=[30,12,14,12,15,17,13,13,14,14,18,16].map(w=>({wch:w}));
+  for(let R=o+1;R<o+sum.length;R++){[1,2,3,4].forEach(C=>{const c=wsS[X.utils.encode_cell({r:R,c:C})];if(c)c.z="0.00"});const c=wsS[X.utils.encode_cell({r:R,c:5})];if(c)c.z="0%";[8,9,10].forEach(C=>{const c=wsS[X.utils.encode_cell({r:R,c:C})];if(c)c.z="$#,##0"})}
   X.utils.book_append_sheet(wb,wsS,"Summary");
   // items + steps
   const det=[["Phase","Group","Item","Status","Step","Estimated (h)","Actual (h)","Difference (h)","% of Estimate"]];
@@ -2060,7 +2626,7 @@ function restoreTheme(){if(S.ui.theme)document.documentElement.setAttribute("dat
 function closeModal(){document.getElementById("modal-root").innerHTML="";restoreTheme();applyPalette();applyAdv();Sync.afterModal()}
 /* Back (Android swipe, mouse back button, Alt+Left, Cmd+[) closes a pop-up instead of leaving the app */
 let histArmed=false;
-addEventListener("popstate",()=>{histArmed=false;if(document.getElementById("ov"))closeModal()});
+addEventListener("popstate",()=>{if(vwPop){vwPop=false;return}if(VW){closeViewer(true);return}histArmed=false;if(document.getElementById("ov"))closeModal()});
 function grow(t){if(!t||(!t.offsetParent&&!t.offsetHeight))return;t.style.height="auto";t.style.height=(t.scrollHeight+2)+"px"}
 document.addEventListener("input",e=>{if(e.target.matches&&e.target.matches("textarea.inp"))grow(e.target)});
 const growAll=root=>requestAnimationFrame(()=>(root||document).querySelectorAll("textarea.inp").forEach(grow));
@@ -2077,7 +2643,7 @@ function modal(html,bind,cls=""){
 }
 function armDelete(btn,fn,armedText="Tap Again to Delete"){if(!btn)return;const orig=btn.textContent;let tm;
   btn.addEventListener("click",()=>{if(btn.classList.contains("armed")){clearTimeout(tm);fn()}else{btn.classList.add("armed");btn.textContent=armedText;clearTimeout(tm);tm=setTimeout(()=>{if(btn.isConnected&&btn.classList.contains("armed")){btn.classList.remove("armed");btn.textContent=orig}},3000)}})}
-const undoSnap=()=>JSON.stringify({projects:S.projects,templates:S.templates,sessions:S.sessions,plans:S.plans,routineSkip:S.routineSkip,settings:S.settings,notes:S.notes,weekly:S.weekly,weekMeta:S.weekMeta,monthly:S.monthly,itemTemplates:S.itemTemplates,phaseTemplates:S.phaseTemplates});
+const undoSnap=()=>JSON.stringify({projects:S.projects,templates:S.templates,sessions:S.sessions,plans:S.plans,routineSkip:S.routineSkip,settings:S.settings,notes:S.notes,weekly:S.weekly,weekMeta:S.weekMeta,monthly:S.monthly,itemTemplates:S.itemTemplates,phaseTemplates:S.phaseTemplates,brand:S.brand});
 let lastUndo=null;
 function undoable(fn,msg){
   const before=undoSnap();
@@ -2144,6 +2710,9 @@ document.addEventListener("click",e=>{
   if(d.hidedone){const r=IX.idx.phase[d.hidedone];r.ph.hideDone=!r.ph.hideDone;commit();return}
   if(d.rgrp){const r=IX.idx.phase[d.rgrp],old=d.g;return askText("Rename Row","Row Name",old,v=>{r.ph.items.forEach(x=>{if((x.group||"")===old)x.group=v});closeModal();commit();toast("Row renamed")})}
   if(d.rvExport)return reviewExportModal(d.rvExport);
+  if(d.rounds)return roundsModal(d.rounds);
+  if(d.creport)return clientReportModal(d.creport);
+  if(d.openlib)return libModal();
   if(d.act==="add-phase")return phaseModal(null);
   if(d.act==="edit-phase")return phaseModal(d.ph);
   if(d.act==="add-item")return addItemModal(d.ph);
@@ -2194,7 +2763,8 @@ render();
 (()=>{const t=LS.get(K_T,null);if(t&&IX.idx.step[t.stepId]){T={...t,speed:1};clearInterval(tickT);tickT=setInterval(tick,250);document.body.classList.add("timing");drawTimer()}})();
 IDB.get("sounds").then(v=>{if(v&&typeof v==="object"&&!Object.keys(S.sounds||{}).length)S.sounds=v;sndReady=true});
 Sync.init();
-if(!Sync.connected())migrateColors();
+if(!Sync.connected()){migrateColors();migrateFiles()}
+setTimeout(()=>{runUploads();runTrash()},4000);
 </script>
 
 </body>
