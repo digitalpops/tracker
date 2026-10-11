@@ -413,6 +413,15 @@ details.sec[open]{padding-bottom:12px}
 .guide h3{margin-top:6px}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) :is(.adv h3,.guide h3,.lbl.sh){color:#38B2C3}}
 :root[data-theme="dark"] :is(.adv h3,.guide h3,.lbl.sh){color:#38B2C3}
+.guide .kt{width:100%;border-collapse:collapse;font-size:13.5px;margin:4px 0 10px}
+.guide .kt th{text-align:left;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:4px 8px;border-bottom:2px solid var(--line2)}
+.guide .kt td{padding:5px 8px;border-bottom:1px solid var(--line);vertical-align:top}.guide .kt td:first-child{white-space:nowrap;width:38%}
+.guide .kt tr.g td{font-weight:800;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;color:#509FAF;padding-top:12px;border-bottom:0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .guide .kt tr.g td{color:#38B2C3}}
+:root[data-theme="dark"] .guide .kt tr.g td{color:#38B2C3}
+.guide .gloss{display:grid;grid-template-columns:minmax(120px,30%) 1fr;gap:6px 14px;margin:4px 0;font-size:13.5px;line-height:1.5}
+.guide .gloss dt{font-weight:800}.guide .gloss dd{margin:0}
+@media (max-width:560px){.guide .gloss{grid-template-columns:1fr;gap:0}.guide .gloss dd{margin-bottom:8px}}
 .guide p.lead{font-size:15px;font-weight:800;color:var(--ink);margin:2px 0 6px}
 .adv section:first-child{border-top:0;padding-top:0}
 .crow{display:grid;grid-template-columns:1fr 110px 110px auto;gap:8px;align-items:center}
@@ -625,7 +634,7 @@ const DOW=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 const DOWL=["MON","TUES","WEDS","THURS","FRI","SAT","SUN"];
 const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const dowIdx=d=>(d.getDay()+6)%7;
-const short=s=>{const d=parse(s);return `${MON[d.getMonth()]} ${d.getDate()}`};
+const short=s=>{const d=parse(s);return `${MON[d.getMonth()]} ${d.getDate()}${d.getFullYear()!==new Date().getFullYear()?", "+d.getFullYear():""}`};
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const uid=()=>Math.random().toString(36).slice(2,10);
 const fmtHM=m=>{m=Math.round(m);if(m<60)return m+"m";const h=Math.floor(m/60),r=m%60;return r?`${h}h ${r}m`:`${h}h`};
@@ -647,7 +656,7 @@ const LPAL_DEF={light:["#CEFBD0","#D5ECC2","#FAF6B7","#F2E3B3","#EDE6D8","#F7D9C
 const LIFE_ORDER=[1,7,2,11,10,5,8,6,12,9,4,3]; /* October 2026 reorder: new slot k shows old slot LIFE_ORDER[k-1] */
 const STATUSES=[["Not Started","--faint"],["In Progress","--accent"],["Submitted","--amber"],["Feedback Received","--p7"],["Revising","--act"],["Approved","--p3"],["Done","--ok"]];
 const SC=Object.fromEntries(STATUSES);
-const APP_VERSION="2026.10.11.01";
+const APP_VERSION="2026.10.11.05";
 const isDone=it=>it.status==="Done"||it.status==="Approved";
 const DEF_NAME="Blue Blaze Project Tracker";
 const appName=()=>((typeof S!=="undefined"&&S&&S.settings&&S.settings.brandName)||"").trim()||DEF_NAME;
@@ -1365,7 +1374,7 @@ const mimeOf=n=>MIMES[extOf(n)]||"application/octet-stream";
 const kindOf=a=>{if(a.kind==="link")return"other";const e=extOf(a.name),m=a.mime||"";if(/^image\/(jpeg|png|gif|webp)$/.test(m)||["jpg","jpeg","png","gif","webp"].includes(e))return"img";if(m==="application/pdf"||e==="pdf")return"pdf";if(/^audio\/(mpeg|mp3|mp4|x-m4a|wav|x-wav|aac)$/.test(m)||["mp3","m4a","wav","aac"].includes(e))return"audio";return"other"};
 const BADGE_C={psd:"#1A3D9C",psb:"#1A3D9C",procreate:"#4A4A55",ai:"#E07B00",eps:"#E07B00",pdf:"#A73A3A",jpg:"#2E9E6A",jpeg:"#2E9E6A",png:"#2E9E6A",gif:"#2E9E6A",webp:"#2E9E6A",heic:"#2E9E6A",tif:"#2E9E6A",tiff:"#2E9E6A",svg:"#C79A00",zip:"#6F7482",rar:"#6F7482",mp4:"#8A4FD8",mov:"#8A4FD8",blend:"#E87D0D",clip:"#C0457A",kra:"#3A6FD8",fig:"#A259FF",doc:"#2B5FB4",docx:"#2B5FB4",xls:"#1F7A45",xlsx:"#1F7A45",ppt:"#C4502A",pptx:"#C4502A",key:"#2B6BD8",txt:"#6F7482",drive:"#1A73E8",dropbox:"#0061FE",proton:"#6D4AFF",gdoc:"#1A73E8",mp3:"#000000",wav:"#000000",m4a:"#000000",aac:"#000000",flac:"#000000"};
 const MIME_EXT={"application/pdf":"pdf","image/jpeg":"jpg","image/png":"png","image/gif":"gif","image/webp":"webp","image/heic":"heic","image/svg+xml":"svg","image/tiff":"tif","image/vnd.adobe.photoshop":"psd","application/x-photoshop":"psd","application/illustrator":"ai","application/postscript":"ai","audio/mpeg":"mp3","audio/mp3":"mp3","audio/wav":"wav","audio/x-wav":"wav","audio/mp4":"m4a","audio/x-m4a":"m4a","video/mp4":"mp4","video/quicktime":"mov","application/zip":"zip","application/x-zip-compressed":"zip","text/plain":"txt","application/msword":"doc","application/vnd.openxmlformats-officedocument.wordprocessingml.document":"docx","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":"xlsx","application/vnd.openxmlformats-officedocument.presentationml.presentation":"pptx"};
-const GTYPE={"application/vnd.google-apps.document":{t:"DOC",c:"#538ED1",l:"Google Doc",app:"googledocs",path:"document"},"application/vnd.google-apps.spreadsheet":{t:"SHEET",c:"#0F9D58",l:"Google Sheet",app:"googlesheets",path:"spreadsheets"},"application/vnd.google-apps.presentation":{t:"SLIDES",c:"#DDAD03",ink:"#1A1F2B",l:"Google Slides",app:"googleslides",path:"presentation"}};
+const GTYPE={"application/vnd.google-apps.document":{t:"DOC",c:"#538ED1",l:"Google Doc",app:"googledocs",path:"document"},"application/vnd.google-apps.spreadsheet":{t:"SHEET",c:"#0F9D58",l:"Google Sheet",app:"googlesheets",path:"spreadsheets"},"application/vnd.google-apps.presentation":{t:"SLIDES",c:"#B8923A",l:"Google Slides",app:"googleslides",path:"presentation"}};
 function badgeOf(a){if(/^application\/vnd\.google-apps/.test(a.mime||"")){const g=GTYPE[a.mime];return g?{t:g.t,c:g.c,ink:g.ink}:{t:"GOOGLE",c:"#1A73E8"}}let e=a.kind==="link"?(extOf(a.name)||extOf(a.url)):(extOf(a.name)||MIME_EXT[a.mime]||"");
   if(!e&&a.kind==="link"){const u=String(a.url||"");e=/drive\.google|docs\.google/.test(u)?"drive":/dropbox\./.test(u)?"dropbox":/proton\.me|protondrive/.test(u)?"proton":"link"}
   return{t:(e||"file").toUpperCase(),c:BADGE_C[e]||"#5A6378"}}
@@ -1510,7 +1519,7 @@ function mountAtt(el,ref){
     el.querySelectorAll("[data-att-menu]").forEach(b=>b.onclick=()=>attMenu(ref,b.dataset.attMenu));
     if(grid)bindReorder(grid,ref);
   };
-  el._draw=draw;draw();
+  el._draw=draw;draw();refreshNames(ref);
 }
 /* hold (touch) or drag (mouse) a card to reorder; the order syncs and the viewer follows it */
 function bindReorder(grid,ref){
@@ -1538,13 +1547,37 @@ function sortSheet(ref){
 function attMenu(ref,id){
   const o=ownerOf(ref),a=o&&(o.files||[]).find(x=>x.id===id);if(!a)return;const others=placesOf(a,o),dl=canDownload(a),u=attUrl(a);
   sheet(esc(a.name),others.length?`Also in ${esc(others.join(", "))}`:"",`<div class="opts">
-    <button class="opt" data-m="move">Move To…</button><button class="opt" data-m="copy" ${a.pending?"disabled":""}>Copy To…${a.pending?` <span class="sub">(After It Uploads)</span>`:""}</button>
+    <button class="opt" data-m="rename">Rename…</button><button class="opt" data-m="move">Move To…</button><button class="opt" data-m="copy" ${a.pending?"disabled":""}>Copy To…${a.pending?` <span class="sub">(After It Uploads)</span>`:""}</button>
     ${dl?`<button class="opt" data-m="dl">${dlLabel(a)}</button>`:""}${u?`<button class="opt" data-m="link">Copy Link</button>`:""}
     <button class="opt danger" data-m="rm">Remove</button></div>`,(h,close)=>{
     const on=(m,f)=>{const b=h.querySelector(`[data-m="${m}"]`);if(b)b.onclick=f};
-    on("move",()=>{close();placePicker(ref,id,"move")});on("copy",()=>{close();placePicker(ref,id,"copy")});
+    on("rename",()=>{close();renameAtt(ref,id)});on("move",()=>{close();placePicker(ref,id,"move")});on("copy",()=>{close();placePicker(ref,id,"copy")});
     on("dl",()=>{close();downloadAtt(a)});on("link",()=>{close();copyText(u)});
     armDelete(h.querySelector('[data-m="rm"]'),()=>{close();removeAtt(ref,id)},"Tap Again to Remove")})}
+/* Rename: a Drive file is renamed in Drive too; a link only changes its label. Every card for the same file follows. */
+function renameAtt(ref,id){
+  const o=ownerOf(ref),a=o&&(o.files||[]).find(x=>x.id===id);if(!a)return;
+  const inDrive=a.kind==="drive"&&!a.pending&&!!a.driveId,ext=a.kind==="drive"&&!isGdoc(a)?extOf(a.name):"";
+  sheet("Rename",inDrive?"Renames the file in Google Drive too.":a.kind==="link"?"Changes the name shown in the tracker. The link stays the same.":"The new name goes to Google Drive with the upload.",
+    `<div class="field"><input class="inp" id="rn-v" value="${esc(a.name)}" aria-label="New Name" autocomplete="off"></div><div class="m-actions"><button class="btn" id="rn-c">Cancel</button><button class="btn primary" id="rn-ok">Rename</button></div>`,(h,close)=>{
+    const i=h.querySelector("#rn-v"),ok=h.querySelector("#rn-ok");
+    setTimeout(()=>{i.focus();const d=ext&&a.name.toLowerCase().endsWith("."+ext)?a.name.length-ext.length-1:a.name.length;try{i.setSelectionRange(0,d)}catch(x){}},30);
+    const apply=n=>{const k=shareKey(a);attOwners().forEach(w=>(w.files||[]).forEach(x=>{if(x===a||(k&&shareKey(x)===k))x.name=n}));commit();refreshAttViews()};
+    const go=async()=>{let v=i.value.trim().replace(/[\\/]/g,"-");if(!v)return i.focus();if(ext&&!extOf(v))v+="."+ext;if(v===a.name)return close();
+      if(!inDrive){apply(v);close();return toast("Renamed")}
+      if(!Sync.connected()||!navigator.onLine)return toast("Renaming a Drive file needs internet (VPN if needed).");
+      ok.disabled=true;ok.textContent="Renaming…";
+      try{const r=await Sync.call("driveRename",{id:a.driveId,name:v});apply(r&&r.name||v);close();toast("Renamed in the Tracker and Google Drive")}
+      catch(x){ok.disabled=false;ok.textContent="Rename";toast(/NO_EDIT/.test(x.message)?"Google Drive won't let this account rename that file (view-only). Nothing changed.":/NO_FILE/.test(x.message)?"Google Drive can't find that file anymore.":/Unknown action/i.test(x.message)?"Update your Google Sheet script first: paste the new Code.gs, then deploy a new version.":driveErr(x),7000)}};
+    ok.onclick=go;h.querySelector("#rn-c").onclick=close;i.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();e.stopPropagation();go()}}})}
+/* names changed in Google Drive show up here: checked when Notes or an item opens (online, at most every 2 minutes per place) */
+const nameChk={};
+async function refreshNames(ref){
+  if(!Sync.connected()||!navigator.onLine)return;const o=ownerOf(ref);if(!o)return;const k=ref.kind+":"+ref.id;if(nameChk[k]&&Date.now()-nameChk[k]<120000)return;
+  const ids=[...new Set((o.files||[]).filter(a=>a.kind==="drive"&&a.driveId&&!a.pending).map(a=>a.driveId))];if(!ids.length)return;nameChk[k]=Date.now();
+  let r;try{r=await Sync.call("driveNames",{ids})}catch(x){if(/Unknown action/i.test(x.message))nameChk[k]=Infinity;return}
+  let ch=0;attOwners().forEach(w=>(w.files||[]).forEach(a=>{const n=a.kind==="drive"&&a.driveId&&r&&r[a.driveId];if(typeof n==="string"&&n&&n!==a.name){a.name=n;ch++}}));
+  if(ch){commit();refreshAttViews()}}
 function placePicker(ref,id,mode){
   const o=ownerOf(ref),a=o&&(o.files||[]).find(x=>x.id===id),p=projOfRef(ref);if(!a||!p)return;const k=shareKey(a);
   const L=placeList(p).map(x=>{const t=ownerOf(x.ref),here=t===o,has=!here&&(t.files||[]).some(y=>shareKey(y)===k);
@@ -3246,12 +3279,14 @@ manual:[
 <li>Other files (PSD, Procreate, AI and so on), Google Docs, Sheets and Slides, and Dropbox or Proton links: the tracker asks how to open that type on this device: Open in App, Open in Browser, Download or Copy Link. Tick Remember for that type and it opens straight away next time. Change it in Settings > Advanced > Data > Link and File Actions.</li>
 <li>Open in App goes straight to the right Google app: Docs, Sheets, Slides, or Drive for everything else.</li>
 <li>On iPad and iPhone, Google always sends regular Drive files (PSD, Procreate and so on) to the Drive app, so those offer Open in App, Download and Copy Link only. Docs open in the browser as usual; Sheets and Slides show Google's read-only preview there. To edit, use Open in App.</li>
-<li>Badges show the file type: PDF in red, images in green, PSD in dark blue, audio in black, video in violet, and DOC (blue), SHEET (green) and SLIDES (yellow) for Google files. Google files show "Google Doc", "Google Sheet" or "Google Slides" instead of a size, because Google doesn't give them one.</li>
+<li>Badges show the file type: PDF in red, images in green, PSD in dark blue, audio in black, video in violet, and DOC (blue), SHEET (green) and SLIDES (gold) for Google files. Google files show "Google Doc", "Google Sheet" or "Google Slides" instead of a size, because Google doesn't give them one.</li>
 <li>Web pages (ArtStation, Pinterest and so on) always open in the browser.</li>
 </ul>
-<h4>The ⋯ Menu: Move, Copy, Download, Remove</h4>
+<h4>The ⋯ Menu: Rename, Move, Copy, Download, Remove</h4>
 [[fig:menu|The ⋯ menu and the Copy To list]]
 <ul>
+<li>Rename…: renames a Drive file in Google Drive and in the tracker, on every card for that file. The file type ending (.psd, .pdf) stays on if you leave it off. For links it only changes the name shown in the tracker. Renaming a Drive file needs internet.</li>
+<li>Names changed in Google Drive show up by themselves: when you open Notes or an item while online, the tracker checks Drive for the current names of its files.</li>
 <li>Move To…: moves the card to Project Notes, another phase's notes or any item in the same project.</li>
 <li>Copy To…: adds a second card for the same Drive file somewhere else. Both cards show 2x next to the file size. Nothing is duplicated in Drive or on your device.</li>
 <li>Download as PDF (Google Docs, Sheets and Slides): your script makes the PDF. If Google won't make it, the tracker opens Google's own PDF download instead.</li>
@@ -3303,7 +3338,7 @@ manual:[
 </ul>
 <h4>Deadline Forecast</h4>
 <ul>
-<li>With a due date, the Board shows hours left (the larger of budget or estimate, minus what's logged, for phases not finished), the projected finish based on your last 14 days of logged time on this project, and Running Late with the daily hours you'd need.</li>
+<li>With a due date, the Board shows hours left (the larger of budget or estimate, minus what's logged, for phases not finished), the projected finish based on your last 14 days of logged time on this project, and Running Late with the daily hours you'd need. Dates outside the current year show their year (for example Apr 26, 2028).</li>
 </ul>
 <h4>Client Report</h4>
 [[fig:creport|Client Report options]]
@@ -3329,15 +3364,7 @@ manual:[
 <li>From a downloaded project: Load from File brings back that project with its logged time and planned blocks, but not diary entries, reviews or month notes.</li>
 <li>Last resort: in your Google Sheet, File > Version History can roll the whole Sheet back to before the change.</li>
 </ul>`},
-{id:"m8",h:"8. Keyboard Shortcuts",html:`
-<ul>
-<li><span class="k">1</span>–<span class="k">5</span> pages · <span class="k">←</span> <span class="k">→</span> previous and next week, month or day · <span class="k">T</span> this week, month or today · <span class="k">N</span> new block</li>
-<li><span class="k">Space</span> pause or resume the timer · <span class="k">Shift+T</span> stop · <span class="k">Cmd/Ctrl+Z</span> undo · <span class="k">P</span> Projects · <span class="k">&lt;</span> Settings · <span class="k">Shift+D</span> theme · <span class="k">Shift+S</span> sync · <span class="k">?</span> list of shortcuts</li>
-<li>In pop-ups: <span class="k">Enter</span> confirms (in writing boxes, <span class="k">Cmd/Ctrl+Enter</span>), <span class="k">Backspace</span> twice deletes, <span class="k">Esc</span> closes. <span class="k">Shift+Enter</span> adds a phase on the Board. Shift+click a phase opens or closes all.</li>
-<li>In the audio player: <span class="k">Space</span> play or pause, <span class="k">Shift+←</span> <span class="k">Shift+→</span> 10 seconds, <span class="k">M</span> mute. These only work while a track is open, so Space still pauses the timer everywhere else.</li>
-<li>Change any of them in Settings > Advanced > Keyboard Shortcuts. ✕ clears a shortcut to Empty. Extra actions (open this week's review, project notes, backup and so on) start Empty.</li>
-</ul>`},
-{id:"m9",h:"9. Using It Offline",html:`
+{id:"m9",h:"8. Using It Offline",html:`
 <p>The tracker opens, saves and runs the timer without internet. Changes wait on the device (the chip shows X Waiting) and sync when you're back online. When traveling where Google is blocked, that means when your VPN is on.</p>
 <h4>Before You Travel</h4>
 <ul>
@@ -3353,7 +3380,69 @@ manual:[
 <li>Calendar Alerts need internet when you start a stage. Once the events reach the device, the alerts ring offline.</li>
 <li>If you edit the same project on two devices while both are offline, the last one to sync wins for that project. Logged sessions never overwrite each other.</li>
 </ul>`},
-{id:"m10",h:"10. Troubleshooting",html:`
+{id:"m11",h:"9. Advanced Settings",html:`
+[[fig:adv|Settings > Advanced]]
+<h4>Branding</h4>
+<ul><li>App Name (header, browser tab, file names) and Home Screen Name (up to 12 characters). Upload Logo (SVG, PNG or JPG), Reset to Default, and Accent Color on SVG Logos.</li>
+<li>Export Icon Files makes a zip with new home-screen icons and the name, using the icon colors you pick. Follow the instructions inside it to put them on GitHub.</li></ul>
+<h4>Appearance</h4><ul><li>Background and card colors for Light and Dark, and Text Size (Small, Medium, Large).</li></ul>
+<h4>Budget Meter</h4><ul><li>Budget colors, Warning Threshold (70% to 90%), Warning Colors, Over Budget Colors, Show Percentages, Week View Warnings and Budget Alerts on Review Pages.</li></ul>
+<h4>Board</h4><ul><li>Phase Colors on Phase Bars, Phase Colors on Items, Include Bonus Hours in Project Totals, Linked Character Names.</li></ul>
+<h4>Flags</h4><ul><li>Rate Floor Warning, Revisions Over Scope, Deadline Running Late, Missing Decision-Maker. Each switches its amber chip on or off.</li></ul>
+<h4>Calendar</h4><ul><li>Week Starts On, Day Starts, Day Ends, and the 12-Hour or 24-Hour Clock.</li>
+<li>Google Calendar: Show Google Calendar, the calendars to show (tick each one), and Send Due Dates to Google Calendar (chapter 1, Google Calendar).</li></ul>
+<h4>Timer</h4><ul><li>Sprint presets (up to 5), break rules, Timer Sound and Volume, your own sounds, Timer Notifications, Calendar Alerts (This Device), and the Still Working? prompt with its minutes.</li></ul>
+<h4>Data</h4><ul><li>Export Everything, Import Backup, Sunday Backup Reminder.</li>
+<li>Attachments (This Device): Keep All Attachments Offline, the files and space used, and Clear Offline Copies (tap twice). Clearing only removes copies on this device; your files stay in Drive.</li>
+<li>Link and File Actions (This Device): what each file type or link does when tapped. Reset makes one ask again; Reset All (tap twice) resets every type.</li>
+<li>Check Google Drive Access confirms attachments can reach Drive.</li>
+<li>Clear All Data (tap twice): see Recovering Data in chapter 7.</li>
+<li>Google Sheet: Copy Connection Link (for another device; treat it like a password), Show Link and Sync Now.</li>
+<li>Disconnect affects only the device you tap it on. That device forgets the web app URL and key and stops syncing; your Sheet and your other devices keep working, and nothing is deleted. If changes are still waiting to sync, it won't disconnect until they're sent. Reconnect by pasting your connection link. Use it when switching to another Sheet or before handing a device to someone else. If a device is lost or the link gets out, run resetKey in Apps Script instead and reconnect your devices.</li></ul>
+<h4>Keyboard Shortcuts</h4><ul><li>The button at the bottom left of the Advanced tab (chapter 10).</li></ul>`},
+{id:"m8",h:"10. Keyboard Shortcuts",html:`
+<p>The default shortcuts, on any keyboard (laptop or iPad). <span class="k">Cmd</span> is for Mac and iPad, <span class="k">Ctrl</span> for Windows.</p>
+<table class="kt">
+<thead><tr><th>Key</th><th>Action</th></tr></thead>
+<tbody>
+<tr class="g"><td colspan="2">Pages</td></tr>
+<tr><td><span class="k">1</span> <span class="k">2</span> <span class="k">3</span> <span class="k">4</span> <span class="k">5</span></td><td>Board, Month, Week, Day, Review</td></tr>
+<tr class="g"><td colspan="2">Moving Around</td></tr>
+<tr><td><span class="k">←</span> <span class="k">→</span></td><td>Previous or next week, month or day</td></tr>
+<tr><td><span class="k">T</span></td><td>This week, this month or today</td></tr>
+<tr><td><span class="k">P</span></td><td>Projects &amp; Templates</td></tr>
+<tr><td><span class="k">&lt;</span></td><td>Settings</td></tr>
+<tr><td><span class="k">?</span></td><td>Show the list of keyboard shortcuts</td></tr>
+<tr class="g"><td colspan="2">Timer and Planning</td></tr>
+<tr><td><span class="k">Space</span></td><td>Pause or resume the timer</td></tr>
+<tr><td><span class="k">Shift+T</span></td><td>Stop the timer (logs the time so far)</td></tr>
+<tr><td><span class="k">N</span></td><td>New block (Week and Day)</td></tr>
+<tr class="g"><td colspan="2">General</td></tr>
+<tr><td><span class="k">Cmd/Ctrl+Z</span></td><td>Undo the last change</td></tr>
+<tr><td><span class="k">Shift+D</span></td><td>Light / Dark theme</td></tr>
+<tr><td><span class="k">Shift+S</span></td><td>Sync now</td></tr>
+<tr class="g"><td colspan="2">In Pop-Ups</td></tr>
+<tr><td><span class="k">Enter</span></td><td>Confirm (Save, Add, Create)</td></tr>
+<tr><td><span class="k">Cmd/Ctrl+Enter</span></td><td>Confirm while typing in a writing box</td></tr>
+<tr><td><span class="k">Backspace</span> twice</td><td>Delete (the first press arms the Delete button)</td></tr>
+<tr><td><span class="k">Esc</span></td><td>Close the pop-up</td></tr>
+<tr><td><span class="k">Shift+Enter</span></td><td>New phase (on the Board)</td></tr>
+<tr><td>Shift+click a phase</td><td>Open or close all phases (on the Board)</td></tr>
+<tr class="g"><td colspan="2">File Viewer</td></tr>
+<tr><td><span class="k">←</span> <span class="k">→</span></td><td>Previous or next file</td></tr>
+<tr><td><span class="k">+</span> <span class="k">−</span> <span class="k">0</span></td><td>Zoom in, zoom out, fit</td></tr>
+<tr><td><span class="k">Esc</span></td><td>Close the viewer</td></tr>
+<tr class="g"><td colspan="2">Audio Player</td></tr>
+<tr><td><span class="k">Space</span></td><td>Play or pause</td></tr>
+<tr><td><span class="k">Shift+←</span> <span class="k">Shift+→</span></td><td>10 seconds back or forward</td></tr>
+<tr><td><span class="k">M</span></td><td>Mute or unmute</td></tr>
+</tbody></table>
+<ul>
+<li>The audio player keys only work while a track is open, so Space still pauses the timer everywhere else. Shortcuts never fire while you're typing in a box.</li>
+<li>Change any of them in Settings > Advanced > Keyboard Shortcuts. ✕ clears a shortcut to Empty. Extra actions start Empty: Open This Week's Review, Open This Month's Review, Edit Project, Project Notes, Export Everything (Backup) and Open the Guide.</li>
+</ul>
+`},
+{id:"m10",h:"11. Troubleshooting",html:`
 <ul>
 <li>"Sorry, unable to open the file at this time" (Google): you're signed into more than one Google account. Use an Incognito window with only the Sheet's account.</li>
 <li>"Couldn't reach that URL": the web app URL must end in /exec, and the deployment's access must be Anyone.</li>
@@ -3376,26 +3465,78 @@ manual:[
 <li>Your data stays in your Google Sheet. If asked whether to also clear data, either choice is fine: it only removes this device's copy and offline files.</li>
 <li>To reinstall, open your tracker's address in the browser and install it again (see the setup guide). On iPad, paste your connection link once.</li>
 </ul>`},
-{id:"m11",h:"11. Advanced Settings",html:`
-[[fig:adv|Settings > Advanced]]
-<h4>Branding</h4>
-<ul><li>App Name (header, browser tab, file names) and Home Screen Name (up to 12 characters). Upload Logo (SVG, PNG or JPG), Reset to Default, and Accent Color on SVG Logos.</li>
-<li>Export Icon Files makes a zip with new home-screen icons and the name, using the icon colors you pick. Follow the instructions inside it to put them on GitHub.</li></ul>
-<h4>Appearance</h4><ul><li>Background and card colors for Light and Dark, and Text Size (Small, Medium, Large).</li></ul>
-<h4>Budget Meter</h4><ul><li>Budget colors, Warning Threshold (70% to 90%), Warning Colors, Over Budget Colors, Show Percentages, Week View Warnings and Budget Alerts on Review Pages.</li></ul>
-<h4>Board</h4><ul><li>Phase Colors on Phase Bars, Phase Colors on Items, Include Bonus Hours in Project Totals, Linked Character Names.</li></ul>
-<h4>Flags</h4><ul><li>Rate Floor Warning, Revisions Over Scope, Deadline Running Late, Missing Decision-Maker. Each switches its amber chip on or off.</li></ul>
-<h4>Calendar</h4><ul><li>Week Starts On, Day Starts, Day Ends, and the 12-Hour or 24-Hour Clock.</li>
-<li>Google Calendar: Show Google Calendar, the calendars to show (tick each one), and Send Due Dates to Google Calendar (chapter 1, Google Calendar).</li></ul>
-<h4>Timer</h4><ul><li>Sprint presets (up to 5), break rules, Timer Sound and Volume, your own sounds, Timer Notifications, Calendar Alerts (This Device), and the Still Working? prompt with its minutes.</li></ul>
-<h4>Data</h4><ul><li>Export Everything, Import Backup, Sunday Backup Reminder.</li>
-<li>Attachments (This Device): Keep All Attachments Offline, the files and space used, and Clear Offline Copies (tap twice). Clearing only removes copies on this device; your files stay in Drive.</li>
-<li>Link and File Actions (This Device): what each file type or link does when tapped. Reset makes one ask again; Reset All (tap twice) resets every type.</li>
-<li>Check Google Drive Access confirms attachments can reach Drive.</li>
-<li>Clear All Data (tap twice): see Recovering Data in chapter 7.</li>
-<li>Google Sheet: Copy Connection Link (for another device; treat it like a password), Show Link and Sync Now.</li>
-<li>Disconnect affects only the device you tap it on. That device forgets the web app URL and key and stops syncing; your Sheet and your other devices keep working, and nothing is deleted. If changes are still waiting to sync, it won't disconnect until they're sent. Reconnect by pasting your connection link. Use it when switching to another Sheet or before handing a device to someone else. If a device is lost or the link gets out, run resetKey in Apps Script instead and reconnect your devices.</li></ul>
-<h4>Keyboard Shortcuts</h4><ul><li>The button at the bottom left of the Advanced tab (chapter 8).</li></ul>`}
+{id:"m12",h:"12. Glossary",html:`
+<p>The words used in the tracker and this manual, in alphabetical order.</p>
+<dl class="gloss">
+<dt>2x</dt><dd>Shown next to a file&#x27;s size when the same Drive file has a card in two places (made with Copy To). Nothing is duplicated.</dd>
+<dt>Accent Color</dt><dd>The tracker&#x27;s main highlight color (buttons, today&#x27;s date, links). It also tints an SVG logo when Accent Color on SVG Logos is on.</dd>
+<dt>Advanced Settings</dt><dd>The second tab of Settings: Branding, Appearance, Budget Meter, Board, Flags, Calendar, Timer, Keyboard Shortcuts and Data.</dd>
+<dt>Attachment Card</dt><dd>The tile for one file or link in Notes or an item: a thumbnail or badge, the name and the size. Tap it to open; hold and drag to reorder.</dd>
+<dt>Audio Player</dt><dd>The tracker&#x27;s own player for MP3, M4A and WAV files, inside the File Viewer.</dd>
+<dt>Backup</dt><dd>A file with everything in the tracker (Settings &gt; Advanced &gt; Data, or the Sunday Backup banner). Your Google Sheet is the main copy; a backup is the spare.</dd>
+<dt>Badge</dt><dd>The colored label on an attachment card that names the file type: PDF, PSD, MP3, DOC, SHEET, SLIDES and so on.</dd>
+<dt>Block</dt><dd>A planned stretch of time on Week or Day. Project Work blocks belong to a step and take its phase color.</dd>
+<dt>Bonus Phase</dt><dd>A phase whose hours count toward a separate ceiling instead of the main budget, for extra work beyond the core scope.</dd>
+<dt>Branding</dt><dd>The App Name, Home Screen Name, logo and home-screen icon (Settings &gt; Advanced &gt; Branding).</dd>
+<dt>Budget</dt><dd>The hours a project, phase or item is allowed. The bars fill as you log time against it.</dd>
+<dt>Budget Meter</dt><dd>The colors that show how full a budget is: teal for used, yellow past the warning point, pink over budget. Each can be switched off.</dd>
+<dt>Checklist</dt><dd>A simple tick list inside an item.</dd>
+<dt>Clear (✕)</dt><dd>The small ✕ next to a date box. It empties the date; then tap Save.</dd>
+<dt>Client Report</dt><dd>A clean summary of a project to share with a client, with options for which numbers to show (Projects &gt; Client Report or the Board).</dd>
+<dt>Connection Link</dt><dd>A single link that holds your web app URL and key. Opening or pasting it connects a device. Treat it like a password.</dd>
+<dt>Daily Routine</dt><dd>The Life Blocks that fill in every matching day automatically (Settings &gt; General &gt; Edit Routine).</dd>
+<dt>Daily Target</dt><dd>The hours you aim to log each day (6 by default). Month shades days by how close you got.</dd>
+<dt>Decision-Maker</dt><dd>The person on a client project who signs off. A flag appears when a Client project has none.</dd>
+<dt>Diary</dt><dd>The writing box on the Day page for notes about that day.</dd>
+<dt>Due Date</dt><dd>The date a whole project is due. It shows in the project&#x27;s color on Month, Week and Day, and drives the deadline forecast.</dd>
+<dt>Effective Rate</dt><dd>What you actually earn per hour logged on a project or phase.</dd>
+<dt>Estimate</dt><dd>The time you expect a step to take. Item and phase estimates add up from their steps; the thin line on a bar marks it.</dd>
+<dt>Feedback Round</dt><dd>One round of client feedback on a phase. Past the rounds included, the phase shows Over Scope.</dd>
+<dt>File Viewer</dt><dd>The full-screen view that opens images, PDFs and audio inside the tracker, with arrows to move between files.</dd>
+<dt>Flags</dt><dd>Amber chips that warn you: Below Your Floor, Over Scope, Running Late and No Decision-Maker. Each can be switched off.</dd>
+<dt>General Settings</dt><dd>The first tab of Settings: daily target, work days, Daily Routine, colors, rates and value.</dd>
+<dt>Google Events</dt><dd>Events from your Google Calendar, shown as striped blocks in Week and Day and as labels in Month.</dd>
+<dt>Google Sheet</dt><dd>Your &quot;Project Tracker&quot; spreadsheet in Google Drive. It holds all your data and syncs every device.</dd>
+<dt>Group</dt><dd>A row of items inside a phase, such as Archetype A or Sidekick. Items in the same group sit side by side.</dd>
+<dt>Item</dt><dd>One piece of work inside a phase, such as a character, page or proposal. It holds steps, a checklist, feedback, notes and attachments.</dd>
+<dt>Key</dt><dd>The password-like code that lets the tracker talk to your Google Sheet. It&#x27;s part of your connection link.</dd>
+<dt>Life Block</dt><dd>A block for life outside work (meals, walks, rest). It never counts toward a budget.</dd>
+<dt>⋯ Menu</dt><dd>The three-dot button on an attachment card: Rename, Move To, Copy To, Download (or Download as PDF), Copy Link and Remove.</dd>
+<dt>Monthly Review</dt><dd>The review of a month on the Review page: focus, hours by project, wins, improvements, goals and notes.</dd>
+<dt>Offline Copy</dt><dd>A file saved on the device so it opens without internet. Turn on Keep All Attachments Offline to save every file.</dd>
+<dt>Open in App / Open in Browser</dt><dd>The choices for opening a non-image file: in its own app (Drive, Docs, Photoshop) or in a browser tab.</dd>
+<dt>Phase</dt><dd>A stage of a project with its own budget, color, target date and items, such as Broad Exploration or Refinement.</dd>
+<dt>Phase Color</dt><dd>The color of a phase&#x27;s bars, blocks and target dates, picked from your Phase Colors.</dd>
+<dt>Pop-Up</dt><dd>A window that opens over the page, such as Edit Project or an item.</dd>
+<dt>Project</dt><dd>The top level of your work: a client job, a portfolio chapter or a pitch. It holds phases, a budget, pricing and a due date.</dd>
+<dt>Project Color</dt><dd>The color of a project&#x27;s due date on Month, Week and Day (yellow by default), set in Edit Project.</dd>
+<dt>Project Tracker Dates</dt><dd>The Google calendar that holds your due dates and phase target dates as all-day events.</dd>
+<dt>Project Tracker Files</dt><dd>The folder in your Google Drive where the tracker stores uploaded attachments.</dd>
+<dt>Project Type</dt><dd>Client (paid work), Internal (your own work, such as a portfolio chapter) or Pitch (a proposal you&#x27;re not paid for yet).</dd>
+<dt>Projected Finish</dt><dd>The date the project would be done at your recent pace (the last 14 days of logged time).</dd>
+<dt>Rate Floor</dt><dd>The lowest hourly rate you&#x27;ll accept. Client projects below it show the Below Your Floor flag.</dd>
+<dt>Remember</dt><dd>The tick box that saves how a file type opens on this device, so it opens straight away next time.</dd>
+<dt>Running Late</dt><dd>The flag that shows when the projected finish is after the due date, with the hours per day you&#x27;d need to catch up.</dd>
+<dt>Section Header</dt><dd>The large teal title of a section, such as DAILY ROUTINE in Settings or a chapter title in this manual.</dd>
+<dt>Session</dt><dd>One stretch of logged time on a step. The Time Log lists them.</dd>
+<dt>Shadow Value</dt><dd>What Internal and Pitch work would be worth at your rate, even though no one is paying for it yet.</dd>
+<dt>Stage</dt><dd>A timed stretch of work within a step (up to 90 minutes), followed by a break.</dd>
+<dt>Status</dt><dd>Where an item stands: Not Started, In Progress, Submitted, Feedback Received, Revising, Approved or Done.</dd>
+<dt>Step</dt><dd>A task inside an item with its own time estimate, such as Sketch or Render. You run the timer on a step.</dd>
+<dt>Sub-Header</dt><dd>The smaller bold title inside a section, such as &quot;The Top Bar&quot;.</dd>
+<dt>Sync Chip</dt><dd>The status button in the top bar: Synced, X Waiting, Offline or Not Connected. Tap it to sync now.</dd>
+<dt>Target Date</dt><dd>The date a phase should be done. It shows in the phase&#x27;s color on Month, Week and Day.</dd>
+<dt>Target Week</dt><dd>The week an item should be done. It lists the item under This Week&#x27;s Items on Week.</dd>
+<dt>Template</dt><dd>A saved starting point: an item template (steps and checklist), a phase template or a pipeline template (a whole project).</dd>
+<dt>Time Log</dt><dd>The list of sessions logged on a step, where you can fix or delete them.</dd>
+<dt>Two-Tap Button</dt><dd>A button for something hard to undo, such as Delete or Reset All. The first tap arms it, the second tap does it.</dd>
+<dt>Undo</dt><dd>The button that appears for a few seconds after most changes, or Cmd/Ctrl+Z.</dd>
+<dt>Waiting</dt><dd>Changes saved on the device that haven&#x27;t reached your Google Sheet yet. They sync when you&#x27;re back online.</dd>
+<dt>Warning Point</dt><dd>How full a budget gets before its bar turns yellow (80% by default).</dd>
+<dt>Web App URL</dt><dd>The address of your Google Sheet&#x27;s script, ending in /exec. It&#x27;s part of your connection link.</dd>
+<dt>Weekly Review</dt><dd>The review of a week on the Review page: logged vs target, items submitted and budget used.</dd>
+</dl>
+`}
 ]};
 
 function guideModal(tab="quick",back){
