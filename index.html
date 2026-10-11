@@ -408,9 +408,12 @@ details.sec[open]{padding-bottom:12px}
 /* advanced settings */
 .adv{display:grid;gap:18px}
 .adv section{display:grid;gap:10px;padding-top:14px;border-top:1px solid var(--line)}
-.adv h3{color:#509FAF}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .adv h3{color:#38B2C3}}
-:root[data-theme="dark"] .adv h3{color:#38B2C3}
+.pjc{width:52px;height:37px;padding:3px;border:1px solid var(--line2);border-radius:8px;background:var(--field,transparent);cursor:pointer;flex:none}.pjc-row{align-items:center;gap:10px}
+.adv h3,.guide h3,.lbl.sh{font-size:15px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#509FAF;margin:0}
+.guide h3{margin-top:6px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) :is(.adv h3,.guide h3,.lbl.sh){color:#38B2C3}}
+:root[data-theme="dark"] :is(.adv h3,.guide h3,.lbl.sh){color:#38B2C3}
+.guide p.lead{font-size:15px;font-weight:800;color:var(--ink);margin:2px 0 6px}
 .adv section:first-child{border-top:0;padding-top:0}
 .crow{display:grid;grid-template-columns:1fr 110px 110px auto;gap:8px;align-items:center}
 .crow-h{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
@@ -505,7 +508,6 @@ body.timing .toast{bottom:calc(130px + env(safe-area-inset-bottom,0px))}
 .fd-nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
 .fd-row input{accent-color:var(--accent);width:17px;height:17px}
 .guide{display:grid;gap:12px}
-.guide h3{font-size:12px;margin-top:6px}
 .guide h4{font-size:15px;margin:10px 0 2px;font-weight:800}
 .guide p,.guide li{font-size:13.5px;line-height:1.55;margin:0 0 6px}
 .guide ul{margin:0 0 8px;padding-left:20px}
@@ -556,7 +558,22 @@ input[type="date"].inp::-webkit-date-and-time-value,input[type="time"].inp::-web
 .vw-in img{display:block;user-select:none;-webkit-user-drag:none;max-width:none}
 .vw-in canvas{display:block;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.4)}
 .vw-audio{display:grid;gap:14px;justify-items:center;padding:30px;max-width:520px;width:min(520px,90vw);text-align:center}
-.vw-audio b{font-size:15px;overflow-wrap:anywhere}.vw-audio audio{width:100%}
+.vw-audio b{font-size:15px;overflow-wrap:anywhere;color:#fff}.vw-audio audio{display:none}
+.ap{gap:18px;background:rgba(20,24,34,.92);border:1px solid #333a48;border-radius:18px;color:#E8ECF3;padding:28px 26px 22px}
+.ap-ctl{display:flex;align-items:center;justify-content:center;gap:clamp(28px,8vw,56px);width:100%}
+.ap-play{width:84px;height:84px;border-radius:50%;border:0;background:#38B2C3;color:#0B1324;display:grid;place-items:center;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.35);flex:none}
+.ap-play svg{width:42px;height:42px}.ap-play:not(.on) svg{margin-left:5px}.ap-play:active{transform:scale(.96)}
+.ap-skip{display:flex;align-items:center;gap:4px;min-width:64px;height:52px;padding:0 12px;border-radius:26px;border:1px solid #444c5c;background:#232a38;color:#E8ECF3;font-weight:800;font-size:14px;cursor:pointer;justify-content:center}
+.ap-skip svg{width:24px;height:24px}
+.ap-seek{width:100%;height:28px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer;--p:0%}
+.ap-seek::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(90deg,#38B2C3 var(--p),#3A4252 var(--p))}
+.ap-seek::-moz-range-track{height:6px;border-radius:3px;background:#3A4252}.ap-seek::-moz-range-progress{height:6px;border-radius:3px;background:#38B2C3}
+.ap-seek::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#fff;margin-top:-7px;border:0;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.ap-seek::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:0}
+.ap-time{display:flex;justify-content:space-between;align-items:center;width:100%;font-size:13px;font-variant-numeric:tabular-nums;color:#B8C0CE;margin-top:-10px}
+.ap-time .btn{color:#E8ECF3;border-color:#444c5c;background:#232a38}
+.ap-hint{font-size:11.5px;color:#8C95A6}
+@media (hover:none){.ap-hint{display:none}}
 .vw-audio .bdg{font-size:12px;font-weight:800;letter-spacing:.04em;color:#fff;background:var(--bc);padding:4px 10px;border-radius:6px;border:1px solid #555}
 .vw-msg{color:#CDD2DD;text-align:center;padding:30px;max-width:420px}
 .vw-nav{position:fixed;top:50%;transform:translateY(-50%);z-index:61;width:44px;height:64px;border-radius:10px;border:1px solid #3A4763;background:rgba(46,57,78,.85);color:#fff;font-size:24px}
@@ -630,7 +647,7 @@ const LPAL_DEF={light:["#CEFBD0","#D5ECC2","#FAF6B7","#F2E3B3","#EDE6D8","#F7D9C
 const LIFE_ORDER=[1,7,2,11,10,5,8,6,12,9,4,3]; /* October 2026 reorder: new slot k shows old slot LIFE_ORDER[k-1] */
 const STATUSES=[["Not Started","--faint"],["In Progress","--accent"],["Submitted","--amber"],["Feedback Received","--p7"],["Revising","--act"],["Approved","--p3"],["Done","--ok"]];
 const SC=Object.fromEntries(STATUSES);
-const APP_VERSION="2026.10.10.03";
+const APP_VERSION="2026.10.11.01";
 const isDone=it=>it.status==="Done"||it.status==="Approved";
 const DEF_NAME="Blue Blaze Project Tracker";
 const appName=()=>((typeof S!=="undefined"&&S&&S.settings&&S.settings.brandName)||"").trim()||DEF_NAME;
@@ -1118,6 +1135,7 @@ function projectModal(id,isNew){
       <div class="field"><label for="pj-dm">Decision-Maker</label><input class="inp" id="pj-dm" value="${esc(p.dm||"")}" placeholder="The person who signs off"></div></div>
     <div class="two"><div class="field"><label for="pj-due">Due Date</label>${dateBox('id="pj-due"',p.due)}</div>
       <div class="field"><label for="pj-rounds">Feedback Rounds Included per Phase</label><input class="inp" type="number" min="0" step="1" id="pj-rounds" value="${p.roundsIncl??""}" placeholder="Default: ${S.settings.roundsIncl??1}"><span class="sub">0 Counts Rounds Without a Limit</span></div></div>
+    <div class="field"><label for="pj-color">Project Color</label><div class="row pjc-row"><input type="color" id="pj-color" class="pjc" value="${pColor(p)}"><span class="sub grow">Due Date Color in Month, Week and Day</span><button type="button" class="btn sm ghost" id="pj-cdef">Default</button></div></div>
     <details class="sec" open><summary>PRICING</summary><div style="display:grid;gap:10px">
       <div class="seg-ctl" id="pj-modes" style="width:auto;flex-wrap:wrap">${MODES.map(([m,l])=>`<button data-pmode="${m}" aria-pressed="${pr.mode===m}">${l}</button>`).join("")}</div>
       <div id="pj-price" style="display:grid;gap:8px"></div></div></details>
@@ -1144,7 +1162,8 @@ function projectModal(id,isNew){
       ob.querySelectorAll("[data-pd]").forEach(b=>b.onclick=()=>{const i=+b.dataset.pd;[phOrd[i+1],phOrd[i]]=[phOrd[i],phOrd[i+1]];drawOrd()})};
     drawOrd();
     root.querySelector("#pj-cancel").onclick=()=>{if(isNew){S.projects=S.projects.filter(x=>x.id!==id);commit()}closeModal()};
-    root.querySelector("#pj-save").onclick=()=>{p.name=nm.value.trim()||"Untitled Project";p.subtitle=root.querySelector("#pj-sub").value.trim();
+    root.querySelector("#pj-cdef").onclick=()=>{root.querySelector("#pj-color").value=PCOL_DEF.toLowerCase()};
+    root.querySelector("#pj-save").onclick=()=>{p.color=(root.querySelector("#pj-color").value||PCOL_DEF).toUpperCase();p.name=nm.value.trim()||"Untitled Project";p.subtitle=root.querySelector("#pj-sub").value.trim();
       p.type=type;p.client=root.querySelector("#pj-client").value.trim();p.dm=root.querySelector("#pj-dm").value.trim();p.due=root.querySelector("#pj-due").value;
       const rv=root.querySelector("#pj-rounds").value;if(rv===""||isNaN(+rv))delete p.roundsIncl;else p.roundsIncl=Math.max(0,Math.round(+rv));
       p.pricing={mode:pr.mode,rate:numv(pr.rate),dayRate:numv(pr.dayRate),fee:numv(pr.fee),billOver:!!pr.billOver};
@@ -1344,7 +1363,7 @@ const extOf=n=>{const m=String(n||"").toLowerCase().split(/[?#]/)[0].match(/\.([
 const MIMES={jpg:"image/jpeg",jpeg:"image/jpeg",png:"image/png",gif:"image/gif",webp:"image/webp",pdf:"application/pdf",psd:"image/vnd.adobe.photoshop",svg:"image/svg+xml",zip:"application/zip",mp4:"video/mp4",mov:"video/quicktime",txt:"text/plain"};
 const mimeOf=n=>MIMES[extOf(n)]||"application/octet-stream";
 const kindOf=a=>{if(a.kind==="link")return"other";const e=extOf(a.name),m=a.mime||"";if(/^image\/(jpeg|png|gif|webp)$/.test(m)||["jpg","jpeg","png","gif","webp"].includes(e))return"img";if(m==="application/pdf"||e==="pdf")return"pdf";if(/^audio\/(mpeg|mp3|mp4|x-m4a|wav|x-wav|aac)$/.test(m)||["mp3","m4a","wav","aac"].includes(e))return"audio";return"other"};
-const BADGE_C={psd:"#263BA9",psb:"#263BA9",procreate:"#4A4A55",ai:"#E07B00",eps:"#E07B00",pdf:"#A73A3A",jpg:"#2E9E6A",jpeg:"#2E9E6A",png:"#2E9E6A",gif:"#2E9E6A",webp:"#2E9E6A",heic:"#2E9E6A",tif:"#2E9E6A",tiff:"#2E9E6A",svg:"#C79A00",zip:"#6F7482",rar:"#6F7482",mp4:"#8A4FD8",mov:"#8A4FD8",blend:"#E87D0D",clip:"#C0457A",kra:"#3A6FD8",fig:"#A259FF",doc:"#2B5FB4",docx:"#2B5FB4",xls:"#1F7A45",xlsx:"#1F7A45",ppt:"#C4502A",pptx:"#C4502A",key:"#2B6BD8",txt:"#6F7482",drive:"#1A73E8",dropbox:"#0061FE",proton:"#6D4AFF",gdoc:"#1A73E8",mp3:"#000000",wav:"#000000",m4a:"#000000",aac:"#000000",flac:"#000000"};
+const BADGE_C={psd:"#1A3D9C",psb:"#1A3D9C",procreate:"#4A4A55",ai:"#E07B00",eps:"#E07B00",pdf:"#A73A3A",jpg:"#2E9E6A",jpeg:"#2E9E6A",png:"#2E9E6A",gif:"#2E9E6A",webp:"#2E9E6A",heic:"#2E9E6A",tif:"#2E9E6A",tiff:"#2E9E6A",svg:"#C79A00",zip:"#6F7482",rar:"#6F7482",mp4:"#8A4FD8",mov:"#8A4FD8",blend:"#E87D0D",clip:"#C0457A",kra:"#3A6FD8",fig:"#A259FF",doc:"#2B5FB4",docx:"#2B5FB4",xls:"#1F7A45",xlsx:"#1F7A45",ppt:"#C4502A",pptx:"#C4502A",key:"#2B6BD8",txt:"#6F7482",drive:"#1A73E8",dropbox:"#0061FE",proton:"#6D4AFF",gdoc:"#1A73E8",mp3:"#000000",wav:"#000000",m4a:"#000000",aac:"#000000",flac:"#000000"};
 const MIME_EXT={"application/pdf":"pdf","image/jpeg":"jpg","image/png":"png","image/gif":"gif","image/webp":"webp","image/heic":"heic","image/svg+xml":"svg","image/tiff":"tif","image/vnd.adobe.photoshop":"psd","application/x-photoshop":"psd","application/illustrator":"ai","application/postscript":"ai","audio/mpeg":"mp3","audio/mp3":"mp3","audio/wav":"wav","audio/x-wav":"wav","audio/mp4":"m4a","audio/x-m4a":"m4a","video/mp4":"mp4","video/quicktime":"mov","application/zip":"zip","application/x-zip-compressed":"zip","text/plain":"txt","application/msword":"doc","application/vnd.openxmlformats-officedocument.wordprocessingml.document":"docx","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":"xlsx","application/vnd.openxmlformats-officedocument.presentationml.presentation":"pptx"};
 const GTYPE={"application/vnd.google-apps.document":{t:"DOC",c:"#538ED1",l:"Google Doc",app:"googledocs",path:"document"},"application/vnd.google-apps.spreadsheet":{t:"SHEET",c:"#0F9D58",l:"Google Sheet",app:"googlesheets",path:"spreadsheets"},"application/vnd.google-apps.presentation":{t:"SLIDES",c:"#DDAD03",ink:"#1A1F2B",l:"Google Slides",app:"googleslides",path:"presentation"}};
 function badgeOf(a){if(/^application\/vnd\.google-apps/.test(a.mime||"")){const g=GTYPE[a.mime];return g?{t:g.t,c:g.c,ink:g.ink}:{t:"GOOGLE",c:"#1A73E8"}}let e=a.kind==="link"?(extOf(a.name)||extOf(a.url)):(extOf(a.name)||MIME_EXT[a.mime]||"");
@@ -1778,14 +1797,21 @@ function openViewer(ref,id){
       if(Math.abs(cs[n].width-vp.width)<2&&cs[n].dataset.r)continue;const c=document.createElement("canvas");c.width=vp.width;c.height=vp.height;await pg.render({canvasContext:c.getContext("2d"),viewport:vp}).promise;
       if(tok!==VW.tok)return;const t=cs[n].getContext("2d");cs[n].width=vp.width;cs[n].height=vp.height;t.drawImage(c,0,0);cs[n].dataset.r=1}}
   async function show(){
-    const a=VW.list[VW.i];VW.tok++;VW.pdf=null;VW.zoom=1;VW.base=null;VW.kind=kindOf(a);const tok=VW.tok;
+    const a=VW.list[VW.i];VW.tok++;VW.pdf=null;VW.au=null;VW.zoom=1;VW.base=null;VW.kind=kindOf(a);const tok=VW.tok;
     q("#vw-n").textContent=a.name;q("#vw-c").textContent=`${VW.list.length>1?`${VW.i+1} of ${VW.list.length} · `:""}${a.pending?"Waiting to Upload":fsize(a.size)}`;
     q("#vw-drive").hidden=!a.driveId;q("#vw-dl").hidden=!canDownload(a)&&!a.pending;box.innerHTML=`<div class="vw-msg">Opening…</div>`;
     let b;try{b=await getBlob(a)}catch(x){if(tok===VW.tok)box.innerHTML=`<div class="vw-msg">${x.message==="ELSEWHERE"?"This file was added on another device and hasn't reached Google Drive yet. It opens once that device is back online.":x.message==="NOT_CONNECTED"||!navigator.onLine?"This file isn't saved on this device yet. Open it once while online (VPN if needed), or turn on Keep All Attachments Offline in Settings > Advanced.":esc(driveErr(x))}</div>`;return}
     if(tok!==VW.tok)return;const r=st.getBoundingClientRect(),aw=r.width-24,ah=r.height-24;
     ["#vw-out","#vw-fit","#vw-zin"].forEach(x=>{const e=q(x);if(e)e.hidden=VW.kind==="audio"});
     if(VW.kind==="audio"){const u=fileURLs[a.id]||(fileURLs[a.id]=URL.createObjectURL(b));if(tok!==VW.tok)return;
-      box.innerHTML=`<div class="vw-audio"><span class="bdg" style="--bc:#000">${esc(badgeOf(a).t)}</span><b>${esc(a.name)}</b><audio controls preload="metadata" src="${u}"></audio></div>`;return}
+      box.innerHTML=`<div class="vw-audio ap"><span class="bdg" style="--bc:#000">${esc(badgeOf(a).t)}</span><b>${esc(a.name)}</b><audio preload="auto" src="${u}"></audio>
+        <div class="ap-ctl"><button type="button" class="ap-skip" data-ap="-10" aria-label="Back 10 seconds" title="Back 10 Seconds (Shift+←)">${AP_IC.back}<span>10</span></button>
+          <button type="button" class="ap-play" id="ap-play" aria-label="Play" title="Play / Pause (Space)">${AP_IC.play}</button>
+          <button type="button" class="ap-skip" data-ap="10" aria-label="Forward 10 seconds" title="Forward 10 Seconds (Shift+→)"><span>10</span>${AP_IC.fwd}</button></div>
+        <input type="range" class="ap-seek" id="ap-seek" min="0" max="1000" step="1" value="0" aria-label="Position">
+        <div class="ap-time"><span id="ap-cur">0:00</span><button type="button" class="btn sm ghost" id="ap-mute">${VW.muted?"Unmute":"Mute"}</button><span id="ap-dur">–:––</span></div>
+        <div class="ap-hint">Space Play / Pause · Shift+← → 10 Seconds · M Mute · ← → Other Files</div></div>`;
+      setupAudio(box,tok);return}
     if(VW.kind==="img"){const u=fileURLs[a.id]||(fileURLs[a.id]=URL.createObjectURL(b));const im=await loadImg(u).catch(()=>null);if(tok!==VW.tok)return;
       if(!im){box.innerHTML=`<div class="vw-msg">This image couldn't be shown.</div>`;return}
       const k=Math.min(1,aw/im.naturalWidth,ah/im.naturalHeight);VW.base={w:im.naturalWidth*k};box.innerHTML="";im.draggable=false;box.appendChild(im);setW()}
@@ -1796,6 +1822,18 @@ function openViewer(ref,id){
         if(doc.numPages>n)box.insertAdjacentHTML("beforeend",`<div class="vw-msg">Showing the first ${n} pages. Open in Drive for the rest.</div>`);
         setW();await renderPDF()}catch(x){if(tok===VW.tok)box.innerHTML=`<div class="vw-msg">This PDF couldn't be opened.</div>`}}
   }
+  function setupAudio(box,tok){const au=box.querySelector("audio"),pl=box.querySelector("#ap-play"),sk=box.querySelector("#ap-seek"),cu=box.querySelector("#ap-cur"),du=box.querySelector("#ap-dur"),mu=box.querySelector("#ap-mute");let drag=false;
+    au.muted=!!VW.muted;
+    const paint=()=>{const on=!au.paused;pl.innerHTML=on?AP_IC.pause:AP_IC.play;pl.setAttribute("aria-label",on?"Pause":"Play");pl.classList.toggle("on",on)};
+    const tick=()=>{if(!drag&&au.duration)sk.value=Math.round(au.currentTime/au.duration*1000);cu.textContent=mmss(au.currentTime);sk.style.setProperty("--p",(sk.value/10)+"%")};
+    au.addEventListener("loadedmetadata",()=>{du.textContent=mmss(au.duration);tick()});au.addEventListener("timeupdate",tick);
+    ["play","pause","ended"].forEach(ev=>au.addEventListener(ev,paint));
+    pl.onclick=e=>{apToggle();pl.blur()};
+    box.querySelectorAll("[data-ap]").forEach(b=>b.onclick=()=>{apSeek(+b.dataset.ap);b.blur()});
+    mu.onclick=()=>{apMute();mu.blur()};
+    sk.addEventListener("pointerdown",()=>drag=true);sk.addEventListener("input",()=>{if(au.duration){au.currentTime=sk.value/1000*au.duration;cu.textContent=mmss(au.currentTime);sk.style.setProperty("--p",(sk.value/10)+"%")}});
+    sk.addEventListener("change",()=>{drag=false;sk.blur()});
+    VW.au=au;const p=au.play();if(p&&p.catch)p.catch(()=>{if(tok===VW.tok)paint()})}
   const go=d=>{if(VW.list.length<2)return;document.querySelectorAll("#viewer-root audio").forEach(x=>{try{x.pause()}catch(e){}});VW.i=(VW.i+d+VW.list.length)%VW.list.length;show()};
   q("#vw-x").onclick=()=>closeViewer();q("#vw-zin").onclick=()=>zoomTo(VW.zoom*1.4);q("#vw-out").onclick=()=>zoomTo(VW.zoom/1.4);q("#vw-fit").onclick=()=>zoomTo(1);
   q("#vw-dl").onclick=()=>{const a=VW.list[VW.i];if(a.pending){getBlob(a).then(b=>deliverFile(a.name,b)).catch(()=>{})}else downloadAtt(a)};
@@ -1808,19 +1846,29 @@ function openViewer(ref,id){
   st.addEventListener("touchstart",e=>{if(e.touches.length===2){const r=st.getBoundingClientRect();pz={d0:Math.max(dist(e.touches),20),z0:VW.zoom,fx:(e.touches[0].clientX+e.touches[1].clientX)/2-r.left,fy:(e.touches[0].clientY+e.touches[1].clientY)/2-r.top}}},{passive:true});
   st.addEventListener("touchmove",e=>{if(pz&&e.touches.length===2){e.preventDefault();zoomTo(pz.z0*dist(e.touches)/pz.d0,pz.fx,pz.fy)}},{passive:false});
   st.addEventListener("touchend",e=>{if(e.touches.length<2)pz=null},{passive:true});
-  let sx=0,sy=0,st0=0;st.addEventListener("touchstart",e=>{if(e.touches.length===1){sx=e.touches[0].clientX;sy=e.touches[0].clientY;st0=st.scrollTop}},{passive:true});
-  st.addEventListener("touchend",e=>{if(VW.zoom<=1.02&&e.changedTouches.length===1&&!pz){const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
+  let sx=0,sy=0,st0=0,inAp=false;st.addEventListener("touchstart",e=>{inAp=!!(e.target.closest&&e.target.closest(".ap-ctl,.ap-seek,.ap-time"));if(e.touches.length===1){sx=e.touches[0].clientX;sy=e.touches[0].clientY;st0=st.scrollTop}},{passive:true});
+  st.addEventListener("touchend",e=>{if(!inAp&&VW.zoom<=1.02&&e.changedTouches.length===1&&!pz){const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
     if(dy>110&&Math.abs(dx)<70&&st0<=2)return closeViewer();
     if(Math.abs(dx)>70&&Math.abs(dy)<80&&st.scrollWidth<=st.clientWidth+2)go(dx<0?1:-1)}},{passive:true});
-  st.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"||e.button!==0)return;pan={x:e.clientX,y:e.clientY,l:st.scrollLeft,t:st.scrollTop};st.classList.add("dragging")});
+  st.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"||e.button!==0||(e.target.closest&&e.target.closest(".ap")))return;pan={x:e.clientX,y:e.clientY,l:st.scrollLeft,t:st.scrollTop};st.classList.add("dragging")});
   addEventListener("pointermove",e=>{if(pan){st.scrollLeft=pan.l-(e.clientX-pan.x);st.scrollTop=pan.t-(e.clientY-pan.y)}});
   addEventListener("pointerup",()=>{pan=null;st.classList.remove("dragging")});
-  VW.key=e=>{if(!VW)return;if(e.key==="Escape"){e.preventDefault();e.stopImmediatePropagation();closeViewer()}else if(e.key==="ArrowRight"){e.preventDefault();e.stopImmediatePropagation();go(1)}else if(e.key==="ArrowLeft"){e.preventDefault();e.stopImmediatePropagation();go(-1)}
+  VW.key=e=>{if(!VW)return;
+    if(VW.kind==="audio"&&VW.au&&!e.metaKey&&!e.ctrlKey&&!e.altKey){const k=e.key;
+      if(k===" "||k==="Spacebar"||k==="m"||k==="M"||(e.shiftKey&&(k==="ArrowLeft"||k==="ArrowRight"))){e.preventDefault();e.stopImmediatePropagation();if(document.activeElement&&document.activeElement.closest&&document.activeElement.closest("#viewer-root"))document.activeElement.blur();
+        if(k==="m"||k==="M")apMute();else if(k==="ArrowLeft")apSeek(-10);else if(k==="ArrowRight")apSeek(10);else apToggle();return}}
+    if(e.key==="Escape"){e.preventDefault();e.stopImmediatePropagation();closeViewer()}else if(e.key==="ArrowRight"){e.preventDefault();e.stopImmediatePropagation();go(1)}else if(e.key==="ArrowLeft"){e.preventDefault();e.stopImmediatePropagation();go(-1)}
     else if(e.key==="+"||e.key==="="){e.preventDefault();e.stopImmediatePropagation();zoomTo(VW.zoom*1.4)}else if(e.key==="-"){e.preventDefault();e.stopImmediatePropagation();zoomTo(VW.zoom/1.4)}else if(e.key==="0"){e.preventDefault();e.stopImmediatePropagation();zoomTo(1)}else e.stopImmediatePropagation()};
   document.addEventListener("keydown",VW.key,true);
   try{history.pushState({bbv:1},"")}catch(x){}
   show();
 }
+const AP_IC={play:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>`,pause:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg>`,
+  back:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V2L7 6l5 4V7a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z" fill="currentColor"/></svg>`,fwd:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V2l5 4-5 4V7a6 6 0 1 0 6 6h2a8 8 0 1 1-8-8z" fill="currentColor"/></svg>`};
+const mmss=t=>{if(!isFinite(t))return"–:––";t=Math.max(0,Math.floor(t));const h=Math.floor(t/3600),m=Math.floor(t%3600/60),x=String(t%60).padStart(2,"0");return h?`${h}:${String(m).padStart(2,"0")}:${x}`:`${m}:${x}`};
+function apToggle(){const au=VW&&VW.au;if(!au)return;if(au.paused){const p=au.play();if(p&&p.catch)p.catch(()=>{})}else au.pause()}
+function apSeek(d){const au=VW&&VW.au;if(!au)return;au.currentTime=Math.max(0,Math.min((au.duration||0)-0.05,au.currentTime+d));au.dispatchEvent(new Event("timeupdate"))}
+function apMute(){const au=VW&&VW.au;if(!au)return;VW.muted=au.muted=!au.muted;const b=document.getElementById("ap-mute");if(b)b.textContent=au.muted?"Unmute":"Mute";toast(au.muted?"Muted":"Sound On")}
 function closeViewer(fromPop){if(!VW)return;document.querySelectorAll("#viewer-root audio").forEach(x=>{try{x.pause()}catch(e){}});document.removeEventListener("keydown",VW.key,true);VW.tok++;VW=null;document.getElementById("viewer-root").innerHTML="";if(!fromPop){vwPop=true;try{history.back()}catch(x){vwPop=false}}}
 
 /* date boxes with a ✕ to empty them (Android's picker has no Clear, and iPad's Reset puts the saved date back) */
@@ -2124,7 +2172,8 @@ function lane(date){
   return `<div class="lane ${gOn()?"gl2":""}" data-date="${date}">${g}<i class="ab"></i>${gev}${blocks}${acts}${now}</div>`;
 }
 /* project due dates and phase target dates on one day */
-function dueOn(ds){const out=[];S.projects.filter(p=>!p.archived).forEach(p=>{if(p.due===ds)out.push({t:"Due · "+p.name,c:"var(--accent)"});p.phases.forEach(ph=>{if(ph.due===ds)out.push({t:"Target · "+ph.name,c:`var(--${ph.color})`,sub:p.name})})});return out}
+const PCOL_DEF="#EBC14E",pColor=p=>/^#[0-9A-Fa-f]{6}$/.test(p&&p.color||"")?p.color:PCOL_DEF;
+function dueOn(ds){const out=[];S.projects.filter(p=>!p.archived).forEach(p=>{if(p.due===ds)out.push({t:"Due · "+p.name,c:pColor(p)});p.phases.forEach(ph=>{if(ph.due===ds)out.push({t:"Target · "+ph.name,c:`var(--${ph.color})`,sub:p.name})})});return out}
 function dayLabel(date){const d=parse(date),ad=[...dueOn(date).map(x=>({t:x.t,c:x.c})),...gEventsOn(date).filter(e=>e.allDay).map(e=>({t:e.title,c:gevColor(e)}))];
   return `<button class="slab" data-goday="${date}" title="Open ${short(date)}"><b>${DOWL[dowIdx(d)]} <span>${d.getDate()}</span></b><span class="h num"><span class="a">${fmtN(loggedOn(date))}</span> / <span class="e">${S.settings.target}h</span></span>${ad.length?`<span class="gad" style="--gc:${ad[0].c}" title="${esc(ad.map(x=>x.t).join(" · "))}">${esc(ad[0].t)}${ad.length>1?` +${ad.length-1}`:""}</span>`:""}</button>`}
 const zoomW=z=>`width:calc(96px + (100% - 96px) * ${z});min-width:${Math.round(96+(S.settings.dayEnd-S.settings.dayStart)*42*z)}px`;
@@ -2322,7 +2371,7 @@ function bindPinch(){
 }
 
 /* ===================== month ===================== */
-const monthMarks=ds=>{const out=schedOn(ds).map(({e,ph})=>({t:e.label,c:ph?ph.color:"accent"}));S.projects.filter(p=>!p.archived).forEach(p=>{if(p.due===ds)out.push({t:"Due · "+p.name,c:"accent",due:1});p.phases.forEach(ph=>{if(ph.due===ds)out.push({t:"Target · "+ph.name,c:ph.color,due:1})})});
+const monthMarks=ds=>{const out=schedOn(ds).map(({e,ph})=>({t:e.label,c:ph?ph.color:"accent"}));S.projects.filter(p=>!p.archived).forEach(p=>{if(p.due===ds)out.push({t:"Due · "+p.name,hex:pColor(p),due:1});p.phases.forEach(ph=>{if(ph.due===ds)out.push({t:"Target · "+ph.name,c:ph.color,due:1})})});
   if(S.settings.gcalMonth!==false)gEventsOn(ds).forEach(e=>out.push({t:(e.allDay?"":clock(gMins(e,ds)[0])+" ")+e.title,hex:gevColor(e),g:1}));return out};
 const dayPhase=ds=>{const by={};S.sessions.filter(s=>s.date===ds).forEach(s=>{const r=IX.idx.step[s.step];if(r)by[r.ph.id]=(by[r.ph.id]||0)+s.dur});const top=Object.entries(by).sort((x,y)=>y[1]-x[1])[0];return top?IX.idx.phase[top[0]].ph:null};
 const monthRec=mk=>S.monthly[mk]=S.monthly[mk]||{focus:"",wins:[""],improve:[""],goals:[{g:"",w:"",r:""}],notes:""};
@@ -2612,9 +2661,9 @@ function settingsModal(tab="general",D){
   const general=()=>`
     <div class="two"><div class="field"><label for="st-t">Daily Target (Hours)</label>${num("target",D.target,1,14,.5).replace('style="width:76px"','id="st-t"')}</div>
     <div class="field"><label for="st-d">Work Days per Week</label>${num("days",D.days,1,7,1).replace('style="width:76px"','id="st-d"')}</div></div>
-    <div class="field"><div class="row"><span class="lbl grow">DAILY ROUTINE</span><button class="btn sm" id="st-rt">Edit Routine</button></div><span class="sub">Life blocks that fill in every week. Change any single day without touching the routine.</span></div>
-    <div class="field"><div class="row"><span class="lbl grow">COLORS</span><button class="btn sm" id="st-pal">Phase Colors</button><button class="btn sm" id="st-lpal">Life Block Colors</button></div></div>
-    <div class="field" style="gap:10px"><span class="lbl">RATES AND VALUE (USD)</span>
+    <div class="field"><div class="row"><span class="lbl sh grow">DAILY ROUTINE</span><button class="btn sm" id="st-rt">Edit Routine</button></div><span class="sub">Life blocks that fill in every week. Change any single day without touching the routine.</span></div>
+    <div class="field"><div class="row"><span class="lbl sh grow">COLORS</span><button class="btn sm" id="st-pal">Phase Colors</button><button class="btn sm" id="st-lpal">Life Block Colors</button></div></div>
+    <div class="field" style="gap:10px"><span class="lbl sh">RATES AND VALUE (USD)</span>
       <div class="two"><div class="field"><label for="st-rate">Default Hourly Rate ($)</label><input class="inp" type="number" id="st-rate" data-n="rate" min="0" step="5" value="${D.rate}"></div>
         <div class="field"><label for="st-hpd">Hours per Day (for Day Rates)</label><input class="inp" type="number" id="st-hpd" data-n="hpd" min="1" max="24" step="0.5" value="${D.hpd}"></div></div>
       <div class="two"><div class="field"><label for="st-floor">Rate Floor ($ per Hour)</label><input class="inp" type="number" id="st-floor" data-n="rateFloor" data-z min="0" step="5" value="${D.rateFloor||""}" placeholder="Empty = Off"><span class="sub">Effective Rates Below This Turn Amber</span></div>
@@ -3003,7 +3052,7 @@ quick:[
 <li>Settings has this Guide and the version number, so you can check that each device has the latest update.</li>
 </ul>`},
 {id:"q-board",h:"Board",html:`
-<p>Home base. One project at a time, with every phase as a budget bar.</p>[[fig:q-board|The Board]]
+<p class="lead">Home base. One project at a time, with every phase as a budget bar.</p>[[fig:q-board|The Board]]
 <ul>
 <li>The top card shows the whole project: hours used against the budget, the value of the work, and the deadline forecast.</li>
 <li>Tap a phase to open it and see its items as bars, grouped in rows. Tap an item to see its steps and start the timer.</li>
@@ -3011,14 +3060,14 @@ quick:[
 <li>Notes, Edit, Client Report and + Phase sit at the top. Each open phase has + Item, Edit Phase, Notes and Feedback Rounds.</li>
 </ul>`},
 {id:"q-month",h:"Month",html:`
-<p>The big picture of your month.</p>[[fig:month|Month]]
+<p class="lead">The big picture of your month.</p>[[fig:month|Month]]
 <ul>
 <li>Each day shows the hours you logged and gets darker the closer you got to your daily target. Switch to Main Phase to color days by what you worked on.</li>
 <li>Labels come from your project and phase schedules, plus phase target dates and project due dates.</li>
 <li>Tap a day to open it. Monthly Review and a notes box for the month are on this page.</li>
 </ul>`},
 {id:"q-week",h:"Week",html:`
-<p>Plan the week and see where the time went.</p>[[fig:week|Week]]
+<p class="lead">Plan the week and see where the time went.</p>[[fig:week|Week]]
 <ul>
 <li>Each day is a row. The top of the row is your plan (blocks), the thin line under it is the time the timer logged.</li>
 <li>Tap empty space to add a block. Hold a block, then drag it, even to another day. Drag its right edge to resize.</li>
@@ -3026,14 +3075,14 @@ quick:[
 <li>Below: Hours by Phase, Weekly Priorities, Achievements and This Week's Items (items whose target week is this week).</li>
 </ul>`},
 {id:"q-day",h:"Day",html:`
-<p>One day in a single column that fits the screen.</p>[[fig:day|Day]]
+<p class="lead">One day in a single column that fits the screen.</p>[[fig:day|Day]]
 <ul>
 <li>+ Block adds a block. Hold a block to drag it up or down, or hold its bottom edge to resize. Pinch to zoom the hours.</li>
 <li>The thin column on the right is logged time. Tap a piece of it to fix a session.</li>
 <li>On the side: planned and logged time, today's schedule (with Skip), today's items and your Diary.</li>
 </ul>`},
 {id:"q-review",h:"Review",html:`
-<p>Two reviews that keep you honest.</p>[[fig:review|Weekly Review]]
+<p class="lead">Two reviews that keep you honest.</p>[[fig:review|Weekly Review]]
 <ul>
 <li>Weekly Review: hours against target, items submitted, budget alerts, and four boxes: What Worked, What to Improve, Feedback Summary, Next Week's Focus.</li>
 <li>Monthly Review: the month's focus, hours by project, wins, improvements, goals with why/how and rewards, and notes.</li>
@@ -3135,6 +3184,7 @@ manual:[
 <ul>
 <li>Name and Subtitle. Type: Client (paid work), Internal (your own work, like a portfolio chapter) or Pitch.</li>
 <li>Client, Decision-Maker and Due Date. Feedback Rounds Included per Phase (empty uses the default in Settings).</li>
+<li>Project Color: the color of the project's due date in Month, Week and Day. New projects start yellow; Default puts yellow back. Phase target dates use their phase's color.</li>
 <li>Pricing (chapter 6), Weekly Schedule (labels for the calendar, optionally with a time), and Phase Order.</li>
 </ul>
 <h4>Phases</h4>
@@ -3191,11 +3241,11 @@ manual:[
 </ul>
 <h4>Opening Files</h4>
 <ul>
-<li>MP3, M4A and WAV files play in the tracker with an audio player, offline too once saved on the device.</li>
+<li>MP3, M4A and WAV files play in the tracker's own audio player as soon as they open, offline too once saved on the device. If the iPad holds the sound back, tap the big Play button once. Back 10 and Forward 10 sit on either side, and the bar underneath jumps to any point. Keys: <span class="k">Space</span> play or pause, <span class="k">Shift+←</span> <span class="k">Shift+→</span> 10 seconds back or forward, <span class="k">M</span> mute, <span class="k">←</span> <span class="k">→</span> other files, <span class="k">Esc</span> close. Moving to another file or closing stops the sound.</li>
 <li>JPG, PNG and PDF open in the tracker's viewer: pinch or + and − to zoom (double-click on a laptop), swipe sideways or use the arrow keys for the next file, swipe down or Close to go back.</li>
-<li>Other files (PSD, Procreate, AI, MP3 and so on), Google Docs, Sheets and Slides, and Dropbox or Proton links: the tracker asks how to open that type on this device: Open in App, Open in Browser, Download or Copy Link. Tick Remember for that type and it opens straight away next time. Change it in Settings > Advanced > Data > Link and File Actions.</li>
+<li>Other files (PSD, Procreate, AI and so on), Google Docs, Sheets and Slides, and Dropbox or Proton links: the tracker asks how to open that type on this device: Open in App, Open in Browser, Download or Copy Link. Tick Remember for that type and it opens straight away next time. Change it in Settings > Advanced > Data > Link and File Actions.</li>
 <li>Open in App goes straight to the right Google app: Docs, Sheets, Slides, or Drive for everything else.</li>
-<li>On iPad and iPhone, Google always sends regular Drive files (PSD, MP3 and so on) to the Drive app, so those offer Open in App, Download and Copy Link only. Docs open in the browser as usual; Sheets and Slides show Google's read-only preview there. To edit, use Open in App.</li>
+<li>On iPad and iPhone, Google always sends regular Drive files (PSD, Procreate and so on) to the Drive app, so those offer Open in App, Download and Copy Link only. Docs open in the browser as usual; Sheets and Slides show Google's read-only preview there. To edit, use Open in App.</li>
 <li>Badges show the file type: PDF in red, images in green, PSD in dark blue, audio in black, video in violet, and DOC (blue), SHEET (green) and SLIDES (yellow) for Google files. Google files show "Google Doc", "Google Sheet" or "Google Slides" instead of a size, because Google doesn't give them one.</li>
 <li>Web pages (ArtStation, Pinterest and so on) always open in the browser.</li>
 </ul>
@@ -3284,6 +3334,7 @@ manual:[
 <li><span class="k">1</span>–<span class="k">5</span> pages · <span class="k">←</span> <span class="k">→</span> previous and next week, month or day · <span class="k">T</span> this week, month or today · <span class="k">N</span> new block</li>
 <li><span class="k">Space</span> pause or resume the timer · <span class="k">Shift+T</span> stop · <span class="k">Cmd/Ctrl+Z</span> undo · <span class="k">P</span> Projects · <span class="k">&lt;</span> Settings · <span class="k">Shift+D</span> theme · <span class="k">Shift+S</span> sync · <span class="k">?</span> list of shortcuts</li>
 <li>In pop-ups: <span class="k">Enter</span> confirms (in writing boxes, <span class="k">Cmd/Ctrl+Enter</span>), <span class="k">Backspace</span> twice deletes, <span class="k">Esc</span> closes. <span class="k">Shift+Enter</span> adds a phase on the Board. Shift+click a phase opens or closes all.</li>
+<li>In the audio player: <span class="k">Space</span> play or pause, <span class="k">Shift+←</span> <span class="k">Shift+→</span> 10 seconds, <span class="k">M</span> mute. These only work while a track is open, so Space still pauses the timer everywhere else.</li>
 <li>Change any of them in Settings > Advanced > Keyboard Shortcuts. ✕ clears a shortcut to Empty. Extra actions (open this week's review, project notes, backup and so on) start Empty.</li>
 </ul>`},
 {id:"m9",h:"9. Using It Offline",html:`
