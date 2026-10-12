@@ -566,7 +566,7 @@ input[type="date"].inp::-webkit-date-and-time-value,input[type="time"].inp::-web
 .vw-in{min-width:100%;min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:12px;box-sizing:border-box;width:max-content}
 .vw-in img{display:block;user-select:none;-webkit-user-drag:none;max-width:none}
 .vw-in canvas{display:block;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.4)}
-#vw:focus{outline:none}
+#vw:focus,.ap-play:focus{outline:none}
 .vw-audio{display:grid;gap:14px;justify-items:center;padding:30px;max-width:520px;width:min(520px,90vw);text-align:center}
 .vw-audio b{font-size:15px;overflow-wrap:anywhere;color:#fff}.vw-audio audio{display:none}
 .ap{gap:18px;background:rgba(20,24,34,.92);border:1px solid #333a48;border-radius:18px;color:#E8ECF3;padding:28px 26px 22px}
@@ -657,7 +657,7 @@ const LPAL_DEF={light:["#CEFBD0","#D5ECC2","#FAF6B7","#F2E3B3","#EDE6D8","#F7D9C
 const LIFE_ORDER=[1,7,2,11,10,5,8,6,12,9,4,3]; /* October 2026 reorder: new slot k shows old slot LIFE_ORDER[k-1] */
 const STATUSES=[["Not Started","--faint"],["In Progress","--accent"],["Submitted","--amber"],["Feedback Received","--p7"],["Revising","--act"],["Approved","--p3"],["Done","--ok"]];
 const SC=Object.fromEntries(STATUSES);
-const APP_VERSION="2026.10.12.02";
+const APP_VERSION="2026.10.12.03";
 const isDone=it=>it.status==="Done"||it.status==="Approved";
 const DEF_NAME="Blue Blaze Project Tracker";
 const appName=()=>((typeof S!=="undefined"&&S&&S.settings&&S.settings.brandName)||"").trim()||DEF_NAME;
@@ -698,8 +698,8 @@ const CKEYS=[
   {k:"page",l:"Page Background",sub:"Behind Month, Week, Day and Review. The Board has its own.",v:"--bg",d:["#D7D7DB","#19212F"],bg:1,grp:"ap"},
   {k:"cal",l:"Calendar Panel",sub:"Month, Week and Day tables",v:"--cal",d:["#FFFFFF","#0B1324"],bg:1,grp:"ap"},
   {k:"rvp",l:"Review Panel",sub:"Boxes on the Review page, including Budget Alerts",v:"--rvp",d:["#FFFFFF","#0B1324"],bg:1,grp:"ap"},
-  {k:"rvPrev",l:"Previous Month Review Card",v:"--rv-prev",d:["#B6D6C5","#32575C"],bg:1,grp:"ap"},
-  {k:"rvGoals",l:"Goals Card",v:"--rv-goals",d:["#E0BAD0","#6B496B"],bg:1,grp:"ap"},
+  {k:"rvPrev",l:"Previous Month Review + Weekly Priorities",sub:"Monthly Review card, and Weekly Priorities on Week and the Weekly Review",v:"--rv-prev",d:["#B6D6C5","#32575C"],bg:1,grp:"ap"},
+  {k:"rvGoals",l:"Goals + Achievements",sub:"Monthly Review Goals, and Achievements on Week and the Weekly Review",v:"--rv-goals",d:["#E0BAD0","#6B496B"],bg:1,grp:"ap"},
   {k:"bbg",l:"Board Background",v:"--bbg",d:["#D7D7DB","#2B364A"],bg:1,grp:"ap"},
   {k:"card",l:"Board Cards",sub:"Project and Phase cards",v:"--card",d:["#FFFFFF","#1B1E25"],bg:1,grp:"ap"},
   {k:"act",l:"Hours Used",sub:"Used everywhere teal shows time",v:"--act",d:["#38B2C3","#38B2C3"],m:1,grp:"bm"},
@@ -1215,9 +1215,10 @@ function itemModal(id){
     root.querySelector("#it-ltpl").onclick=()=>tplPicker("item",t=>{closeModal();undoable(()=>applyItemTemplate(it,t),`${t.name} loaded`);itemModal(id)},()=>itemModal(id));
     root.querySelector("#it-week").onchange=e=>{it.week=e.target.value;commit()};
     root.querySelectorAll("[data-chk]").forEach(c=>c.onchange=()=>{const x=it.checklist.find(k=>k.id===c.dataset.chk);x.d=c.checked;c.parentElement.classList.toggle("done",c.checked);save()});
-    [["#chk-new","#chk-add"],["#fb-new","#fb-add"]].forEach(([i,b])=>root.querySelector(i).onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();root.querySelector(b).click()}});
-    root.querySelector("#chk-add").onclick=()=>{const v=root.querySelector("#chk-new").value.trim();if(v){it.checklist.push({id:uid(),t:v,d:false});commit();itemModal(id)}};
-    root.querySelector("#fb-add").onclick=()=>{const v=root.querySelector("#fb-new").value.trim();if(v){it.feedback.push({d:TODAY(),t:v});commit();itemModal(id)}};
+    let viaKey=false;const reopen=sel=>{const m=root.querySelector(".modal"),st=m?m.scrollTop:0;itemModal(id);const m2=document.querySelector("#modal-root .modal");if(m2)m2.scrollTop=st;if(viaKey){viaKey=false;refocus(sel)}};
+    [["#chk-new","#chk-add"],["#fb-new","#fb-add"]].forEach(([i,b])=>root.querySelector(i).onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();e.stopPropagation();if(!e.target.value.trim())return;viaKey=true;root.querySelector(b).click();viaKey=false}});
+    root.querySelector("#chk-add").onclick=()=>{const v=root.querySelector("#chk-new").value.trim();if(v){it.checklist.push({id:uid(),t:v,d:false});commit();reopen("#chk-new")}};
+    root.querySelector("#fb-add").onclick=()=>{const v=root.querySelector("#fb-new").value.trim();if(v){it.feedback.push({d:TODAY(),t:v});commit();reopen("#fb-new")}};
     root.querySelectorAll("[data-start]").forEach(b=>b.onclick=()=>startSheet(b.dataset.start));
     root.querySelectorAll("[data-log]").forEach(b=>b.onclick=()=>timeLogModal(b.dataset.log,id));
     root.querySelectorAll("[data-editstep]").forEach(b=>b.onclick=()=>stepModal(it.id,b.dataset.editstep));
@@ -1822,6 +1823,30 @@ function gSettingsBox(el,D){
 
 /* ===================== viewer (images + PDF) ===================== */
 const PDFJS="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+const H2C="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",JSPDF="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+let PDFMKp=null;const loadPdfMaker=()=>PDFMKp=PDFMKp||(async()=>{if(!window.html2canvas)await loadScript(H2C);if(!(window.jspdf&&window.jspdf.jsPDF))await loadScript(JSPDF);return{h2c:window.html2canvas,jsPDF:window.jspdf.jsPDF}})().catch(e=>{PDFMKp=null;throw e});
+/* Letter pages: the report is laid out 720px wide (7.5 in at 96 dpi), cut into 10 in pages between blocks where it can, and saved as a PDF file */
+async function pdfFromHTML(h,name){
+  const t=toast("Making the PDF…",60000);let lib;
+  try{lib=await loadPdfMaker()}catch(x){t.remove();return toast("The PDF maker needs the internet the first time. Try again while online (VPN if needed); after that it works offline.",7000)}
+  const W=720,PH=960,host=document.createElement("div");host.className="pr pdf-src";host.style.cssText=`position:fixed;left:-10000px;top:0;width:${W}px;background:#fff;color:#111;font-family:var(--sans);padding:0`;host.innerHTML=h;document.body.appendChild(host);
+  try{await Promise.all([...host.querySelectorAll("img")].map(i=>i.complete?0:new Promise(r=>{i.onload=i.onerror=r})));
+    const top=host.getBoundingClientRect().top,cuts=[0],tops=q=>[...new Set([...host.querySelectorAll(q)].map(el=>Math.round(el.getBoundingClientRect().top-top)))].sort((a,b)=>a-b);
+    const big=tops(".ph, h2"),small=tops("table tr, .thumbs figure, li, .note"),total=host.scrollHeight;
+    /* cut before a phase or heading when one is in the lower part of the page, otherwise between table rows or pictures */
+    while(total-cuts[cuts.length-1]>PH){const from=cuts[cuts.length-1],lim=from+PH,pick=(L,min)=>{let c=0;for(const e of L)if(e>from+PH*min&&e<=lim)c=e;return c};cuts.push(pick(big,.35)||pick(small,.5)||lim)}
+    const scale=2,cv=await lib.h2c(host,{scale,backgroundColor:"#ffffff",useCORS:true,logging:false,windowWidth:W});
+    const pdf=new lib.jsPDF({unit:"in",format:"letter",orientation:"portrait"});
+    cuts.forEach((y0,i)=>{const y1=i+1<cuts.length?cuts[i+1]:total,hpx=Math.max(1,y1-y0),pc=document.createElement("canvas");pc.width=W*scale;pc.height=Math.round(hpx*scale);
+      const g=pc.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,pc.width,pc.height);g.drawImage(cv,0,Math.round(y0*scale),pc.width,pc.height,0,0,pc.width,pc.height);
+      if(i)pdf.addPage();pdf.addImage(pc.toDataURL("image/jpeg",0.92),"JPEG",0.5,0.5,7.5,7.5*hpx/W);
+      pdf.setFontSize(8);pdf.setTextColor(125,132,150);pdf.text(`${i+1} / ${cuts.length}`,8,10.7,{align:"right"})});
+    const blob=pdf.output("blob"),file=(String(name||"Report").replace(/[\\/:*?"<>|]+/g,"-").trim()||"Report")+".pdf";t.remove();
+    sheet("PDF Ready",esc(file),`<div class="opts"><button class="opt" id="pdf-go" style="text-align:center;font-size:16px">Save or Share PDF</button></div><span class="sub">Save to Files keeps it on your iPad. Mail, AirDrop and other apps work too.</span>`,(hh,close)=>{
+      hh.querySelector("#pdf-go").onclick=()=>{const f=new File([blob],file,{type:"application/pdf"});
+        if(navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f]}).then(close).catch(e=>{if(!e||e.name!=="AbortError")toast("Couldn't open the share sheet. Try again.")});else{downloadFile(file,blob);close()}}})}
+  catch(x){t.remove();toast("Couldn't make the PDF: "+String(x&&x.message||x).slice(0,120),7000)}
+  finally{host.remove()}}
 const loadScript=src=>new Promise((res,rej)=>{const sc=document.createElement("script");sc.src=src;sc.onload=()=>res();sc.onerror=()=>{sc.remove();rej(new Error("load"))};document.head.appendChild(sc)});
 let PDFp=null;
 /* the worker runs on the page itself, so PDFs still open offline from the cached copy */
@@ -1836,6 +1861,7 @@ function openViewer(ref,id){
     ${list.length>1?`<button class="vw-nav prev" id="vw-prev" aria-label="Previous">‹</button><button class="vw-nav next" id="vw-next" aria-label="Next">›</button>`:""}</div>`;
   const st=root.querySelector("#vw-stage"),box=root.querySelector("#vw-box");
   VW={ref,list,i,zoom:1,base:null,kind:null,pdf:null,rT:null,tok:0};
+  if(IS_IOS&&list.some(a=>kindOf(a)==="audio")){try{const AC=window.AudioContext||window.webkitAudioContext;if(AC){VW.ac=new AC();VW.ac.resume().catch(()=>{})}}catch(x){}}
   const q=x=>root.querySelector(x);
   const setW=(keepX,keepY)=>{if(!VW.base)return;const r=st.getBoundingClientRect(),fx=keepX??r.width/2,fy=keepY??r.height/2,ox=(st.scrollLeft+fx)/Math.max(box.scrollWidth,1),oy=(st.scrollTop+fy)/Math.max(box.scrollHeight,1);
     box.querySelectorAll("img,canvas").forEach(c=>{c.style.width=Math.round(VW.base.w*VW.zoom*(c.dataset.k?+c.dataset.k:1))+"px"});
@@ -1873,7 +1899,8 @@ function openViewer(ref,id){
         setW();await renderPDF()}catch(x){if(tok===VW.tok)box.innerHTML=`<div class="vw-msg">This PDF couldn't be opened.</div>`}}
   }
   function setupAudio(box,tok){const au=box.querySelector("audio"),pl=box.querySelector("#ap-play"),sk=box.querySelector("#ap-seek"),cu=box.querySelector("#ap-cur"),du=box.querySelector("#ap-dur"),mu=box.querySelector("#ap-mute");let drag=false;
-    au.muted=!!VW.muted;
+    if(IS_IOS&&VW.ac){const g=apGain(au);if(g)g.gain.value=VW.muted?0:1;else au.muted=!!VW.muted}else au.muted=!!VW.muted;
+    au.addEventListener("play",()=>{if(VW&&VW.ac&&VW.ac.state!=="running")VW.ac.resume().catch(()=>{})});
     const paint=()=>{const on=!au.paused;pl.innerHTML=on?AP_IC.pause:AP_IC.play;pl.setAttribute("aria-label",on?"Pause":"Play");pl.classList.toggle("on",on)};
     const tick=()=>{if(!drag&&au.duration)sk.value=Math.round(au.currentTime/au.duration*1000);cu.textContent=mmss(au.currentTime);sk.style.setProperty("--p",(sk.value/10)+"%")};
     au.addEventListener("loadedmetadata",()=>{du.textContent=mmss(au.duration);tick()});au.addEventListener("timeupdate",tick);
@@ -1883,7 +1910,7 @@ function openViewer(ref,id){
     mu.onclick=()=>{apMute();vwFocus()};
     sk.addEventListener("pointerdown",()=>drag=true);sk.addEventListener("input",()=>{if(au.duration){au.currentTime=sk.value/1000*au.duration;cu.textContent=mmss(au.currentTime);sk.style.setProperty("--p",(sk.value/10)+"%")}});
     sk.addEventListener("change",()=>{drag=false;vwFocus()});
-    VW.au=au;const p=au.play();if(p&&p.catch)p.catch(()=>{if(tok===VW.tok)paint()})}
+    VW.au=au;const p=au.play();if(p&&p.catch)p.catch(()=>{if(tok===VW.tok)paint()});vwFocus()}
   const go=d=>{if(VW.list.length<2)return;document.querySelectorAll("#viewer-root audio").forEach(x=>{try{x.pause()}catch(e){}});VW.i=(VW.i+d+VW.list.length)%VW.list.length;show();vwFocus()};
   q("#vw-x").onclick=()=>closeViewer();q("#vw-zin").onclick=()=>zoomTo(VW.zoom*1.4);q("#vw-out").onclick=()=>zoomTo(VW.zoom/1.4);q("#vw-fit").onclick=()=>zoomTo(1);
   q("#vw-dl").onclick=()=>{const a=VW.list[VW.i];if(a.pending){getBlob(a).then(b=>deliverFile(a.name,b)).catch(()=>{})}else downloadAtt(a)};
@@ -1919,10 +1946,17 @@ const AP_IC={play:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v1
 const mmss=t=>{if(!isFinite(t))return"–:––";t=Math.max(0,Math.floor(t));const h=Math.floor(t/3600),m=Math.floor(t%3600/60),x=String(t%60).padStart(2,"0");return h?`${h}:${String(m).padStart(2,"0")}:${x}`:`${m}:${x}`};
 function apToggle(){const au=VW&&VW.au;if(!au)return;if(au.paused){const p=au.play();if(p&&p.catch)p.catch(()=>{})}else au.pause()}
 function apSeek(d){const au=VW&&VW.au;if(!au)return;au.currentTime=Math.max(0,Math.min((au.duration||0)-0.05,au.currentTime+d));au.dispatchEvent(new Event("timeupdate"))}
-function apMute(){const au=VW&&VW.au;if(!au)return;VW.muted=au.muted=!au.muted;const b=document.getElementById("ap-mute");if(b)b.textContent=au.muted?"Unmute":"Mute";}
+/* iPad: muting the audio element itself hands the keyboard to iPad's own audio controls after a couple of presses,
+   so on iPad the sound is muted through a volume control in between instead */
+function apGain(au){if(au._g)return au._g;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;
+  /* only when the volume control is already running (started by the tap that opened the file); otherwise the player's own mute is used, so the sound can't go silent */
+  try{const c=VW.ac;if(!c||c.state!=="running")return null;const src=c.createMediaElementSource(au),g=c.createGain();src.connect(g);g.connect(c.destination);au._g=g;return g}catch(x){return null}}
+function apMute(){const au=VW&&VW.au;if(!au)return;
+  if(IS_IOS){const g=apGain(au);if(g){VW.muted=!VW.muted;g.gain.value=VW.muted?0:1;const b=document.getElementById("ap-mute");if(b)b.textContent=VW.muted?"Unmute":"Mute";return}}
+  VW.muted=au.muted=!au.muted;const b=document.getElementById("ap-mute");if(b)b.textContent=au.muted?"Unmute":"Mute";}
 /* the viewer keeps keyboard focus while it's open: on iPad, Safari stops sending keys to the page when nothing has focus */
-function vwFocus(){const v=document.getElementById("vw");if(v&&document.activeElement!==v){try{v.focus({preventScroll:true})}catch(x){}}}
-function closeViewer(fromPop){if(!VW)return;document.querySelectorAll("#viewer-root audio").forEach(x=>{try{x.pause()}catch(e){}});document.removeEventListener("keydown",VW.key,true);VW.tok++;VW=null;document.getElementById("viewer-root").innerHTML="";if(!fromPop){vwPop=true;try{history.back()}catch(x){vwPop=false}}}
+function vwFocus(){const v=(VW&&VW.kind==="audio"&&document.getElementById("ap-play"))||document.getElementById("vw");if(v&&document.activeElement!==v){try{v.focus({preventScroll:true})}catch(x){}}}
+function closeViewer(fromPop){if(!VW)return;if(VW.ac){try{VW.ac.close()}catch(x){}}document.querySelectorAll("#viewer-root audio").forEach(x=>{try{x.pause()}catch(e){}});document.removeEventListener("keydown",VW.key,true);VW.tok++;VW=null;document.getElementById("viewer-root").innerHTML="";if(!fromPop){vwPop=true;try{history.back()}catch(x){vwPop=false}}}
 
 /* date boxes with a ✕ to empty them (Android's picker has no Clear, and iPad's Reset puts the saved date back) */
 const dateBox=(attrs,val,cls="")=>`<span class="dbox ${cls}"><input class="inp" type="date" ${attrs} value="${esc(val||"")}"><button type="button" class="dclr" data-dclr aria-label="Clear date" title="Clear Date" ${val?"":"data-empty"}>✕</button></span>`;
@@ -2253,15 +2287,14 @@ function viewWeek(){
   <div class="wk-grid">
     <div class="wk-col">
       <section class="panel" style="display:grid;gap:12px"><div class="row"><h3 class="grow">Hours by Phase</h3><span class="sub"><span class="a">Actual</span> / Planned</span></div>${hp||`<p class="empty">No project time this week yet.</p>`}</section>
-      <section class="panel" style="display:grid;gap:10px"><h3>Weekly Priorities</h3>${listEd("pri",meta.priorities)}</section>
-      <section class="panel" style="display:grid;gap:10px"><h3>Achievements</h3>${listEd("ach",meta.achievements)}
-        <button class="btn sm" style="justify-self:start" data-rv-week="${ws}">Open This Week's Review</button></section>
+      <section class="panel rv-prev" style="display:grid;gap:10px"><h3>Weekly Priorities</h3>${listEd("pri",meta.priorities,ws)}</section>
+      <section class="panel rv-goals" style="display:grid;gap:10px"><h3>Achievements</h3>${listEd("ach",meta.achievements,ws)}</section>
     </div>
     <section class="panel"><div class="row"><h3 class="grow">This Week's Items</h3><span class="sub">${tasks.length}</span></div>
       ${tasks.length?tasks.map(({ph,it})=>{const s=itemStats(it);return `<div class="task"><span class="dot" style="--c:var(--${ph.color})"></span><button style="border:0;background:none;padding:0;text-align:left" data-open-item="${it.id}"><b>${esc(it.name)}</b> <span class="sub">${esc(ph.name)}</span></button><span class="chip" style="--sc:var(${SC[it.status]})">${esc(it.status)} · ${AE(s.act,s.est)}${S.settings.weekWarn?pctTag(s.act,s.est):""}</span></div>`}).join(""):`<p class="empty">Set an item's target week to see it here.</p>`}</section>
   </div>`;
 }
-function listEd(key,arr){return `<div class="list-ed" data-list="${key}">${arr.map((v,i)=>`<div class="li"><span class="n">${i+1}</span><input class="inp" data-li="${i}" value="${esc(v)}" aria-label="Item ${i+1}"><button class="btn sm ghost" data-lx="${i}" aria-label="Remove">✕</button></div>`).join("")}<button class="btn sm ghost" style="justify-self:start" data-ladd>+ Add</button></div>`}
+function listEd(key,arr,wk){return `<div class="list-ed" data-list="${key}" data-wk="${wk||""}">${arr.map((v,i)=>`<div class="li"><span class="n">${i+1}</span><input class="inp" data-li="${i}" value="${esc(v)}" aria-label="Item ${i+1}"><button class="btn sm ghost" data-lx="${i}" aria-label="Remove">✕</button></div>`).join("")}<button class="btn sm ghost" style="justify-self:start" data-ladd>+ Add</button></div>`}
 
 /* ===================== day (vertical, fits the screen) ===================== */
 function viewDay(){
@@ -2468,7 +2501,8 @@ function weeklyReview(){
   const l=S.sessions.filter(s=>s.date>=ws&&s.date<=we).reduce((a,s)=>a+s.dur,0);
   let sub=0,its=0;S.projects.forEach(p=>p.phases.forEach(ph=>ph.items.forEach(it=>{if(it.week===ws){its++;if(["Submitted","Feedback Received","Revising","Approved","Done"].includes(it.status))sub++}})));
   let ba=0,bb=0;proj().phases.forEach(ph=>{if(!ph.bonus){const s=phaseStats(ph);ba+=s.act;bb+=s.budget}});
-  const f=(k,l,ph)=>`<section class="panel field"><label for="wr-${k}">${l}</label><textarea class="inp" id="wr-${k}" data-wr="${k}" rows="5" placeholder="${ph}">${esc(r[k]||"")}</textarea></section>`;
+  const f=(k,l,ph,rows=5)=>`<section class="panel field"><label for="wr-${k}">${l}</label><textarea class="inp" id="wr-${k}" data-wr="${k}" rows="${rows}" placeholder="${esc(ph)}">${esc(r[k]||"")}</textarea></section>`;
+  const meta=S.weekMeta[ws]=S.weekMeta[ws]||{priorities:[],achievements:[]},prevFocus=((S.weekly[iso(addDays(parse(ws),-7))]||{}).focus||"").trim();
   return `<div class="row"><h2 class="grow">Week of ${short(ws)} – ${short(we)}</h2>
     <span class="navg"><button class="btn" data-rw="-7" aria-label="Previous week">←</button><button class="btn" data-rw="0">This Week</button><button class="btn" data-rw="7" aria-label="Next week">→</button>
     <button class="btn" data-rv-export="weekly">Export</button></span></div>
@@ -2476,7 +2510,10 @@ function weeklyReview(){
     <div class="stat"><span class="k">Items Submitted</span><span class="v num"><span class="a">${sub}</span> / ${its}</span></div>
     <div class="stat"><span class="k">${esc(proj().name)} Budget Used</span><span class="v">${AE(ba,bb,fmtH)}</span></div></div>
   ${alertsRow(ws,we)}
-  <div class="rv-grid">${f("worked","What Worked","Habits, stages or tricks that paid off")}${f("improve","What to Improve","Where time leaked, what ran over")}${f("mentor","Feedback Summary","The main notes from this week's feedback")}${f("focus","Next Week's Focus","What has to be ready by Monday")}</div>`;
+  ${f("now","THIS WEEK'S FOCUS",prevFocus?"Last week you planned: "+prevFocus.replace(/\s+/g," ").slice(0,200):"The one thing this week is about",3)}
+  <div class="rv-grid"><section class="panel rv-prev field"><span class="lbl">WEEKLY PRIORITIES</span>${listEd("pri",meta.priorities,ws)}</section><section class="panel rv-goals field"><span class="lbl">ACHIEVEMENTS</span>${listEd("ach",meta.achievements,ws)}</section></div>
+  <div class="rv-grid">${f("worked","WHAT WORKED","Habits, stages or tricks that paid off")}${f("improve","WHAT TO IMPROVE","Where time leaked, what ran over")}${f("mentor","FEEDBACK SUMMARY","The main notes from this week's feedback")}${f("focus","NEXT WEEK'S FOCUS","What has to be ready by Monday")}</div>
+  ${f("notes","NOTES","Anything else about this week",4)}`;
 }
 function monthlyReview(){
   const mk=S.ui.month,r=monthRec(mk);
@@ -2505,7 +2542,7 @@ function monthlyReview(){
 function weekInfo(ws){const we=iso(addDays(parse(ws),6)),r=S.weekly[ws]||{};
   const l=S.sessions.filter(s=>s.date>=ws&&s.date<=we).reduce((a,s)=>a+s.dur,0);
   let sub=0,its=0;S.projects.forEach(p=>p.phases.forEach(ph=>ph.items.forEach(it=>{if(it.week===ws){its++;if(["Submitted","Feedback Received","Revising","Approved","Done"].includes(it.status))sub++}})));
-  return{ws,we,r,l,target:S.settings.target*S.settings.days*60,sub,its,alerts:alertsList(ws,we)}}
+  return{ws,we,r,l,target:S.settings.target*S.settings.days*60,sub,its,alerts:alertsList(ws,we),meta:S.weekMeta[ws]||{priorities:[],achievements:[]}}}
 function monthInfo(mk){const [y,m]=mk.split("-").map(Number),from=iso(new Date(y,m-1,1)),to=iso(new Date(y,m,0)),r=S.monthly[mk]||{focus:"",wins:[],improve:[],goals:[],notes:""};
   const ses=S.sessions.filter(s=>s.date>=from&&s.date<=to),l=ses.reduce((a,s)=>a+s.dur,0),per={};
   ses.forEach(s=>{const x=IX.idx.step[s.step];if(x)per[x.p.name]=(per[x.p.name]||0)+s.dur});
@@ -2515,11 +2552,13 @@ function alertsList(from,to){const seen=new Set();S.sessions.filter(s=>s.date>=f
 const alertsText=al=>al.map(a=>`${a.name} ${a.over?"Over ":""}${a.pct}%`).join("; ");
 function printReview(kind){
   const P=document.getElementById("print-root"),e=esc,para=t=>t&&String(t).trim()?`<p>${e(t)}</p>`:`<p class="sub">Nothing written.</p>`;
+  const olist=a=>{const L=(a||[]).filter(x=>String(x||"").trim());return L.length?`<ol>${L.map(x=>`<li>${e(x)}</li>`).join("")}</ol>`:`<p class="sub">Nothing listed.</p>`};
   let h="";
   if(kind==="weekly"){const w=weekInfo(S.ui.rweek);
     h=`<h1>Weekly Review · ${short(w.ws)} – ${short(w.we)}</h1><div class="sub">${esc(appName())} · Exported ${short(TODAY())}</div>
       <div class="st"><span>Logged <b>${fmtH(w.l)}</b> of ${fmtH(w.target)}</span><span>Items Submitted <b>${w.sub}</b> / ${w.its}</span>${w.alerts.length?`<span>Budget Alerts: ${e(alertsText(w.alerts))}</span>`:""}</div>
-      <h2>What Worked</h2>${para(w.r.worked)}<h2>What to Improve</h2>${para(w.r.improve)}<h2>Feedback Summary</h2>${para(w.r.mentor)}<h2>Next Week's Focus</h2>${para(w.r.focus)}`}
+      <h2>This Week's Focus</h2>${para(w.r.now)}<h2>Weekly Priorities</h2>${olist(w.meta.priorities)}<h2>Achievements</h2>${olist(w.meta.achievements)}
+      <h2>What Worked</h2>${para(w.r.worked)}<h2>What to Improve</h2>${para(w.r.improve)}<h2>Feedback Summary</h2>${para(w.r.mentor)}<h2>Next Week's Focus</h2>${para(w.r.focus)}<h2>Notes</h2>${para(w.r.notes)}`}
   else{const m=monthInfo(S.ui.month),li=a=>(a||[]).filter(x=>String(x).trim()).length?`<ol>${a.filter(x=>String(x).trim()).map(x=>`<li>${e(x)}</li>`).join("")}</ol>`:`<p class="sub">Nothing written.</p>`;
     const goals=(m.r.goals||[]).filter(g=>g.g||g.w||g.r);
     h=`<h1>Monthly Review · ${e(m.title)}</h1><div class="sub">${esc(appName())} · Exported ${short(TODAY())}</div>
@@ -2528,19 +2567,14 @@ function printReview(kind){
       <h2>Wins</h2>${li(m.r.wins)}<h2>Improvements</h2>${li(m.r.improve)}
       <h2>Goals</h2>${goals.length?`<table><tr><th>#</th><th>Goal</th><th>Why / How</th><th>Rewards</th></tr>${goals.map((g,i)=>`<tr><td>${i+1}</td><td>${e(g.g)}</td><td>${e(g.w)}</td><td>${e(g.r)}</td></tr>`).join("")}</table>`:`<p class="sub">No goals set.</p>`}
       <h2>Notes</h2>${para(m.r.notes)}`}
-  printHTML(h);
+  printHTML(h,"Project Tracker Review");
 }
-function printHTML(h){
+function printHTML(h,name){
   const P=document.getElementById("print-root");P.innerHTML=`<div class="pr">${h}</div>`;document.body.classList.add("printing");
   /* iPad: Safari only prints straight from a tap, and keeps its print window open without telling the page,
      so a Ready window holds the report until you print or close it */
-  if(IS_IOS){const clean=()=>{removeEventListener("afterprint",clean);if(P.firstChild&&P.firstChild.dataset.k===k){document.body.classList.remove("printing");P.innerHTML=""}};
-    const k=String(Date.now());P.firstChild.dataset.k=k;addEventListener("afterprint",clean);
-    const imgs=[...P.querySelectorAll("img")];
-    return void Promise.all(imgs.map(i=>i.complete?0:new Promise(r=>{i.onload=i.onerror=r}))).then(()=>{
-      let closeSheet=null;closeSheet=sheet("Report Ready","Tap Print, then choose Save to Files (Print Options > Share) for a PDF, or pick a printer.",`<div class="opts"><button class="opt" id="pr-go" style="text-align:center;font-size:16px">Print / Save as PDF</button></div>`,(hh,close)=>{
-        hh.querySelector("#pr-go").onclick=()=>{try{window.print()}catch(x){toast("Printing isn't available here.")}};
-        const x=hh.querySelector("[data-sx]");x.onclick=()=>{close();clean()}})})}
+  /* iPad: Safari's print window is unreliable in a Home Screen app, so the tracker makes the PDF file itself */
+  if(IS_IOS){document.body.classList.remove("printing");P.innerHTML="";return void pdfFromHTML(h,name)}
   const done=()=>{document.body.classList.remove("printing");P.innerHTML="";removeEventListener("afterprint",done)};addEventListener("afterprint",done);
   const imgs=[...P.querySelectorAll("img")];
   Promise.all(imgs.map(i=>i.complete?0:new Promise(r=>{i.onload=i.onerror=r}))).then(()=>setTimeout(()=>{try{window.print()}catch(x){toast("Printing isn't available here.")}setTimeout(()=>{if(!matchMedia("print").matches)done()},1500)},60));
@@ -2564,7 +2598,7 @@ function clientReportModal(pid){
     root.querySelector("#cr-none").onclick=()=>{sel=new Set();box.innerHTML=list();bind()};
     root.querySelectorAll("[data-cro]").forEach(c=>c.onchange=()=>{o[c.dataset.cro]=c.checked});
     go.onclick=async()=>{S.ui.crOpts={...o};save();go.disabled=true;go.textContent="Preparing…";
-      const h=await clientReportHTML(p,p.phases.filter(ph=>sel.has(ph.id)),o);closeModal();setTimeout(()=>printHTML(h),120)};
+      const h=await clientReportHTML(p,p.phases.filter(ph=>sel.has(ph.id)),o);closeModal();setTimeout(()=>printHTML(h,p.name+" - Client Report"),120)};
   },"wide");
 }
 async function clientReportHTML(p,phs,o){
@@ -2611,9 +2645,10 @@ function exportReviewsXLSX(X,range){
   let from=range==="month"?new Date(ty,tm,1):range==="3m"?new Date(ty,tm-2,1):range==="year"?new Date(ty,0,1):null;
   if(!from){const ds=[...S.sessions.map(s=>s.date),...Object.keys(S.weekly),...Object.keys(S.monthly).map(k=>k+"-01")].sort();from=ds.length?parse(ds[0]):new Date(ty,tm,1)}
   const fromS=iso(from),toS=TODAY(),H=m=>Math.round(m/60*100)/100;
-  const wk=[["Week Start","Week End","Logged (h)","Target (h)","Items Submitted","Items Planned","Budget Alerts","What Worked","What to Improve","Feedback Summary","Next Week's Focus"]];
-  for(let d=weekOf(from);iso(d)<=toS;d=addDays(d,7)){const w=weekInfo(iso(d));const has=w.l||Object.values(w.r).some(v=>String(v||"").trim());if(!has)continue;
-    wk.push([w.ws,w.we,H(w.l),H(w.target),w.sub,w.its,alertsText(w.alerts),w.r.worked||"",w.r.improve||"",w.r.mentor||"",w.r.focus||""])}
+  const wk=[["Week Start","Week End","Logged (h)","Target (h)","Items Submitted","Items Planned","Budget Alerts","This Week's Focus","Weekly Priorities","Achievements","What Worked","What to Improve","Feedback Summary","Next Week's Focus","Notes"]];
+  const nl=a=>(a||[]).filter(x=>String(x||"").trim()).map((x,i)=>`${i+1}. ${x}`).join("\n");
+  for(let d=weekOf(from);iso(d)<=toS;d=addDays(d,7)){const w=weekInfo(iso(d));const has=w.l||Object.values(w.r).some(v=>String(v||"").trim())||nl(w.meta.priorities)||nl(w.meta.achievements);if(!has)continue;
+    wk.push([w.ws,w.we,H(w.l),H(w.target),w.sub,w.its,alertsText(w.alerts),w.r.now||"",nl(w.meta.priorities),nl(w.meta.achievements),w.r.worked||"",w.r.improve||"",w.r.mentor||"",w.r.focus||"",w.r.notes||""])}
   const mo=[["Month","Focus","Logged (h)","Hours by Project","Budget Alerts","Wins","Improvements","Goals","Notes"]];
   for(let d=new Date(from.getFullYear(),from.getMonth(),1);iso(d)<=toS;d=new Date(d.getFullYear(),d.getMonth()+1,1)){const m=monthInfo(iso(d).slice(0,7));
     const has=m.l||m.r.focus||m.r.notes||(m.r.wins||[]).some(x=>String(x).trim())||(m.r.improve||[]).some(x=>String(x).trim())||(m.r.goals||[]).some(g=>g.g||g.w||g.r);if(!has)continue;
@@ -3146,7 +3181,7 @@ quick:[
 {id:"q-review",h:"Review",html:`
 <p class="lead">Two reviews that keep you honest.</p>[[fig:review|Weekly Review]]
 <ul>
-<li>Weekly Review: hours against target, items submitted, budget alerts, and four boxes: What Worked, What to Improve, Feedback Summary, Next Week's Focus.</li>
+<li>Weekly Review: hours against target, items submitted, budget alerts, This Week's Focus, your Weekly Priorities and Achievements, four boxes (What Worked, What to Improve, Feedback Summary, Next Week's Focus) and Notes.</li>
 <li>Monthly Review: the month's focus, hours by project, wins, improvements, goals with why/how and rewards, and notes.</li>
 <li>Export turns either review into a PDF, or a range of reviews into an Excel file.</li>
 </ul>`}
@@ -3182,7 +3217,7 @@ manual:[
 <li>Tap the name to rename it. Status: Not Started, In Progress, Submitted, Feedback Received, Revising, Approved, Done. Starting the timer moves Not Started to In Progress for you.</li>
 <li>Target Week puts the item in This Week's Items on the Week page.</li>
 <li>Steps: each has an estimate and optional timer stages. Start runs the timer, Time Log fixes logged sessions, Edit Step changes the estimate and stages. The arrows reorder steps.</li>
-<li>Checklist and Feedback keep their own lists. Notes has a writing box, any links you type become tappable, and Attachments sits below it.</li>
+<li>Checklist and Feedback keep their own lists. Type an entry and press Enter: it's added and the box is ready for the next one. Notes has a writing box, any links you type become tappable, and Attachments sits below it.</li>
 <li>At the bottom: Delete, Move to Phase, Save as Template and Load Template.</li>
 </ul>
 <h4>Month</h4>
@@ -3202,7 +3237,7 @@ manual:[
 <li>Hold a block, then drag to move it, even to another day. On a laptop, just drag. Drag the right edge to change its length.</li>
 <li>Pinch the chart, or use − Fit +, to zoom the hours.</li>
 <li>Striped blocks are Google Calendar events. Under each day's name: project due dates, phase target dates and all-day events (+2 means two more). Tap a striped block for its details.</li>
-<li>Hours by Phase compares actual and planned time this week. Weekly Priorities and Achievements are simple lists. This Week's Items lists items with this target week.</li>
+<li>Hours by Phase compares actual and planned time this week. Weekly Priorities (green) and Achievements (the Goals card color) are simple lists: Enter saves a line and starts the next one; Enter on an empty line finishes. They also appear in the Weekly Review. This Week's Items lists items with this target week.</li>
 </ul>
 <h4>Day</h4>
 [[fig:day|Day: one column for the whole day]]
@@ -3230,9 +3265,10 @@ manual:[
 [[fig:review|Weekly Review]]
 <ul>
 <li>Weekly Review: Logged vs Target, Items Submitted (items with this target week that reached Submitted or later), and the project's budget used. Budget Alerts list phases past the warning point.</li>
-<li>The four boxes save as you type. The arrows move between weeks.</li>
-<li>Monthly Review: Focus, hours logged in total and per project, Previous Month Review (Wins and Improvements), Goals (Goal, Why/How, Rewards) and Notes.</li>
-<li>Export: Create PDF prints the review on screen (choose Save as PDF in the print window; on iPad tap Share > Save to Files). Export Excel File saves every review in a date range.</li>
+<li>Top to bottom: THIS WEEK'S FOCUS (faintly shows last week's Next Week's Focus until you write your own), WEEKLY PRIORITIES and ACHIEVEMENTS (the same lists as on the Week page; edit them in either place), WHAT WORKED and WHAT TO IMPROVE, FEEDBACK SUMMARY and NEXT WEEK'S FOCUS, then NOTES.</li>
+<li>Everything saves as you type. The arrows move between weeks.</li>
+<li>Monthly Review: Focus, hours logged in total and per project, Previous Month Review (Wins and Improvements), Goals (Goal, Why/How, Rewards) and Notes. In Wins and Improvements, Enter saves a line and starts the next. In Goals, Enter moves from Goal to Why / How to Rewards, then starts a new goal; Shift+Enter adds a line break.</li>
+<li>Export: Create PDF prints the review on screen (choose Save as PDF in the print window). On iPad the tracker makes the PDF file itself: tap Save or Share PDF, then Save to Files. Export Excel File saves every review in a date range.</li>
 </ul>`},
 {id:"m2",h:"2. Projects, Phases and Items",html:`
 <h4>Projects & Templates</h4>
@@ -3340,7 +3376,7 @@ manual:[
 <li>Phase Colors (Settings > General, or Edit Colors in a phase): 12 colors, each with a Light Theme and a Dark Theme version. Pick a swatch, then adjust Hue, Saturation and Value or type a hex code. Drag the ≡ handle to reorder; phases keep their colors when you do. Save as Default makes Reset to Defaults return to your set.</li>
 <li>Life Block Colors work the same way for life blocks and your Daily Routine.</li>
 <li>Pick a phase's color in Edit Phase, or from a Project Work block (it recolors the whole phase).</li>
-<li>Appearance (Settings > Advanced): page, calendar, review and board backgrounds and cards, each for Light and Dark. Text on a light background switches automatically so it stays readable. Default resets one color.</li>
+<li>Appearance (Settings > Advanced): page, calendar, review and board backgrounds and cards, each for Light and Dark. Text on a light background switches automatically so it stays readable. Default resets one color. Previous Month Review + Weekly Priorities share one color, and Goals + Achievements share another.</li>
 <li>Budget Meter colors: Hours Used, Hours Left, Warning Bar, Over Budget and Warning Text. Warning Colors and Over Budget Colors can be switched off so everything stays teal.</li>
 <li>Board: Phase Colors on Phase Bars and Phase Colors on Items. Off, they're teal.</li>
 <li>Light/Dark in the top bar switches the theme on this device.</li>
@@ -3374,7 +3410,7 @@ manual:[
 [[fig:creport|Client Report options]]
 <ul>
 <li>On the Board or in Projects: a clean PDF with phases, item status, progress, revision rounds and image thumbnails. Hours, Rates and Value, and Private Notes stay out unless you tick them. Pick the phases to include, then Create PDF.</li>
-<li>On iPad a Report Ready window opens: tap Print / Save as PDF (Safari only prints straight from a tap), then Share > Save to Files for a PDF. Close the window when you're done.</li>
+<li>On iPad the tracker makes the PDF file itself (Safari's print window is unreliable in a Home Screen app). When PDF Ready appears, tap Save or Share PDF and choose Save to Files, Mail or another app. The pages are pictures of the report, so the text can't be selected. The PDF maker downloads once while online, then works offline.</li>
 <li>A file shared in several places appears once.</li>
 </ul>`},
 {id:"m7",h:"7. Exports and Backups",html:`
@@ -3456,20 +3492,22 @@ manual:[
 <tr><td><span class="k">Enter</span></td><td>Confirm (Save, Add, Create)</td></tr>
 <tr><td><span class="k">Cmd/Ctrl+Enter</span></td><td>Confirm while typing in a writing box</td></tr>
 <tr><td><span class="k">Backspace</span> twice</td><td>Delete (the first press arms the Delete button)</td></tr>
-<tr><td><span class="k">Esc</span> or <span class="k">Cmd+.</span></td><td>Close the pop-up (Cmd+. for iPad keyboards without Esc)</td></tr>
+<tr><td><span class="k">Esc</span> or <span class="k">Cmd/Ctrl+.</span></td><td>Close the pop-up (Cmd+. on iPad, Ctrl+. on Android)</td></tr>
 <tr><td><span class="k">Shift+Enter</span></td><td>New phase (on the Board)</td></tr>
 <tr><td>Shift+click a phase</td><td>Open or close all phases (on the Board)</td></tr>
+<tr><td><span class="k">Enter</span> in a list line</td><td>Save it and start a new line (empty line: finish)</td></tr>
+<tr><td><span class="k">Enter</span> in a goal</td><td>Next box: Goal, Why / How, Rewards (Shift+Enter: line break)</td></tr>
 <tr class="g"><td colspan="2">File Viewer</td></tr>
 <tr><td><span class="k">←</span> <span class="k">→</span></td><td>Previous or next file</td></tr>
 <tr><td><span class="k">+</span> <span class="k">−</span> <span class="k">0</span></td><td>Zoom in, zoom out, fit</td></tr>
-<tr><td><span class="k">Esc</span> or <span class="k">Cmd+.</span></td><td>Close the viewer</td></tr>
+<tr><td><span class="k">Esc</span> or <span class="k">Cmd/Ctrl+.</span></td><td>Close the viewer</td></tr>
 <tr class="g"><td colspan="2">Audio Player</td></tr>
 <tr><td><span class="k">Space</span></td><td>Play or pause</td></tr>
 <tr><td><span class="k">Shift+←</span> <span class="k">Shift+→</span></td><td>10 seconds back or forward</td></tr>
 <tr><td><span class="k">M</span></td><td>Mute or unmute</td></tr>
 </tbody></table>
 <ul>
-<li>The audio player keys only work while a track is open, so Space still pauses the timer everywhere else. Shortcuts never fire while you're typing in a box. On Android, Esc works like the Back button: it closes the viewer, then the pop-up, and leaves the app when nothing is open.</li>
+<li>The audio player keys only work while a track is open, so Space still pauses the timer everywhere else. Shortcuts never fire while you're typing in a box. On Android, Esc leaves the app (Android's own choice); use Ctrl+. or the Back swipe to close the viewer, then the pop-up.</li>
 <li>Change any of them in Settings > Advanced > Keyboard Shortcuts. ✕ clears a shortcut to Empty. Extra actions start Empty: Open This Week's Review, Open This Month's Review, Edit Project, Project Notes, Export Everything (Backup) and Open the Guide.</li>
 </ul>
 `},
@@ -3502,6 +3540,7 @@ manual:[
 <dl class="gloss">
 <dt>2x</dt><dd>Shown next to a file&#x27;s size when the same Drive file has a card in two places (made with Copy To). Nothing is duplicated.</dd>
 <dt>Accent Color</dt><dd>The tracker&#x27;s main highlight color (buttons, today&#x27;s date, links). It also tints an SVG logo when Accent Color on SVG Logos is on.</dd>
+<dt>Achievements</dt><dd>What you got done this week, listed on the Week page and in the Weekly Review.</dd>
 <dt>Advanced Settings</dt><dd>The second tab of Settings: Branding, Appearance, Budget Meter, Board, Flags, Calendar, Timer, Keyboard Shortcuts and Data.</dd>
 <dt>Attachment Card</dt><dd>The tile for one file or link in Notes or an item: a thumbnail or badge, the name and the size. Tap it to open; hold and drag to reorder.</dd>
 <dt>Audio Player</dt><dd>The tracker&#x27;s own player for MP3, M4A and WAV files, inside the File Viewer.</dd>
@@ -3560,13 +3599,15 @@ manual:[
 <dt>Target Date</dt><dd>The date a phase should be done. It shows in the phase&#x27;s color on Month, Week and Day.</dd>
 <dt>Target Week</dt><dd>The week an item should be done. It lists the item under This Week&#x27;s Items on Week.</dd>
 <dt>Template</dt><dd>A saved starting point: an item template (steps and checklist), a phase template or a pipeline template (a whole project).</dd>
+<dt>This Week&#x27;s Focus</dt><dd>The one thing a week is about, at the top of the Weekly Review.</dd>
 <dt>Time Log</dt><dd>The list of sessions logged on a step, where you can fix or delete them.</dd>
 <dt>Two-Tap Button</dt><dd>A button for something hard to undo, such as Delete or Reset All. The first tap arms it, the second tap does it.</dd>
 <dt>Undo</dt><dd>The button that appears for a few seconds after most changes, or Cmd/Ctrl+Z.</dd>
 <dt>Waiting</dt><dd>Changes saved on the device that haven&#x27;t reached your Google Sheet yet. They sync when you&#x27;re back online.</dd>
 <dt>Warning Point</dt><dd>How full a budget gets before its bar turns yellow (80% by default).</dd>
 <dt>Web App URL</dt><dd>The address of your Google Sheet&#x27;s script, ending in /exec. It&#x27;s part of your connection link.</dd>
-<dt>Weekly Review</dt><dd>The review of a week on the Review page: logged vs target, items submitted and budget used.</dd>
+<dt>Weekly Priorities</dt><dd>The list of what matters most this week, on the Week page and in the Weekly Review (one list, two places).</dd>
+<dt>Weekly Review</dt><dd>The review of a week on the Review page: logged vs target, items submitted, budget used, This Week's Focus, Weekly Priorities, Achievements, reflections and Notes.</dd>
 </dl>
 `}
 ]};
@@ -3589,13 +3630,11 @@ function guideModal(tab="quick",back){
 const effTheme=()=>S.ui.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
 function restoreTheme(){if(S.ui.theme)document.documentElement.setAttribute("data-theme",S.ui.theme);else document.documentElement.removeAttribute("data-theme")}
 function closeModal(){document.getElementById("modal-root").innerHTML="";document.getElementById("ov2")?.remove();restoreTheme();applyPalette();applyAdv();Sync.afterModal()}
-/* Cmd+. works like Esc (iPad keyboards often have no Esc key). On Android, Esc is the system Back:
-   the Back below closes the top layer, so the page doesn't also close something on the key press. */
+/* Cmd+. (iPad, Mac) and Ctrl+. (Android, Windows) work like Esc: iPad keyboards often have no Esc key, and Android uses Esc to leave the app. */
 const IS_ANDROID=/Android/i.test(navigator.userAgent);
 addEventListener("keydown",e=>{
-  if(e.metaKey&&!e.ctrlKey&&!e.altKey&&(e.key==="."||e.code==="Period")){e.preventDefault();e.stopImmediatePropagation();
+  if((e.metaKey||e.ctrlKey)&&!(e.metaKey&&e.ctrlKey)&&!e.altKey&&!e.shiftKey&&(e.key==="."||e.code==="Period")){e.preventDefault();e.stopImmediatePropagation();
     (document.activeElement||document.body).dispatchEvent(new KeyboardEvent("keydown",{key:"Escape",code:"Escape",bubbles:true,cancelable:true}));return}
-  if(IS_ANDROID&&e.isTrusted&&e.key==="Escape"&&(VW||document.getElementById("ov")||document.getElementById("ov2")))e.stopImmediatePropagation();
 },true);
 /* Back (Android swipe, mouse back button, Alt+Left, Cmd+[) closes a pop-up instead of leaving the app */
 let histArmed=false;
@@ -3649,13 +3688,18 @@ function render(){
   bindView(v);
   growAll(v);
 }
+/* Enter in a list line: save it and start a new line below; Enter on an empty line removes it and finishes */
+function refocus(sel){const go=()=>{const x=document.querySelector(sel);if(x&&document.activeElement!==x){x.focus({preventScroll:false});try{const n=x.value.length;x.setSelectionRange(n,n)}catch(e){}}return !!x};if(!go())requestAnimationFrame(go)}
+function listEnter(inp,arr,i,selTpl){inp.addEventListener("keydown",e=>{if(e.key!=="Enter"||e.shiftKey||e.isComposing||e.altKey||e.metaKey||e.ctrlKey)return;e.preventDefault();e.stopPropagation();
+  if(!inp.value.trim()){arr.splice(i,1);inp.blur();commit();return}
+  arr[i]=inp.value;arr.splice(i+1,0,"");commit();refocus(selTpl.replace("#",i+1))})}
 function bindView(v){
   const mn=v.querySelector("#mn-notes");if(mn){let t;mn.oninput=()=>{monthRec(S.ui.month).notes=mn.value;v.querySelector("#mn-st").textContent="Saving…";clearTimeout(t);t=setTimeout(()=>{save();v.querySelector("#mn-st").textContent="Saved"},500)}}
   const pp=v.querySelector("#proj-pick");if(pp)pp.onchange=e=>{S.ui.project=e.target.value;commit()};
   const mg=v.querySelector("#m-gev");if(mg)mg.onchange=()=>{S.settings.gcalMonth=mg.checked;commit()};
   const di=v.querySelector("#diary");if(di){let dt;di.oninput=()=>{S.notes[S.ui.day]=di.value;v.querySelector("#diary-st").textContent="Saving…";clearTimeout(dt);dt=setTimeout(()=>{save();v.querySelector("#diary-st").textContent="Saved"},600)}}
-  v.querySelectorAll("[data-list]").forEach(L=>{const arr=S.weekMeta[S.ui.week][L.dataset.list==="pri"?"priorities":"achievements"];
-    L.querySelectorAll("[data-li]").forEach(i=>i.oninput=()=>{arr[i.dataset.li]=i.value;save()});
+  v.querySelectorAll("[data-list]").forEach(L=>{const wk=L.dataset.wk||S.ui.week,M=S.weekMeta[wk]=S.weekMeta[wk]||{priorities:[],achievements:[]},arr=M[L.dataset.list==="pri"?"priorities":"achievements"];
+    L.querySelectorAll("[data-li]").forEach(i=>{i.oninput=()=>{arr[i.dataset.li]=i.value;save()};listEnter(i,arr,+i.dataset.li,`[data-list="${L.dataset.list}"][data-wk="${L.dataset.wk}"] [data-li="#"]`)});
     L.querySelectorAll("[data-lx]").forEach(b=>b.onclick=()=>{arr.splice(b.dataset.lx,1);commit()});
     L.querySelector("[data-ladd]").onclick=()=>{arr.push("");commit();const ins=document.querySelectorAll(`[data-list="${L.dataset.list}"] [data-li]`);ins[ins.length-1]?.focus()}});
   v.querySelectorAll("[data-wr]").forEach(t=>t.oninput=()=>{S.weekly[S.ui.rweek][t.dataset.wr]=t.value;save()});
@@ -3664,12 +3708,17 @@ function bindView(v){
     v.querySelector("#mr-focus").oninput=e=>{mr.focus=e.target.value;save()};
     v.querySelector("#mr-notes").oninput=e=>{mr.notes=e.target.value;save()};
     v.querySelectorAll("[data-mlist]").forEach(L=>{const arr=mr[L.dataset.mlist];
-      L.querySelectorAll("[data-mi]").forEach(i=>i.oninput=()=>{arr[i.dataset.mi]=i.value;save()});
+      L.querySelectorAll("[data-mi]").forEach(i=>{i.oninput=()=>{arr[i.dataset.mi]=i.value;save()};listEnter(i,arr,+i.dataset.mi,`[data-mlist="${L.dataset.mlist}"] [data-mi="#"]`)});
       L.querySelectorAll("[data-mx]").forEach(b=>b.onclick=()=>{arr.splice(b.dataset.mx,1);commit()});
-      L.querySelector("[data-madd]").onclick=()=>{arr.push("");commit()}});
-    v.querySelectorAll("[data-goal]").forEach(t=>t.oninput=()=>{mr.goals[t.dataset.goal][t.dataset.gk]=t.value;save()});
+      L.querySelector("[data-madd]").onclick=()=>{arr.push("");commit();refocus(`[data-mlist="${L.dataset.mlist}"] [data-mi="${arr.length-1}"]`)}});
+    v.querySelectorAll("[data-goal]").forEach(t=>{t.oninput=()=>{mr.goals[t.dataset.goal][t.dataset.gk]=t.value;save()};
+      t.addEventListener("keydown",e=>{if(e.key!=="Enter"||e.shiftKey||e.isComposing||e.altKey||e.metaKey||e.ctrlKey)return;e.preventDefault();e.stopPropagation();
+        const i=+t.dataset.goal,k=t.dataset.gk,nx={g:"w",w:"r"}[k];
+        if(nx)return void v.querySelector(`[data-goal="${i}"][data-gk="${nx}"]`)?.focus();
+        const g=mr.goals[i];if(!(g.g||"").trim()&&!(g.w||"").trim()&&!(g.r||"").trim())return void t.blur();
+        mr.goals.splice(i+1,0,{g:"",w:"",r:""});commit();refocus(`[data-goal="${i+1}"][data-gk="g"]`)})});
     v.querySelectorAll("[data-gx]").forEach(b=>b.onclick=()=>{mr.goals.splice(b.dataset.gx,1);commit()});
-    v.querySelector("#goal-add").onclick=()=>{mr.goals.push({g:"",w:"",r:""});commit()};
+    v.querySelector("#goal-add").onclick=()=>{mr.goals.push({g:"",w:"",r:""});commit();refocus(`[data-goal="${mr.goals.length-1}"][data-gk="g"]`)};
   }
 }
 document.addEventListener("click",e=>{
