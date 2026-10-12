@@ -666,7 +666,7 @@ const LPAL_DEF={light:["#CEFBD0","#D5ECC2","#FAF6B7","#F2E3B3","#EDE6D8","#F7D9C
 const LIFE_ORDER=[1,7,2,11,10,5,8,6,12,9,4,3]; /* October 2026 reorder: new slot k shows old slot LIFE_ORDER[k-1] */
 const STATUSES=[["Not Started","--faint"],["In Progress","--accent"],["Submitted","--amber"],["Feedback Received","--p7"],["Revising","--act"],["Approved","--p3"],["Done","--ok"]];
 const SC=Object.fromEntries(STATUSES);
-const APP_VERSION="2026.10.12.04";
+const APP_VERSION="2026.10.12.05";
 const isDone=it=>it.status==="Done"||it.status==="Approved";
 const DEF_NAME="Blue Blaze Project Tracker";
 const appName=()=>((typeof S!=="undefined"&&S&&S.settings&&S.settings.brandName)||"").trim()||DEF_NAME;
@@ -2043,7 +2043,11 @@ function moveItemModal(id){const {p,ph,it}=IX.idx.item[id];const opts=p.phases.f
       if(hasLinked(to,it.linkId,it.id)){const e=root.querySelector("#mv-err");e.hidden=false;e.textContent=`${to.name} already has an item for ${it.name}. Each character can only appear once per phase.`;return}
       closeModal();undoable(()=>{ph.items=ph.items.filter(x=>x.id!==id);to.items.push(it);S.ui.open[to.id]=true},`${it.name} moved to ${to.name}`)}});
 }
-const linkList=text=>{const u=[...new Set((String(text||"").match(/https?:\/\/[^\s<>"')\]]+/g)||[]))];return u.length?`<span class="lbl">LINKS</span>${u.map(x=>`<a href="${esc(x)}" target="_blank" rel="noopener">${esc(x)}</a>`).join("")}`:""};
+/* web addresses in a writing box: full ones (https://…), www.… and bare ones like youtu.be/… or dropbox.com/… */
+const LINK_RE=/https?:\/\/[^\s<>"')\]]+|(?<![@\w./:-])(?:www\.[a-z0-9-]+(?:\.[a-z0-9-]+)+|(?:[a-z0-9-]+\.)+(?:com|net|org|io|be|me|tv|app|co|mx|art|gg|ly|dev|studio|info|edu|gov|link|page|site|xyz))(?:\/[^\s<>"')\]]*)?/gi;
+const findLinks=text=>{const seen=new Set(),out=[];(String(text||"").match(LINK_RE)||[]).forEach(m=>{const t=m.replace(/[.,;:!?]+$/,"");if(t.length<5)return;const href=/^https?:\/\//i.test(t)?t:"https://"+t;if(!seen.has(href)){seen.add(href);out.push({href,text:t})}});return out};
+const linkList=text=>{const u=findLinks(text);return u.length?`<span class="lbl">LINKS</span>${u.map(x=>`<a href="${esc(x.href)}" target="_blank" rel="noopener">${esc(x.text)}</a>`).join("")}`:""};
+const linkBox=(id,text)=>`<div class="nt-links" data-links="${id}">${linkList(text)}</div>`;
 function notesModal(kind,obj,title,back){
   const ref={kind,id:obj.id},cur=()=>ownerOf(ref)||obj;
   const ph={project:"Lore, references, links to resources…",phase:"Process reminders and workflow notes for this phase…",item:"Notes for this item…"}[kind];
@@ -2355,7 +2359,7 @@ function viewDay(){
         return all.length?`<section class="panel" style="display:grid;gap:6px"><h3>Schedule</h3>${all.map(({e,p,ph})=>{const sk=(e.skip||[]).includes(d);return `<div class="row"><span class="dot" style="--c:var(--${ph?ph.color:"accent"})"></span><span class="grow"><b style="${sk?"text-decoration:line-through;color:var(--faint)":""}">${esc(e.label)}</b> <span class="sub">${e.allDay?"All Day":clock(e.start)+"–"+clock(e.start+e.dur)} · ${esc(ph?ph.name:p.name)}</span></span><button class="btn sm" data-skipe="${e.id}">${sk?"Restore":"Skip"}</button></div>`}).join("")}</section>`:""})()}
       <section class="panel"><h3 style="margin-bottom:6px">Today's Items</h3>${items.length?items.map(({ph,it})=>{const s=itemStats(it);return `<div class="task"><span class="dot" style="--c:var(--${ph.color})"></span><button style="border:0;background:none;padding:0;text-align:left" data-open-item="${it.id}"><b>${esc(it.name)}</b> <span class="sub">${esc(ph.name)}</span></button><span class="chip" style="--sc:var(${SC[it.status]})">${esc(it.status)} · ${AE(s.act,s.est)}</span></div>`}).join(""):`<p class="empty">No project blocks planned for this day.</p>`}</section>
       <section class="panel" style="display:grid;gap:8px"><div class="row"><h3 class="grow">Diary</h3><span class="sub" id="diary-st">Saves as You Type</span></div>
-        <textarea class="inp" id="diary" rows="8" placeholder="What happened today? What did your mentor say, what clicked, what didn't?">${esc(S.notes[d]||"")}</textarea></section>
+        <textarea class="inp" id="diary" rows="8" placeholder="What happened today? What did your mentor say, what clicked, what didn't?">${esc(S.notes[d]||"")}</textarea>${linkBox("diary",S.notes[d])}</section>
     </div>
   </div>`;
 }
@@ -2527,7 +2531,7 @@ function weeklyReview(){
   const l=S.sessions.filter(s=>s.date>=ws&&s.date<=we).reduce((a,s)=>a+s.dur,0);
   let sub=0,its=0;S.projects.forEach(p=>p.phases.forEach(ph=>ph.items.forEach(it=>{if(it.week===ws){its++;if(["Submitted","Feedback Received","Revising","Approved","Done"].includes(it.status))sub++}})));
   let ba=0,bb=0;proj().phases.forEach(ph=>{if(!ph.bonus){const s=phaseStats(ph);ba+=s.act;bb+=s.budget}});
-  const f=(k,l,ph,rows=5)=>`<section class="panel field"><label for="wr-${k}">${l}</label><textarea class="inp" id="wr-${k}" data-wr="${k}" rows="${rows}" placeholder="${esc(ph)}">${esc(r[k]||"")}</textarea></section>`;
+  const f=(k,l,ph,rows=5)=>`<section class="panel field"><label for="wr-${k}">${l}</label><textarea class="inp" id="wr-${k}" data-wr="${k}" rows="${rows}" placeholder="${esc(ph)}">${esc(r[k]||"")}</textarea>${linkBox("wr-"+k,r[k])}</section>`;
   const meta=S.weekMeta[ws]=S.weekMeta[ws]||{priorities:[],achievements:[]},prevFocus=((S.weekly[iso(addDays(parse(ws),-7))]||{}).focus||"").trim();
   return `<div class="row"><h2 class="grow">Week of ${short(ws)} – ${short(we)}</h2>
     <span class="navg"><button class="btn" data-rw="-7" aria-label="Previous week">←</button><button class="btn" data-rw="0">This Week</button><button class="btn" data-rw="7" aria-label="Next week">→</button>
@@ -2550,7 +2554,7 @@ function monthlyReview(){
   return `<div class="row"><h2 class="grow">${new Date(y,m-1,1).toLocaleDateString(undefined,{month:"long",year:"numeric"})}</h2>
     <span class="navg"><button class="btn" data-mr="-1" aria-label="Previous month">←</button><button class="btn" data-mr="0">This Month</button><button class="btn" data-mr="1" aria-label="Next month">→</button>
     <button class="btn" data-rv-export="monthly">Export</button></span></div>
-  <section class="panel field"><label for="mr-focus">FOCUS</label><input class="inp" id="mr-focus" value="${esc(r.focus)}" placeholder="One line for the month, e.g. Broad Exploration + Pitch Pages"></section>
+  <section class="panel field"><label for="mr-focus">FOCUS</label><input class="inp" id="mr-focus" value="${esc(r.focus)}" placeholder="One line for the month, e.g. Broad Exploration + Pitch Pages">${linkBox("mr-focus",r.focus)}</section>
   <div class="stat-row rv-stats"><div class="stat"><span class="k">Logged This Month</span><span class="v a">${fmtH(l)}</span></div>${Object.entries(per).map(([n,v])=>`<div class="stat"><span class="k">${esc(n)}</span><span class="v a">${fmtH(v)}</span></div>`).join("")}</div>
   ${alertsRow(from,to)}
   <section class="panel rv-prev" style="display:grid;gap:12px"><h3>Previous Month Review</h3>
@@ -2561,7 +2565,7 @@ function monthlyReview(){
       <textarea class="inp" rows="2" data-goal="${i}" data-gk="g" aria-label="Goal ${i+1}">${esc(g.g)}</textarea><textarea class="inp why" rows="2" data-goal="${i}" data-gk="w" aria-label="Why / How ${i+1}">${esc(g.w)}</textarea><textarea class="inp rw" rows="2" data-goal="${i}" data-gk="r" aria-label="Rewards ${i+1}">${esc(g.r)}</textarea>
       <button class="btn sm ghost" data-gx="${i}" aria-label="Remove goal">✕</button></div>`).join("")}</div>
     <button class="btn sm" style="justify-self:start" id="goal-add">+ Goal</button></section>
-  <section class="panel field"><label for="mr-notes">NOTES</label><textarea class="inp" id="mr-notes" rows="4">${esc(r.notes)}</textarea></section>`;
+  <section class="panel field"><label for="mr-notes">NOTES</label><textarea class="inp" id="mr-notes" rows="4">${esc(r.notes)}</textarea>${linkBox("mr-notes",r.notes)}</section>`;
 }
 
 /* ===================== review export ===================== */
@@ -3244,7 +3248,7 @@ manual:[
 <li>Tap the name to rename it. Status: Not Started, In Progress, Submitted, Feedback Received, Revising, Approved, Done. Starting the timer moves Not Started to In Progress for you.</li>
 <li>Target Week puts the item in This Week's Items on the Week page.</li>
 <li>Steps: each has an estimate and optional timer stages. Start runs the timer, Time Log fixes logged sessions, Edit Step changes the estimate and stages. The arrows reorder steps.</li>
-<li>Checklist and Feedback keep their own lists. Type an entry and press Enter: it's added and the box is ready for the next one. Notes has a writing box, any links you type become tappable, and Attachments sits below it. Tap a checklist line's text to edit it (Enter saves, Esc cancels), tap ✕ to delete it (with Undo), and hold the ⋮⋮ handle to drag it up or down. Tap a feedback note to edit its text or date; notes stay in date order. ✕ deletes a note (with Undo).</li>
+<li>Checklist and Feedback keep their own lists. Type an entry and press Enter: it's added and the box is ready for the next one. Notes has a writing box, any web addresses you type show up as tappable links under it (https://…, www.… or a short one like youtu.be/…), and Attachments sits below it. Tap a checklist line's text to edit it (Enter saves, Esc cancels), tap ✕ to delete it (with Undo), and hold the ⋮⋮ handle to drag it up or down. Tap a feedback note to edit its text or date; notes stay in date order. ✕ deletes a note (with Undo).</li>
 <li>At the bottom: Delete, Move to Phase, Save as Template and Load Template.</li>
 </ul>
 <h4>Month</h4>
@@ -3274,7 +3278,7 @@ manual:[
 <li>Planned Project Time, Logged and Daily Target sit at the top of the side column.</li>
 <li>The Calendar panel (Due Today when there are no events) lists the day's project due dates and phase target dates, then its Google Calendar events, with a link to join a call when the event has one (Discord, Google Meet, Zoom, Teams).</li>
 <li>Schedule lists today's schedule entries; Skip removes one for this day only. Today's Items lists the items you planned blocks for.</li>
-<li>Diary saves as you type.</li>
+<li>Diary saves as you type. Web addresses in it show up as tappable links underneath.</li>
 </ul>
 <h4>Google Calendar</h4>
 [[fig:gcal|A Google Calendar event in the Week view]]
@@ -3293,7 +3297,7 @@ manual:[
 <ul>
 <li>Weekly Review: Logged vs Target, Items Submitted (items with this target week that reached Submitted or later), and the project's budget used. Budget Alerts list phases past the warning point.</li>
 <li>Top to bottom: THIS WEEK'S FOCUS (faintly shows last week's Next Week's Focus until you write your own), WEEKLY PRIORITIES and ACHIEVEMENTS (the same lists as on the Week page; edit them in either place), WHAT WORKED and WHAT TO IMPROVE, FEEDBACK SUMMARY and NEXT WEEK'S FOCUS, then NOTES.</li>
-<li>Everything saves as you type. The arrows move between weeks.</li>
+<li>Everything saves as you type. The arrows move between weeks. Web addresses in any review box (and in the Monthly Review's Focus and Notes) show up as tappable links under that box.</li>
 <li>Monthly Review: Focus, hours logged in total and per project, Previous Month Review (Wins and Improvements), Goals (Goal, Why/How, Rewards) and Notes. In Wins and Improvements, Enter saves a line and starts the next. In Goals, Enter moves from Goal to Why / How to Rewards, then starts a new goal; Shift+Enter adds a line break. Wins, Improvements and Goals reorder the same way, with the ⋮⋮ handle.</li>
 <li>Export: Create PDF prints the review on screen (choose Save as PDF in the print window). On iPad the tracker makes the PDF file itself: tap Save or Share PDF, then Save to Files. Export Excel File saves every review in a date range.</li>
 </ul>`},
@@ -3734,6 +3738,7 @@ function refocus(sel){const go=()=>{const x=document.querySelector(sel);if(x&&do
 function listEnter(inp,arr,i,selTpl){inp.addEventListener("keydown",e=>{if(e.key!=="Enter"||e.shiftKey||e.isComposing||e.altKey||e.metaKey||e.ctrlKey)return;e.preventDefault();e.stopPropagation();
   if(!inp.value.trim()){arr.splice(i,1);inp.blur();commit();return}
   arr[i]=inp.value;arr.splice(i+1,0,"");commit();refocus(selTpl.replace("#",i+1))})}
+document.addEventListener("input",e=>{const t=e.target;if(!t||!t.id)return;const L=document.querySelector(`[data-links="${t.id}"]`);if(L)L.innerHTML=linkList(t.value)});
 function bindView(v){
   const mn=v.querySelector("#mn-notes");if(mn){let t;mn.oninput=()=>{monthRec(S.ui.month).notes=mn.value;v.querySelector("#mn-st").textContent="Saving…";clearTimeout(t);t=setTimeout(()=>{save();v.querySelector("#mn-st").textContent="Saved"},500)}}
   const pp=v.querySelector("#proj-pick");if(pp)pp.onchange=e=>{S.ui.project=e.target.value;commit()};
