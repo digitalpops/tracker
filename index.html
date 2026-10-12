@@ -196,6 +196,8 @@ main{padding-top:20px;display:grid;gap:18px}
 .fb{display:grid;gap:2px;border-left:3px solid var(--accent);padding:4px 10px}
 .fb .d{font-size:11.5px;color:var(--muted)}
 .chk-list,.fb-list{display:grid;gap:4px}
+.carry{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--stat);border-radius:9px;padding:8px 10px;font-size:13px}
+.opts .opt-h{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:10px 2px 2px}.opts .opt-h:first-child{padding-top:0}
 .chk-row{align-items:center}.chk-row .ct{flex:1;min-width:0;cursor:text;padding:3px 2px;border-radius:5px;overflow-wrap:anywhere}.chk-row .ct:hover{background:var(--btn)}.chk-row .ie{padding:4px 8px}
 .chk-row.done .ct{text-decoration:line-through;color:var(--muted)}
 .btn.xs{padding:2px 7px;min-height:0;font-size:12px;color:var(--faint)}.btn.xs:hover{color:var(--over)}
@@ -666,7 +668,7 @@ const LPAL_DEF={light:["#CEFBD0","#D5ECC2","#FAF6B7","#F2E3B3","#EDE6D8","#F7D9C
 const LIFE_ORDER=[1,7,2,11,10,5,8,6,12,9,4,3]; /* October 2026 reorder: new slot k shows old slot LIFE_ORDER[k-1] */
 const STATUSES=[["Not Started","--faint"],["In Progress","--accent"],["Submitted","--amber"],["Feedback Received","--p7"],["Revising","--act"],["Approved","--p3"],["Done","--ok"]];
 const SC=Object.fromEntries(STATUSES);
-const APP_VERSION="2026.10.12.06";
+const APP_VERSION="2026.10.12.07";
 const isDone=it=>it.status==="Done"||it.status==="Approved";
 const DEF_NAME="Blue Blaze Project Tracker";
 const appName=()=>((typeof S!=="undefined"&&S&&S.settings&&S.settings.brandName)||"").trim()||DEF_NAME;
@@ -779,14 +781,14 @@ function seed(){
   const tdata=chapterTemplate();
   const P=fromStructure(tdata,"Anáuac");
   const st={projects:[P],templates:[{id:"tpl1",name:"Stylized Character · Notable Characters",note:"3 archetypes × 4 variations + Sidekick, 210h + 20h bonus",archived:false,data:tdata}],
-    sessions:[],plans:[],settings:defaultSettings(),routineSkip:{},notes:{},weekly:{},weekMeta:{},monthly:{},itemTemplates:{},phaseTemplates:{},sounds:{},brand:{}};
+    sessions:[],plans:[],settings:defaultSettings(),routineSkip:{},notes:{},weekly:{},weekMeta:{},monthly:{},itemTemplates:{},phaseTemplates:{},sounds:{},brand:{},dayx:{}};
   st.ui=defaultUI(st);if(P.phases[1])st.ui.open[P.phases[1].id]=true;return st;
 }
 
 /* ===================== state ===================== */
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
 const K_CONN="bbst-conn",K_CACHE="bbst-cache",K_SNAP="bbst-snap",K_OUT="bbst-outbox",K_UI="bbst-ui",K_T="bbst-timer";
-const COLS=["projects","templates","sessions","plans","kv"],KVP={note:"notes",weekly:"weekly",wm:"weekMeta",mo:"monthly",itpl:"itemTemplates",ptpl:"phaseTemplates",snd:"sounds",brand:"brand"};
+const COLS=["projects","templates","sessions","plans","kv"],KVP={note:"notes",weekly:"weekly",wm:"weekMeta",mo:"monthly",itpl:"itemTemplates",ptpl:"phaseTemplates",snd:"sounds",brand:"brand",dx:"dayx"};
 function docsOf(st){
   const d={projects:{},templates:{},sessions:{},plans:{},kv:{}};
   st.projects.forEach((p,i)=>d.projects[p.id]={...p,_o:i});
@@ -798,7 +800,7 @@ function docsOf(st){
 }
 function stateFrom(d,ui){
   const ord=o=>Object.values(o||{}).sort((a,b)=>(a._o??0)-(b._o??0)).map(x=>{const y={...x};delete y._o;return y});
-  const st={projects:ord(d.projects),templates:ord(d.templates),sessions:Object.values(d.sessions||{}),plans:Object.values(d.plans||{}),settings:null,routineSkip:{},notes:{},weekly:{},weekMeta:{},itemTemplates:{},phaseTemplates:{},sounds:{},monthly:{},brand:{}};
+  const st={projects:ord(d.projects),templates:ord(d.templates),sessions:Object.values(d.sessions||{}),plans:Object.values(d.plans||{}),settings:null,routineSkip:{},notes:{},weekly:{},weekMeta:{},dayx:{},itemTemplates:{},phaseTemplates:{},sounds:{},monthly:{},brand:{}};
   Object.entries(d.kv||{}).forEach(([k,v])=>{if(k==="settings")st.settings=v;else if(k==="routineSkip")st.routineSkip=v||{};else{const i=k.indexOf(":"),f=KVP[k.slice(0,i)];if(f)st[f][k.slice(i+1)]=v}});
   if(!st.settings)st.settings=defaultSettings();
   st.ui=ui||defaultUI(st);return st;
@@ -1407,11 +1409,27 @@ function badgeOf(a){if(/^application\/vnd\.google-apps/.test(a.mime||"")){const 
   if(!e&&a.kind==="link"){const u=String(a.url||"");e=/drive\.google|docs\.google/.test(u)?"drive":/dropbox\./.test(u)?"dropbox":/proton\.me|protondrive/.test(u)?"proton":"link"}
   return{t:(e||"file").toUpperCase(),c:BADGE_C[e]||"#5A6378"}}
 const fsize=b=>!b?"":b<1048576?Math.max(1,Math.round(b/1024))+" KB":(b/1048576).toFixed(b<10485760?1:0)+" MB";
-const attOwners=()=>{const o=[];S.projects.forEach(p=>{o.push(p);p.phases.forEach(ph=>{o.push(ph);ph.items.forEach(it=>o.push(it))})});return o};
+/* every place a card can live: project notes, phases and items, plus Weekly/Monthly Review notes and the Diary.
+   "home" is the Drive folder group: one per project, Reviews (by year) or Diary (by year). */
+const RVK=new Set(["week","month","day"]);
+const DX=()=>S.dayx||(S.dayx={});
+const dayRec=d=>DX()[d]||(DX()[d]={});
+function attPlaces(){const out=[];S.projects.forEach(p=>{const h="p:"+p.id;out.push({o:p,ref:{kind:"project",id:p.id},home:h});p.phases.forEach(ph=>{out.push({o:ph,ref:{kind:"phase",id:ph.id},home:h});ph.items.forEach(it=>out.push({o:it,ref:{kind:"item",id:it.id},home:h}))})});
+  [["week",S.weekly,"rv"],["month",S.monthly,"rv"],["day",S.dayx,"dy"]].forEach(([k,m,g])=>Object.entries(m||{}).forEach(([id,o])=>{if(o&&o.files&&o.files.length)out.push({o,ref:{kind:k,id},home:g+":"+id.slice(0,4)})}));return out}
+const attOwners=()=>attPlaces().map(x=>x.o);
 function findAtt(id){for(const o of attOwners())for(const a of o.files||[])if(a.id===id)return{o,a};return null}
 const allDriveIds=()=>{const s=new Set();attOwners().forEach(o=>(o.files||[]).forEach(a=>{if(a.driveId)s.add(a.driveId)}));return s};
 const driveIdsIn=o=>{const out=[],walk=x=>{(x.files||[]).forEach(a=>{if(a.driveId&&!a.fromDrive)out.push(a.driveId)});(x.phases||[]).forEach(walk);(x.items||[]).forEach(walk)};walk(o);return out};
-const ownerOf=ref=>ref.kind==="project"?S.projects.find(p=>p.id===ref.id):ref.kind==="phase"?(IX.idx.phase[ref.id]||{}).ph:(IX.idx.item[ref.id]||{}).it;
+const ownerOf=ref=>ref.kind==="week"?(S.weekly[ref.id]=S.weekly[ref.id]||{}):ref.kind==="month"?monthRec(ref.id):ref.kind==="day"?dayRec(ref.id):ref.kind==="project"?S.projects.find(p=>p.id===ref.id):ref.kind==="phase"?(IX.idx.phase[ref.id]||{}).ph:(IX.idx.item[ref.id]||{}).it;
+const peekOwner=ref=>ref.kind==="week"?S.weekly[ref.id]:ref.kind==="month"?S.monthly[ref.id]:ref.kind==="day"?DX()[ref.id]:ownerOf(ref);
+const homeOfRef=ref=>RVK.has(ref.kind)?(ref.kind==="day"?"dy:":"rv:")+String(ref.id).slice(0,4):"p:"+((projOfRef(ref)||{}).id||"");
+const folderOfHome=h=>{const [g,v]=String(h||"").split(":");if(g==="rv")return "Reviews/"+v;if(g==="dy")return "Diary/"+v;const p=S.projects.find(x=>x.id===v);return p?slugName(p.name):""};
+const cardHome=id=>{for(const pl of attPlaces())if((pl.o.files||[]).some(a=>a.id===id))return pl.home;return ""};
+const MONN=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const placeLabel=ref=>ref.kind==="week"?`Week of ${short(ref.id)} Review`:ref.kind==="month"?`${MONN[+ref.id.slice(5,7)-1]} ${ref.id.slice(0,4)} Review`:ref.kind==="day"?`Diary · ${short(ref.id)}`:"";
+/* naming rule for everything the tracker names: words joined with "-", parts split with "_", dates 2026.10.12 */
+const slugName=s=>String(s||"").replace(/[\\/:*?"<>|#%]+/g,"").replace(/[\s_+]+/g,"-").replace(/-+/g,"-").replace(/^-|-$/g,"")||"Untitled";
+const d8=ds=>String(ds||TODAY()).replace(/-/g,".");
 const projOfRef=ref=>ref.kind==="project"?ownerOf(ref):ref.kind==="phase"?(IX.idx.phase[ref.id]||{}).p:(IX.idx.item[ref.id]||{}).p;
 const FIDX=()=>LS.get(K_FIDX,{});
 async function cacheGet(id){if(memFiles[id])return memFiles[id];if(!FIDX()[id])return null;const b=await IDB.get("file:"+id);return b instanceof Blob?b:null}
@@ -1451,7 +1469,7 @@ function refreshAttViews(){document.querySelectorAll("[data-attgrid]").forEach(e
 async function addFiles(ref,list){
   const files=[...list],big=files.filter(f=>f.size>MAX_UP),ok=files.filter(f=>f.size<=MAX_UP&&f.size>0);
   if(big.length)toast(`${big.map(f=>f.name).join(", ")} ${big.length>1?"are":"is"} over 15 MB. Use Add Link for big files.`,5500);
-  if(!ok.length)return;const p=projOfRef(ref),folder=p?p.name:"";
+  if(!ok.length)return;const folder=folderOfHome(homeOfRef(ref));
   const added=[];for(const f of ok){const a={id:uid(),kind:"drive",name:f.name,mime:f.type||mimeOf(f.name),size:f.size,added:TODAY(),at:Date.now(),pending:true};
     const rec={blob:f.slice(0,f.size,f.type||mimeOf(f.name)),folder};memUp[a.id]=rec;await IDB.set("up:"+a.id,rec);added.push(a)}
   const o=ownerOf(ref);if(!o)return;o.files=[...(o.files||[]),...added];
@@ -1463,10 +1481,11 @@ async function runUploads(){
   try{let q=LS.get(K_UPQ,[]);
     while(q.length){const id=q[0],f=findAtt(id),u=memUp[id]||await IDB.get("up:"+id);
       if(!f||!f.a.pending||!u){q=LS.get(K_UPQ,[]).filter(x=>x!==id);LS.set(K_UPQ,q);if(!f)await IDB.del("up:"+id);continue}
-      let r;try{r=await Sync.call("upload",{name:f.a.name,mime:f.a.mime||"application/octet-stream",folder:u.folder||"",data:await blobB64(u.blob)})}
+      const hm=cardHome(id),fd=folderOfHome(hm)||u.folder||"";
+      let r;try{r=await Sync.call("upload",{name:f.a.name,mime:f.a.mime||"application/octet-stream",folder:fd,data:await blobB64(u.blob)})}
       catch(x){if(Date.now()-upWarned>60000){upWarned=Date.now();toast(/Unknown action|NO_DRIVE|permission/i.test(x.message)?driveErr(x):"Files are saved on this device and upload when you're back online.",6000)}break}
       const g=findAtt(id);
-      if(g){Object.assign(g.a,{driveId:r.id,url:r.url,size:r.size||g.a.size});delete g.a.pending;await cachePut(r.id,u.blob);did++;commit()}
+      if(g){Object.assign(g.a,{driveId:r.id,url:r.url,size:r.size||g.a.size,home:hm||undefined});delete g.a.pending;await cachePut(r.id,u.blob);did++;commit()}
       else queueTrash([r.id],0);
       delete memUp[id];await IDB.del("up:"+id);q=LS.get(K_UPQ,[]).filter(x=>x!==id);LS.set(K_UPQ,q)}}
   finally{upRun=false}
@@ -1497,7 +1516,7 @@ async function syncOffline(){
       try{const b=await dbxFetch(a);await cachePut(k,b);refreshAttViews()}catch(x){if(/Unknown action/i.test(x.message)||!navigator.onLine)return;dbxBad.add(k)}}}
   finally{offRun=false}
 }
-function afterSync(){migrateColors();migrateFiles();migrateKeys();gScan();gFlush();gFetch();gDates();runUploads().then(()=>{runTrash();return convertDriveLinks()}).then(()=>syncOffline())}
+function afterSync(){migrateColors();migrateFiles();migrateKeys();gScan();gFlush();gFetch();gDates();runUploads().then(()=>{runTrash();return convertDriveLinks()}).then(()=>{runRelocate();return syncOffline()})}
 addEventListener("online",()=>setTimeout(()=>{runUploads();runTrash()},1500));
 /* One-time update (Oct 2026): item "Links to Files" move into the item's notes. */
 /* One-time update (Oct 2026): the Settings shortcut moves from Cmd+, (taken by Chrome on iPad) to "<" */
@@ -1528,7 +1547,7 @@ const isTouch=()=>matchMedia("(pointer:coarse)").matches;
 const IS_IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
 function shareCounts(){const m={};attOwners().forEach(o=>(o.files||[]).forEach(a=>{const k=shareKey(a);m[k]=(m[k]||0)+1}));return m}
 function placeList(p){const out=[{ref:{kind:"project",id:p.id},label:"Project Notes",lvl:0}];p.phases.forEach(ph=>{out.push({ref:{kind:"phase",id:ph.id},label:`${ph.name} Notes`,lvl:0,color:ph.color});ph.items.forEach(it=>out.push({ref:{kind:"item",id:it.id},label:it.name,sub:it.group||"",lvl:1,color:ph.color}))});return out}
-function placesOf(a,except){const k=shareKey(a),out=[];S.projects.forEach(p=>placeList(p).forEach(x=>{const o=ownerOf(x.ref);if(o&&o!==except&&(o.files||[]).some(y=>shareKey(y)===k))out.push(x.lvl?`${x.label} (${(IX.idx.item[x.ref.id]||{}).ph?.name||""})`:x.label)}));return out}
+function placesOf(a,except){const k=shareKey(a),out=[];S.projects.forEach(p=>placeList(p).forEach(x=>{const o=ownerOf(x.ref);if(o&&o!==except&&(o.files||[]).some(y=>shareKey(y)===k))out.push(x.lvl?`${x.label} (${(IX.idx.item[x.ref.id]||{}).ph?.name||""})`:x.label)}));RVK&&attPlaces().forEach(pl=>{if(RVK.has(pl.ref.kind)&&pl.o!==except&&(pl.o.files||[]).some(y=>shareKey(y)===k))out.push(placeLabel(pl.ref))});return out}
 function attCard(a,cnt){
   const k=kindOf(a),bd=badgeOf(a),st=a.pending?"Waiting to Upload":a.kind==="link"?"Link":isGdoc(a)?((GTYPE[a.mime]||{}).l||"Google File"):fsize(a.size);
   return `<div class="att ${a.pending?"pending":""}" data-att="${a.id}"><button class="att-open" data-att-open="${a.id}" title="${esc(a.name)}"><span class="th" ${k==="img"&&(a.kind==="drive"||isDbx(a))?`data-th="${a.id}"`:""}><span class="bdg" style="--bc:${bd.c};${bd.ink?`color:${bd.ink}`:""}">${esc(bd.t)}</span></span><span class="nm">${esc(a.name)}</span><span class="sz"><span>${st}</span>${cnt>1?`<b class="cnt" title="In ${cnt} Places">${cnt}x</b>`:""}</span></button><button class="att-x" data-att-menu="${a.id}" aria-label="Options for ${esc(a.name)}">⋯</button></div>`}
@@ -1545,7 +1564,7 @@ function sheet(title,sub,body,onMount){
   onMount&&onMount(host,close);return close}
 function mountAtt(el,ref){
   el.setAttribute("data-attgrid","1");
-  const draw=()=>{const o=ownerOf(ref);if(!o){el.innerHTML="";return}const L=o.files||[],cn=shareCounts();
+  const draw=()=>{const o=RVK.has(ref.kind)?(peekOwner(ref)||{}):ownerOf(ref);if(!o){el.innerHTML="";return}const L=o.files||[],cn=shareCounts();
     el.innerHTML=`${L.length?`<div class="att-grid">${L.map(a=>attCard(a,cn[shareKey(a)])).join("")}</div>`:""}
       <div class="row"><button class="btn sm" data-att-add>+ Add Files</button><button class="btn sm ghost" data-att-drive>+ From Drive</button><button class="btn sm ghost" data-att-link>+ Add Link</button>${L.length>1?`<button class="btn sm ghost" data-att-sort>Sort</button>`:""}<span class="sub grow">${L.length?(L.length>1?"Hold and Drag a Card to Reorder":""):"JPG, PNG and PDF Open Here. Other Files Open in Google Drive. Up to 15 MB Each."}</span></div>
       <input type="file" multiple hidden data-att-file>`;
@@ -1614,22 +1633,40 @@ function renameAtt(ref,id){
 /* names changed in Google Drive show up here: checked when Notes or an item opens (online, at most every 2 minutes per place) */
 const nameChk={};
 async function refreshNames(ref){
-  if(!Sync.connected()||!navigator.onLine)return;const o=ownerOf(ref);if(!o)return;const k=ref.kind+":"+ref.id;if(nameChk[k]&&Date.now()-nameChk[k]<120000)return;
+  if(!Sync.connected()||!navigator.onLine)return;const o=peekOwner(ref);if(!o)return;const k=ref.kind+":"+ref.id;if(nameChk[k]&&Date.now()-nameChk[k]<120000)return;
   const ids=[...new Set((o.files||[]).filter(a=>a.kind==="drive"&&a.driveId&&!a.pending).map(a=>a.driveId))];if(!ids.length)return;nameChk[k]=Date.now();
   let r;try{r=await Sync.call("driveNames",{ids})}catch(x){if(/Unknown action/i.test(x.message))nameChk[k]=Infinity;return}
   let ch=0;attOwners().forEach(w=>(w.files||[]).forEach(a=>{const n=a.kind==="drive"&&a.driveId&&r&&r[a.driveId];if(typeof n==="string"&&n&&n!==a.name){a.name=n;ch++}}));
   if(ch){commit();refreshAttViews()}}
 function placePicker(ref,id,mode){
-  const o=ownerOf(ref),a=o&&(o.files||[]).find(x=>x.id===id),p=projOfRef(ref);if(!a||!p)return;const k=shareKey(a);
-  const L=placeList(p).map(x=>{const t=ownerOf(x.ref),here=t===o,has=!here&&(t.files||[]).some(y=>shareKey(y)===k);
-    return `<button class="opt ${x.lvl?"ind":""}" data-to="${x.ref.kind}:${x.ref.id}" ${here||has?"disabled":""}>${x.color?`<span class="dot" style="--c:var(--${x.color})"></span>`:""}<span>${esc(x.label)}${x.sub&&x.lvl?` <span class="sub">${esc(x.sub)}</span>`:""}${here?` <span class="sub">· Here Now</span>`:has?` <span class="sub">· Already There</span>`:""}</span></button>`}).join("");
-  sheet(`${mode==="move"?"Move":"Copy"} ${esc(a.name)} To…`,mode==="copy"?"Both places show the same Drive file, marked 2x. Nothing is duplicated.":"",`<div class="opts places">${L}</div>`,(h,close)=>{
-    h.querySelectorAll("[data-to]").forEach(b=>b.onclick=()=>{const[kind,tid]=b.dataset.to.split(":"),dref={kind,id:tid},dst=ownerOf(dref),src=ownerOf(ref);if(!dst||!src)return close();
+  const o=ownerOf(ref),a=o&&(o.files||[]).find(x=>x.id===id);if(!a)return;const k=shareKey(a),p=projOfRef(ref);
+  const tw=iso(weekOf(new Date())),tm=TODAY().slice(0,7),td=TODAY();
+  const rv=[{ref:{kind:"week",id:tw},label:"This Week's Review",sub:`Week of ${short(tw)}`},{ref:{kind:"month",id:tm},label:"This Month's Review",sub:placeLabel({kind:"month",id:tm}).replace(/ Review$/,"")},{ref:{kind:"day",id:td},label:"Today's Diary",sub:short(td)}];
+  if(RVK.has(ref.kind)&&!rv.some(x=>x.ref.kind===ref.kind&&x.ref.id===ref.id))rv.unshift({ref,label:placeLabel(ref)});
+  const cur=(typeof proj==="function"&&proj())||null,projs=p?[p]:[...(cur&&!cur.archived?[cur]:[]),...S.projects.filter(x=>!x.archived&&x!==cur)];
+  const btn=(x,lvl)=>{const t=peekOwner(x.ref),here=t===o,has=!here&&!!t&&(t.files||[]).some(y=>shareKey(y)===k);
+    return `<button class="opt ${lvl?"ind":""}" data-to="${x.ref.kind}:${x.ref.id}" ${here||has?"disabled":""}>${x.color?`<span class="dot" style="--c:var(--${x.color})"></span>`:""}<span>${esc(x.label)}${x.sub?` <span class="sub">${esc(x.sub)}</span>`:""}${here?` <span class="sub">· Here Now</span>`:has?` <span class="sub">· Already There</span>`:""}</span></button>`};
+  const L=`<div class="opt-h">Reviews and Diary</div>${rv.map(x=>btn(x,0)).join("")}`+projs.map(pp=>`<div class="opt-h">${esc(pp.name)}</div>`+placeList(pp).map(x=>btn({...x,sub:x.lvl?x.sub:""},x.lvl)).join("")).join("");
+  sheet(`${mode==="move"?"Move":"Copy"} ${esc(a.name)} To…`,mode==="copy"?"Both places show the same Drive file, marked 2x. Nothing is duplicated.":(a.kind==="drive"&&!a.fromDrive?"If the file ends up in only one place, it moves to that place's folder in your Google Drive.":""),`<div class="opts places">${L}</div>`,(h,close)=>{
+    h.querySelectorAll("[data-to]").forEach(b=>b.onclick=()=>{const di=b.dataset.to.indexOf(":"),dref={kind:b.dataset.to.slice(0,di),id:b.dataset.to.slice(di+1)},src=ownerOf(ref);
       const lbl=b.querySelector("span:not(.dot)").childNodes[0].textContent.trim();close();
-      undoable(()=>{if(mode==="move"){src.files=(src.files||[]).filter(x=>x.id!==id);dst.files=[...(dst.files||[]),a]}else dst.files=[...(dst.files||[]),{...a,id:uid(),at:Date.now()}]},`${mode==="move"?"Moved":"Copied"} to ${lbl}`)})})}
+      undoable(()=>{const dst=ownerOf(dref);if(!dst||!src)return;stampHome(a,homeOfRef(ref));if(mode==="move"){src.files=(src.files||[]).filter(x=>x.id!==id);dst.files=[...(dst.files||[]),a]}else dst.files=[...(dst.files||[]),{...a,id:uid(),at:Date.now()}]},`${mode==="move"?"Moved":"Copied"} to ${lbl}`,refreshAttViews);
+      refreshAttViews();scheduleRelocate()})})}
 function removeAtt(ref,id){const o=ownerOf(ref);if(!o)return;const a=(o.files||[]).find(x=>x.id===id);if(!a)return;const others=placesOf(a,o);
-  undoable(()=>{o.files=o.files.filter(x=>x.id!==id)},others.length?`Removed here. Still in ${others[0]}${others.length>1?` and ${others.length-1} more`:""}.`:a.fromDrive?`${a.name} removed. It stays in your Google Drive.`:a.kind==="drive"&&!a.pending?`${a.name} removed and moved to the Drive trash`:`${a.name} removed`);
-  if(a.driveId&&!a.fromDrive)queueTrash([a.driveId]);refreshAttViews()}
+  undoable(()=>{stampHome(a,homeOfRef(ref));o.files=o.files.filter(x=>x.id!==id)},others.length?`Removed here. Still in ${others[0]}${others.length>1?` and ${others.length-1} more`:""}.`:a.fromDrive?`${a.name} removed. It stays in your Google Drive.`:a.kind==="drive"&&!a.pending?`${a.name} removed and moved to the Drive trash`:`${a.name} removed`);
+  if(a.driveId&&!a.fromDrive)queueTrash([a.driveId]);refreshAttViews();scheduleRelocate()}
+/* files follow their card: an uploaded file that ends up shown in only one place moves to that place's Drive folder
+   (a project's folder, Reviews/2026 or Diary/2026). Files added From Drive are yours and never move. */
+function stampHome(a,h){if(!a||!a.driveId||a.fromDrive)return;attOwners().forEach(o=>(o.files||[]).forEach(x=>{if(x.driveId===a.driveId&&!x.home)x.home=h}))}
+let relT=null,relRun=false,relWarned=false;const scheduleRelocate=()=>{clearTimeout(relT);relT=setTimeout(runRelocate,9500)};
+async function runRelocate(){if(relRun||!Sync.connected()||!navigator.onLine)return;relRun=true;let ch=0;
+  try{const by={};attPlaces().forEach(pl=>(pl.o.files||[]).forEach(a=>{if(a.kind!=="drive"||!a.driveId||a.fromDrive||a.pending)return;const x=by[a.driveId]=by[a.driveId]||{cards:[],homes:new Set()};x.cards.push(a);x.homes.add(pl.home)}));
+    for(const [id,x] of Object.entries(by)){if(x.homes.size!==1)continue;const H=[...x.homes][0],cur=(x.cards.find(c=>c.home)||{}).home;
+      if(!cur||cur===H){if(x.cards.some(c=>c.home!==H)){x.cards.forEach(c=>c.home=H);ch++}continue}
+      const fd=folderOfHome(H);if(!fd)continue;
+      try{await Sync.call("driveMove",{id,folder:fd});x.cards.forEach(c=>c.home=H);ch++}
+      catch(e){const m=String(e&&e.message||e);if(m==="NO_FILE"){x.cards.forEach(c=>c.home=H);ch++;continue}if(/Unknown action/i.test(m)&&!relWarned){relWarned=true;toast("Update your Google Sheet script to let files follow their card: paste the new Code.gs, then deploy a new version.",7000)}break}}}
+  finally{relRun=false;if(ch)commit()}}
 function copyText(t){(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("Link copied"),()=>sheet("Copy Link","Select the link and copy it.",`<textarea class="inp" rows="3" readonly>${esc(t)}</textarea>`,h=>{const x=h.querySelector("textarea");setTimeout(()=>{x.focus();x.select()},30)}))}
 function newDriveAtt(r){return{id:uid(),kind:"drive",driveId:r.id,name:r.name,mime:r.mime,size:r.size,url:r.url,added:TODAY(),at:Date.now(),fromDrive:true}}
 function linkModal(ref){
@@ -2358,8 +2395,10 @@ function viewDay(){
       ${(()=>{const all=[];S.projects.filter(p=>!p.archived).forEach(p=>{const chk=(list,ph)=>(list||[]).forEach(e=>{const di=dowIdx(dt);if(e.repeat==="once"?e.date===d:(e.day===di&&(!e.from||d>=e.from)&&(!e.to||d<=e.to)))all.push({e,p,ph})});chk(p.schedule,null);p.phases.forEach(ph=>chk(ph.schedule,ph))});
         return all.length?`<section class="panel" style="display:grid;gap:6px"><h3>Schedule</h3>${all.map(({e,p,ph})=>{const sk=(e.skip||[]).includes(d);return `<div class="row"><span class="dot" style="--c:var(--${ph?ph.color:"accent"})"></span><span class="grow"><b style="${sk?"text-decoration:line-through;color:var(--faint)":""}">${esc(e.label)}</b> <span class="sub">${e.allDay?"All Day":clock(e.start)+"–"+clock(e.start+e.dur)} · ${esc(ph?ph.name:p.name)}</span></span><button class="btn sm" data-skipe="${e.id}">${sk?"Restore":"Skip"}</button></div>`}).join("")}</section>`:""})()}
       <section class="panel"><h3 style="margin-bottom:6px">Today's Items</h3>${items.length?items.map(({ph,it})=>{const s=itemStats(it);return `<div class="task"><span class="dot" style="--c:var(--${ph.color})"></span><button style="border:0;background:none;padding:0;text-align:left" data-open-item="${it.id}"><b>${esc(it.name)}</b> <span class="sub">${esc(ph.name)}</span></button><span class="chip" style="--sc:var(${SC[it.status]})">${esc(it.status)} · ${AE(s.act,s.est)}</span></div>`}).join(""):`<p class="empty">No project blocks planned for this day.</p>`}</section>
+      ${todoPanel(d)}
       <section class="panel" style="display:grid;gap:8px"><div class="row"><h3 class="grow">Diary</h3><span class="sub" id="diary-st">Saves as You Type</span></div>
-        <textarea class="inp" id="diary" rows="8" placeholder="What happened today? What did your mentor say, what clicked, what didn't?">${esc(S.notes[d]||"")}</textarea>${linkBox("diary",S.notes[d])}</section>
+        <textarea class="inp" id="diary" rows="8" placeholder="What happened today? What did your mentor say, what clicked, what didn't?">${esc(S.notes[d]||"")}</textarea>${linkBox("diary",S.notes[d])}
+        <span class="lbl" style="margin-top:4px">ATTACHMENTS</span><div class="att-wrap" data-attref="day:${d}"></div></section>
     </div>
   </div>`;
 }
@@ -2543,7 +2582,8 @@ function weeklyReview(){
   ${f("now","THIS WEEK'S FOCUS",prevFocus?"Last week you planned: "+prevFocus.replace(/\s+/g," ").slice(0,200):"The one thing this week is about",3)}
   <div class="rv-grid"><section class="panel rv-prev field"><span class="lbl">WEEKLY PRIORITIES</span>${listEd("pri",meta.priorities,ws)}</section><section class="panel rv-goals field"><span class="lbl">ACHIEVEMENTS</span>${listEd("ach",meta.achievements,ws)}</section></div>
   <div class="rv-grid">${f("worked","WHAT WORKED","Habits, stages or tricks that paid off")}${f("improve","WHAT TO IMPROVE","Where time leaked, what ran over")}${f("mentor","FEEDBACK SUMMARY","The main notes from this week's feedback")}${f("focus","NEXT WEEK'S FOCUS","What has to be ready by Monday")}</div>
-  ${f("notes","NOTES","Anything else about this week",4)}`;
+  <section class="panel field"><label for="wr-notes">NOTES</label><textarea class="inp" id="wr-notes" data-wr="notes" rows="4" placeholder="Anything else about this week">${esc(r.notes||"")}</textarea>${linkBox("wr-notes",r.notes)}
+    <span class="lbl" style="margin-top:6px">ATTACHMENTS</span><div class="att-wrap" data-attref="week:${ws}"></div></section>`;
 }
 function monthlyReview(){
   const mk=S.ui.month,r=monthRec(mk);
@@ -2565,7 +2605,8 @@ function monthlyReview(){
       <textarea class="inp" rows="2" data-goal="${i}" data-gk="g" aria-label="Goal ${i+1}">${esc(g.g)}</textarea><textarea class="inp why" rows="2" data-goal="${i}" data-gk="w" aria-label="Why / How ${i+1}">${esc(g.w)}</textarea><textarea class="inp rw" rows="2" data-goal="${i}" data-gk="r" aria-label="Rewards ${i+1}">${esc(g.r)}</textarea>
       <button class="btn sm ghost" data-gx="${i}" aria-label="Remove goal">✕</button></div>`).join("")}</div>
     <button class="btn sm" style="justify-self:start" id="goal-add">+ Goal</button></section>
-  <section class="panel field"><label for="mr-notes">NOTES</label><textarea class="inp" id="mr-notes" rows="4">${esc(r.notes)}</textarea>${linkBox("mr-notes",r.notes)}</section>`;
+  <section class="panel field"><label for="mr-notes">NOTES</label><textarea class="inp" id="mr-notes" rows="4">${esc(r.notes)}</textarea>${linkBox("mr-notes",r.notes)}
+    <span class="lbl" style="margin-top:6px">ATTACHMENTS</span><div class="att-wrap" data-attref="month:${mk}"></div></section>`;
 }
 
 /* ===================== review export ===================== */
@@ -2597,7 +2638,7 @@ function printReview(kind){
       <h2>Wins</h2>${li(m.r.wins)}<h2>Improvements</h2>${li(m.r.improve)}
       <h2>Goals</h2>${goals.length?`<table><tr><th>#</th><th>Goal</th><th>Why / How</th><th>Rewards</th></tr>${goals.map((g,i)=>`<tr><td>${i+1}</td><td>${e(g.g)}</td><td>${e(g.w)}</td><td>${e(g.r)}</td></tr>`).join("")}</table>`:`<p class="sub">No goals set.</p>`}
       <h2>Notes</h2>${para(m.r.notes)}`}
-  printHTML(h,"Project Tracker Review");
+  printHTML(h,kind==="weekly"?`Weekly-Review_${d8(S.ui.rweek)}`:`Monthly-Review_${d8(S.ui.month)}`);
 }
 function printHTML(h,name){
   const P=document.getElementById("print-root");P.innerHTML=`<div class="pr">${h}</div>`;document.body.classList.add("printing");
@@ -2605,7 +2646,8 @@ function printHTML(h,name){
      so a Ready window holds the report until you print or close it */
   /* iPad: Safari's print window is unreliable in a Home Screen app, so the tracker makes the PDF file itself */
   if(IS_IOS){document.body.classList.remove("printing");P.innerHTML="";return void pdfFromHTML(h,name)}
-  const done=()=>{document.body.classList.remove("printing");P.innerHTML="";removeEventListener("afterprint",done)};addEventListener("afterprint",done);
+  const t0=document.title;if(name)document.title=name;
+  const done=()=>{document.body.classList.remove("printing");P.innerHTML="";document.title=t0;removeEventListener("afterprint",done)};addEventListener("afterprint",done);
   const imgs=[...P.querySelectorAll("img")];
   Promise.all(imgs.map(i=>i.complete?0:new Promise(r=>{i.onload=i.onerror=r}))).then(()=>setTimeout(()=>{try{window.print()}catch(x){toast("Printing isn't available here.")}setTimeout(()=>{if(!matchMedia("print").matches)done()},1500)},60));
 }
@@ -2628,7 +2670,7 @@ function clientReportModal(pid){
     root.querySelector("#cr-none").onclick=()=>{sel=new Set();box.innerHTML=list();bind()};
     root.querySelectorAll("[data-cro]").forEach(c=>c.onchange=()=>{o[c.dataset.cro]=c.checked});
     go.onclick=async()=>{S.ui.crOpts={...o};save();go.disabled=true;go.textContent="Preparing…";
-      const h=await clientReportHTML(p,p.phases.filter(ph=>sel.has(ph.id)),o);closeModal();setTimeout(()=>printHTML(h,p.name+" - Client Report"),120)};
+      const h=await clientReportHTML(p,p.phases.filter(ph=>sel.has(ph.id)),o);closeModal();setTimeout(()=>printHTML(h,`${slugName(p.name)}_Client-Report_${d8()}`),120)};
   },"wide");
 }
 async function clientReportHTML(p,phs,o){
@@ -2686,7 +2728,7 @@ function exportReviewsXLSX(X,range){
   const wb=X.utils.book_new(),sh=(rows,cols)=>{const ws=X.utils.aoa_to_sheet(rows);ws["!cols"]=cols.map(w=>({wch:w}));return ws};
   X.utils.book_append_sheet(wb,sh(wk,[12,12,10,10,15,13,28,40,40,40,40]),"Weekly");
   X.utils.book_append_sheet(wb,sh(mo,[16,36,10,30,28,40,40,50,50]),"Monthly");
-  downloadFile(`${shortName()} Reviews ${TODAY()}.xlsx`,new Blob([X.write(wb,{bookType:"xlsx",type:"array"})],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
+  downloadFile(`${slugName(shortName())}_Reviews_${d8()}.xlsx`,new Blob([X.write(wb,{bookType:"xlsx",type:"array"})],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
 }
 
 /* ===================== projects & templates ===================== */
@@ -2718,8 +2760,8 @@ function libModal(){
     root.querySelectorAll("[data-tpl-arch]").forEach(b=>b.onclick=()=>{const t=S.templates.find(x=>x.id===b.dataset.tplArch);t.archived=!t.archived;commit();libModal()});
     root.querySelectorAll("[data-tpl-ren]").forEach(b=>b.onclick=()=>{const t=S.templates.find(x=>x.id===b.dataset.tplRen);if(!t)return;askText("Rename Template","Template Name",t.name,v=>{t.name=v;commit();libModal();toast("Template renamed")},()=>libModal(),"Rename")});
     root.querySelectorAll("[data-tpl-del]").forEach(b=>armDelete(b,()=>{S.templates=S.templates.filter(x=>x.id!==b.dataset.tplDel);commit();libModal()}));
-    root.querySelectorAll("[data-lib-dl]").forEach(b=>b.onclick=()=>{const p=S.projects.find(x=>x.id===b.dataset.libDl);downloadFile(`${p.name} Project ${TODAY()}.json`,JSON.stringify(projectFile(p)));toast("Project downloaded")});
-    root.querySelectorAll("[data-tpl-dl]").forEach(b=>b.onclick=()=>{const t=S.templates.find(x=>x.id===b.dataset.tplDl);downloadFile(`${t.name} Template.json`,JSON.stringify({kind:"bbst-template",name:t.name,note:t.note,data:t.data}));toast("Template downloaded")});
+    root.querySelectorAll("[data-lib-dl]").forEach(b=>b.onclick=()=>{const p=S.projects.find(x=>x.id===b.dataset.libDl);downloadFile(`${slugName(p.name)}_Project_${d8()}.json`,JSON.stringify(projectFile(p)));toast("Project downloaded")});
+    root.querySelectorAll("[data-tpl-dl]").forEach(b=>b.onclick=()=>{const t=S.templates.find(x=>x.id===b.dataset.tplDl);downloadFile(`${slugName(t.name)}_Template_${d8()}.json`,JSON.stringify({kind:"bbst-template",name:t.name,note:t.note,data:t.data}));toast("Template downloaded")});
   },"wide");
 }
 document.getElementById("upload").addEventListener("change",async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;
@@ -2930,7 +2972,7 @@ function settingsModal(tab="general",D){
       on("st-exp",backupNow);
       on("st-imp",()=>document.getElementById("upload-bk").click());
       const cb=body.querySelector("#st-conn");if(cb)Sync.extras(cb);
-      armDelete(body.querySelector("#st-reset"),()=>{closeModal();T=null;persistT(true);drawTimer();undoable(()=>{S.projects=[];S.sessions=[];S.plans=[];S.notes={};S.weekly={};S.weekMeta={};S.monthly={};S.routineSkip={}},"All data cleared")},"Tap Again to Clear Everything");
+      armDelete(body.querySelector("#st-reset"),()=>{closeModal();T=null;persistT(true);drawTimer();undoable(()=>{S.projects=[];S.sessions=[];S.plans=[];S.notes={};S.weekly={};S.weekMeta={};S.monthly={};S.dayx={};S.routineSkip={}},"All data cleared")},"Tap Again to Clear Everything");
     };
     root.querySelector("#st-keys").onclick=()=>kbModal(()=>settingsModal("advanced",D),D);
     root.querySelector("#st-guide").onclick=()=>guideModal("quick",()=>settingsModal(tab,D));
@@ -2952,7 +2994,7 @@ function settingsModal(tab="general",D){
 
 /* ===================== files ===================== */
 function downloadFile(name,data,type="application/json"){const a=document.createElement("a");a.href=URL.createObjectURL(data instanceof Blob?data:new Blob([data],{type}));a.download=name.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^\x20-\x7E]/g,"").replace(/[\\/:*?"<>|]/g,"-");document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000)}
-const backupNow=()=>{downloadFile(`${shortName()} Backup ${TODAY()}.json`,JSON.stringify({kind:"bbst-backup",exported:new Date().toISOString(),data:docsOf(S)}));toast("Backup downloaded")};
+const backupNow=()=>{downloadFile(`${slugName(shortName())}_Backup_${d8()}.json`,JSON.stringify({kind:"bbst-backup",exported:new Date().toISOString(),data:docsOf(S)}));toast("Backup downloaded")};
 function projectFile(p){const ids=new Set();p.phases.forEach(ph=>ph.items.forEach(it=>it.steps.forEach(st=>ids.add(st.id))));
   return {kind:"bbst-project",exported:new Date().toISOString(),project:p,sessions:S.sessions.filter(x=>ids.has(x.step)),plans:S.plans.filter(x=>ids.has(x.step))}}
 function importProject(f){
@@ -2965,7 +3007,7 @@ function importProject(f){
 document.getElementById("upload-bk").addEventListener("change",async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;
   let d;try{d=JSON.parse(await f.text())}catch(x){return toast("That file isn't a tracker backup.")}
   if(d.kind!=="bbst-backup"||!d.data)return toast("That file isn't a full tracker backup.");
-  closeModal();undoable(()=>{const n=stateFrom(d.data,S.ui);["projects","templates","sessions","plans","settings","routineSkip","notes","weekly","weekMeta","monthly","itemTemplates","phaseTemplates","sounds","brand"].forEach(k=>S[k]=n[k]);ensureSettings();applyPalette();applyAdv()},"Backup restored");
+  closeModal();undoable(()=>{const n=stateFrom(d.data,S.ui);["projects","templates","sessions","plans","settings","routineSkip","notes","weekly","weekMeta","monthly","dayx","itemTemplates","phaseTemplates","sounds","brand"].forEach(k=>S[k]=n[k]);ensureSettings();applyPalette();applyAdv()},"Backup restored");
 });
 
 /* ===================== branding ===================== */
@@ -3021,7 +3063,7 @@ async function exportIcons(D){
     icons:[{src:"icons/icon-192.png",sizes:"192x192",type:"image/png",purpose:"any"},{src:"icons/icon-512.png",sizes:"512x512",type:"image/png",purpose:"any"},{src:"icons/icon-maskable-512.png",sizes:"512x512",type:"image/png",purpose:"maskable"}]};
   const how=`HOW TO USE THESE ICON FILES\r\n\r\n1. On github.com, open your tracker repository > Add file > Upload files.\r\n2. Drag in manifest.webmanifest and the icons folder from this zip. They replace the old ones. Click Commit changes.\r\n3. Wait 1-2 minutes, then open the tracker once on each device while online.\r\n4. iPad: press and hold the tracker icon > Remove App > Delete from Home Screen. Open the tracker in Safari, tap Share > Add to Home Screen, type "${sn}" as the name, and tap Add. Open the new icon and paste your connection link once. Your data stays in your Google Sheet.\r\n5. Android: the new icon usually appears within a day. To see it now, remove the app icon and install it again from Chrome (menu > Install app).\r\n6. Laptop (Chrome): the new icon appears after Chrome checks for updates, usually within a day. To see it now, uninstall the app (menu inside the app window > Uninstall) and install it again.\r\n`;
   const files=[["manifest.webmanifest",JSON.stringify(man,null,2)],["icons/icon-192.png",await png(192,.86)],["icons/icon-512.png",await png(512,.86)],["icons/icon-maskable-512.png",await png(512,.7)],["icons/apple-touch-icon.png",await png(180,.86)],["HOW TO USE THESE FILES.txt",how]];
-  downloadFile(`${sn} Icon Files.zip`,await makeZip(files));
+  downloadFile(`${slugName(sn)}_Icon-Files.zip`,await makeZip(files));
 }
 
 /* ===================== excel report ===================== */
@@ -3078,7 +3120,7 @@ function exportModal(pid){
     const say=t=>{msg.hidden=false;msg.textContent=t};
     root.querySelector("#xp-back").onclick=()=>libModal();
     go.onclick=async()=>{go.disabled=true;go.textContent="Preparing…";
-      const name=`${p.name} Time Report ${TODAY()}.xlsx`.replace(/[\\/:*?"<>|]/g,"-");
+      const name=`${slugName(p.name)}_Time-Report_${d8()}.xlsx`;
       try{
         const X=await loadXLSX(),buf=buildReport(X,p,[...sel],{sessions:root.querySelector("#xp-ses").checked});
         const dl=null;
@@ -3207,7 +3249,7 @@ quick:[
 <ul>
 <li>+ Block adds a block. Hold a block to drag it up or down, or hold its bottom edge to resize. Pinch to zoom the hours.</li>
 <li>The thin column on the right is logged time. Tap a piece of it to fix a session.</li>
-<li>On the side: planned and logged time, today's schedule (with Skip), today's items and your Diary.</li>
+<li>On the side: planned and logged time, today's schedule (with Skip), today's items, your To-Do list and your Diary (with attachments).</li>
 </ul>`},
 {id:"q-review",h:"Review",html:`
 <p class="lead">Two reviews that keep you honest.</p>[[fig:review|Weekly Review]]
@@ -3278,7 +3320,9 @@ manual:[
 <li>Planned Project Time, Logged and Daily Target sit at the top of the side column.</li>
 <li>The Calendar panel (Due Today when there are no events) lists the day's project due dates and phase target dates, then its Google Calendar events, with a link to join a call when the event has one (Discord, Google Meet, Zoom, Teams).</li>
 <li>Schedule lists today's schedule entries; Skip removes one for this day only. Today's Items lists the items you planned blocks for.</li>
-<li>Diary saves as you type. Web addresses in it show up as tappable links underneath.</li>
+<li>To-Do (above the Diary): a checklist for the day. Type and press Enter to add (the box stays ready for the next), tick to complete, tap the text to edit, ✕ to delete (with Undo), and drag ⋮⋮ to reorder. The heading shows how many are done.</li>
+<li>Unfinished to-dos are never moved without asking: today shows "2 Unfinished From Yesterday" (or from the last day that had any) with Move to Today, which moves only the unticked ones, or Leave Them.</li>
+<li>Diary saves as you type. Web addresses in it show up as tappable links underneath, and Attachments under it work like Project Notes (photos of a sketchbook page, a voice memo from a call).</li>
 </ul>
 <h4>Google Calendar</h4>
 [[fig:gcal|A Google Calendar event in the Week view]]
@@ -3297,7 +3341,7 @@ manual:[
 <ul>
 <li>Weekly Review: Logged vs Target, Items Submitted (items with this target week that reached Submitted or later), and the project's budget used. Budget Alerts list phases past the warning point.</li>
 <li>Top to bottom: THIS WEEK'S FOCUS (faintly shows last week's Next Week's Focus until you write your own), WEEKLY PRIORITIES and ACHIEVEMENTS (the same lists as on the Week page; edit them in either place), WHAT WORKED and WHAT TO IMPROVE, FEEDBACK SUMMARY and NEXT WEEK'S FOCUS, then NOTES.</li>
-<li>Everything saves as you type. The arrows move between weeks. Web addresses in any review box (and in the Monthly Review's Focus and Notes) show up as tappable links under that box.</li>
+<li>Everything saves as you type. The arrows move between weeks. Web addresses in any review box (and in the Monthly Review's Focus and Notes) show up as tappable links under that box. The Weekly and Monthly Review NOTES have Attachments too.</li>
 <li>Monthly Review: Focus, hours logged in total and per project, Previous Month Review (Wins and Improvements), Goals (Goal, Why/How, Rewards) and Notes. In Wins and Improvements, Enter saves a line and starts the next. In Goals, Enter moves from Goal to Why / How to Rewards, then starts a new goal; Shift+Enter adds a line break. Wins, Improvements and Goals reorder the same way, with the ⋮⋮ handle.</li>
 <li>Export: Create PDF prints the review on screen (choose Save as PDF in the print window). On iPad the tracker makes the PDF file itself: tap Save or Share PDF, then Save to Files. Export Excel File saves every review in a date range.</li>
 </ul>`},
@@ -3363,7 +3407,8 @@ manual:[
 </ul>
 <h4>Adding Files</h4>
 <ul>
-<li>+ Add Files: any file up to 15 MB. It's saved in Google Drive > Project Tracker Files, in a folder named after the project. The original on your device is never changed.</li>
+<li>+ Add Files: any file up to 15 MB. It's saved in Google Drive > Project Tracker Files: in the project's folder, in Reviews/2026 for files added to a Weekly or Monthly Review, or in Diary/2026 for the Diary (by the year of that review or day). Each folder is made the first time it's needed. The original on your device is never changed.</li>
+<li>Folder and file names the tracker makes follow one rule: no spaces, words joined with "-", parts split with "_", dates as 2026.10.12. For example Sing-Song-Retainer, Project-Tracker_Backup_2026.10.12.json. Your own file names stay as you named them.</li>
 <li>+ From Drive: files already in your Drive. Paste a Drive link, open your Project Tracker Files folders, or search your whole Drive by name, then tick files and tap Add. Nothing is copied or uploaded.</li>
 <li>+ Add Link: web pages, or big files in Dropbox, Drive or Proton Drive. Drive file links become normal Drive cards automatically.</li>
 <li>Offline, a new file waits on the device ("Waiting to Upload") and goes to Drive when you're back online.</li>
@@ -3384,7 +3429,8 @@ manual:[
 <ul>
 <li>Rename…: renames a Drive file in Google Drive and in the tracker, on every card for that file. The file type ending (.psd, .pdf) stays on if you leave it off. For links it only changes the name shown in the tracker. Renaming a Drive file needs internet.</li>
 <li>Names changed in Google Drive show up by themselves: when you open Notes or an item while online, the tracker checks Drive for the current names of its files.</li>
-<li>Move To…: moves the card to Project Notes, another phase's notes or any item in the same project.</li>
+<li>Move To…: moves the card to Project Notes, another phase's notes or any item, or to This Week's Review, This Month's Review or Today's Diary. From a review or the Diary, it lists your projects too.</li>
+<li>Files follow their card: when a file you uploaded ends up in only one place (after Move To, or after Copy To and then Remove), it moves to that place's folder in Google Drive a few seconds later (after the Undo window). While it's in two places, it stays where it is. Files added From Drive are yours and never move.</li>
 <li>Copy To…: adds a second card for the same Drive file somewhere else. Both cards show 2x next to the file size. Nothing is duplicated in Drive or on your device.</li>
 <li>Download as PDF (Google Docs, Sheets and Slides): your script makes the PDF. If Google won't make it, the tracker opens Google's own PDF download instead.</li>
 <li>Download: Drive files up to 50 MB save to Downloads on a laptop or Android; on iPad the share sheet opens (Save to Files, or send to Photoshop or Procreate). With an offline copy it works without internet. Dropbox files up to 50 MB download the same way, through the tracker. Proton Drive links can only be opened.</li>
@@ -3448,6 +3494,7 @@ manual:[
 <ul>
 <li>Excel Report (Projects > Export Report): Summary by phase (budget, estimated, actual, value, earned, effective rate, rounds), Items + Steps, and an optional Session Log.</li>
 <li>Reviews: PDF of one review, or Excel of a date range (Review > Export).</li>
+<li>File names follow the naming rule: Project-Tracker_Backup_2026.10.12.json, Sing-Song_Client-Report_2026.10.12.pdf, Weekly-Review_2026.10.05.pdf, Sing-Song_Time-Report_2026.10.12.xlsx.</li>
 <li>Client Report: PDF (chapter 6).</li>
 <li>Export Everything (Settings > Advanced > Data): one backup file of all your data. Import Backup restores it, with Undo. The Sunday banner offers the same.</li>
 <li>Backups hold your data, not attachment files. Those live in Google Drive, which keeps them safe on its own.</li>
@@ -3600,6 +3647,7 @@ manual:[
 <dt>Estimate</dt><dd>The time you expect a step to take. Item and phase estimates add up from their steps; the thin line on a bar marks it.</dd>
 <dt>Feedback Round</dt><dd>One round of client feedback on a phase. Past the rounds included, the phase shows Over Scope.</dd>
 <dt>File Viewer</dt><dd>The full-screen view that opens images, PDFs and audio inside the tracker, with arrows to move between files.</dd>
+<dt>Files Follow Their Card</dt><dd>A file you uploaded moves in Google Drive to the folder of the one place it's shown in, after Move To or Remove. Files added From Drive never move.</dd>
 <dt>Flags</dt><dd>Amber chips that warn you: Below Your Floor, Over Scope, Running Late and No Decision-Maker. Each can be switched off.</dd>
 <dt>General Settings</dt><dd>The first tab of Settings: daily target, work days, Daily Routine, colors, rates and value.</dd>
 <dt>Google Events</dt><dd>Events from your Google Calendar, shown as striped blocks in Week and Day and as labels in Month.</dd>
@@ -3610,6 +3658,7 @@ manual:[
 <dt>Life Block</dt><dd>A block for life outside work (meals, walks, rest). It never counts toward a budget.</dd>
 <dt>⋯ Menu</dt><dd>The three-dot button on an attachment card: Rename, Move To, Copy To, Download (or Download as PDF), Copy Link and Remove.</dd>
 <dt>Monthly Review</dt><dd>The review of a month on the Review page: focus, hours by project, wins, improvements, goals and notes.</dd>
+<dt>Naming Rule</dt><dd>How the tracker names folders and files: no spaces, words joined with "-", parts split with "_", dates as 2026.10.12.</dd>
 <dt>Offline Copy</dt><dd>A file saved on the device so it opens without internet. Turn on Keep All Attachments Offline to save every file.</dd>
 <dt>Open in App / Open in Browser</dt><dd>The choices for opening a non-image file: in its own app (Drive, Docs, Photoshop) or in a browser tab.</dd>
 <dt>Phase</dt><dd>A stage of a project with its own budget, color, target date and items, such as Broad Exploration or Refinement.</dd>
@@ -3618,7 +3667,7 @@ manual:[
 <dt>Project</dt><dd>The top level of your work: a client job, a portfolio chapter or a pitch. It holds phases, a budget, pricing and a due date.</dd>
 <dt>Project Color</dt><dd>The color of a project&#x27;s due date on Month, Week and Day (yellow by default), set in Edit Project.</dd>
 <dt>Project Tracker Dates</dt><dd>The Google calendar that holds your due dates and phase target dates as all-day events.</dd>
-<dt>Project Tracker Files</dt><dd>The folder in your Google Drive where the tracker stores uploaded attachments.</dd>
+<dt>Project Tracker Files</dt><dd>The folder in your Google Drive where the tracker stores uploaded attachments: one folder per project, plus Reviews/2026 and Diary/2026.</dd>
 <dt>Project Type</dt><dd>Client (paid work), Internal (your own work, such as a portfolio chapter) or Pitch (a proposal you&#x27;re not paid for yet).</dd>
 <dt>Projected Finish</dt><dd>The date the project would be done at your recent pace (the last 14 days of logged time).</dd>
 <dt>Rate Floor</dt><dd>The lowest hourly rate you&#x27;ll accept. Client projects below it show the Below Your Floor flag.</dd>
@@ -3637,6 +3686,7 @@ manual:[
 <dt>Template</dt><dd>A saved starting point: an item template (steps and checklist), a phase template or a pipeline template (a whole project).</dd>
 <dt>This Week&#x27;s Focus</dt><dd>The one thing a week is about, at the top of the Weekly Review.</dd>
 <dt>Time Log</dt><dd>The list of sessions logged on a step, where you can fix or delete them.</dd>
+<dt>To-Do</dt><dd>The checklist for one day on the Day page. Unfinished ones are offered on the next day you open, with Move to Today or Leave Them.</dd>
 <dt>Two-Tap Button</dt><dd>A button for something hard to undo, such as Delete or Reset All. The first tap arms it, the second tap does it.</dd>
 <dt>Undo</dt><dd>The button that appears for a few seconds after most changes, or Cmd/Ctrl+Z.</dd>
 <dt>Waiting</dt><dd>Changes saved on the device that haven&#x27;t reached your Google Sheet yet. They sync when you&#x27;re back online.</dd>
@@ -3691,7 +3741,7 @@ function modal(html,bind,cls=""){
 }
 function armDelete(btn,fn,armedText="Tap Again to Delete"){if(!btn)return;const orig=btn.textContent;let tm;
   btn.addEventListener("click",()=>{if(btn.classList.contains("armed")){clearTimeout(tm);fn()}else{btn.classList.add("armed");btn.textContent=armedText;clearTimeout(tm);tm=setTimeout(()=>{if(btn.isConnected&&btn.classList.contains("armed")){btn.classList.remove("armed");btn.textContent=orig}},3000)}})}
-const undoSnap=()=>JSON.stringify({projects:S.projects,templates:S.templates,sessions:S.sessions,plans:S.plans,routineSkip:S.routineSkip,settings:S.settings,notes:S.notes,weekly:S.weekly,weekMeta:S.weekMeta,monthly:S.monthly,itemTemplates:S.itemTemplates,phaseTemplates:S.phaseTemplates,brand:S.brand});
+const undoSnap=()=>JSON.stringify({projects:S.projects,templates:S.templates,sessions:S.sessions,plans:S.plans,routineSkip:S.routineSkip,settings:S.settings,notes:S.notes,weekly:S.weekly,weekMeta:S.weekMeta,dayx:S.dayx||{},monthly:S.monthly,itemTemplates:S.itemTemplates,phaseTemplates:S.phaseTemplates,brand:S.brand});
 let lastUndo=null;
 function undoable(fn,msg,after){
   const before=undoSnap();
@@ -3724,6 +3774,25 @@ function render(){
   bindView(v);
   growAll(v);
 }
+/* Day To-Do: a checklist for each day. Unfinished to-dos from the last day with any are offered on today, never moved without asking. */
+const todosOf=d=>(DX()[d]||{}).todos||[];
+function carryFrom(d){if(d!==TODAY())return null;const me=DX()[d]||{};for(let i=1;i<=14;i++){const pd=iso(addDays(parse(d),-i)),L=todosOf(pd).filter(t=>!t.d&&String(t.t||"").trim());if(L.length)return (me.leftFrom||[]).includes(pd)?null:{pd,L}}return null}
+function todoPanel(d){const L=todosOf(d),c=carryFrom(d),grip=L.length>1?`<span class="grip" title="Drag to Reorder" aria-label="Drag to reorder">⋮⋮</span>`:"";
+  return `<section class="panel" style="display:grid;gap:8px"><div class="row"><h3 class="grow">To-Do</h3>${L.length?`<span class="sub">${L.filter(t=>t.d).length} / ${L.length} Done</span>`:""}</div>
+    ${c?`<div class="carry"><span class="grow"><b>${c.L.length} Unfinished</b> From ${c.pd===iso(addDays(parse(d),-1))?"Yesterday":short(c.pd)}</span><button class="btn sm primary" data-carry="${c.pd}">Move to Today</button><button class="btn sm ghost" data-carry-no="${c.pd}">Leave Them</button></div>`:""}
+    <div class="chk-list todo-list">${L.map(t=>`<div class="chk-row check ${t.d?"done":""}" data-tid="${t.id}">${grip}<input type="checkbox" data-tchk="${t.id}" ${t.d?"checked":""} aria-label="Done"><span class="ct" data-ted="${t.id}" tabindex="0" title="Tap to Edit">${esc(t.t)}</span><button class="btn sm ghost xs" data-tx="${t.id}" aria-label="Delete">✕</button></div>`).join("")}</div>
+    <div class="row"><input class="inp" id="todo-new" placeholder="Add a To-Do" style="flex:1"><button class="btn sm" id="todo-add">Add</button></div></section>`}
+function bindTodo(v){const box=v.querySelector(".todo-list");if(!box)return;const d=S.ui.day,rec=()=>dayRec(d),L=()=>rec().todos=rec().todos||[];
+  const add=keep=>{const i=v.querySelector("#todo-new"),t=i.value.trim();if(!t)return;L().push({id:uid(),t,d:false});commit();if(keep)refocus("#todo-new")};
+  v.querySelector("#todo-add").onclick=()=>add(false);
+  v.querySelector("#todo-new").onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();e.stopPropagation();add(true)}};
+  v.querySelectorAll("[data-tchk]").forEach(c=>c.onchange=()=>{const t=L().find(x=>x.id===c.dataset.tchk);if(t){t.d=c.checked;commit()}});
+  v.querySelectorAll("[data-tx]").forEach(b=>b.onclick=()=>undoable(()=>{rec().todos=L().filter(x=>x.id!==b.dataset.tx)},"To-do deleted"));
+  v.querySelectorAll("[data-ted]").forEach(sp=>{const open=()=>{const t=L().find(x=>x.id===sp.dataset.ted);if(!t||sp.querySelector("input"))return;inlineEdit(sp,t.t,val=>{if(val&&val!==t.t){t.t=val}commit()},()=>commit())};
+    sp.onclick=e=>{e.preventDefault();open()};sp.onkeydown=e=>{if(e.key==="Enter"&&e.target===sp){e.preventDefault();e.stopPropagation();open()}}});
+  dragList(box,".chk-row",(a,b)=>{const arr=L(),[x]=arr.splice(a,1);arr.splice(b,0,x);commit()});
+  v.querySelectorAll("[data-carry]").forEach(b=>b.onclick=()=>{const pd=b.dataset.carry;undoable(()=>{const pr=dayRec(pd),keep=[],mv=[];(pr.todos||[]).forEach(t=>(!t.d&&String(t.t||"").trim()?mv:keep).push(t));pr.todos=keep;rec().todos=[...L(),...mv]},"Moved to today")});
+  v.querySelectorAll("[data-carry-no]").forEach(b=>b.onclick=()=>{const r=rec();r.leftFrom=[...(r.leftFrom||[]),b.dataset.carryNo];commit()})}
 /* tap text to edit it in place: Enter or leaving the box saves, Esc cancels */
 function inlineEdit(host,val,save,cancel){host.innerHTML=`<input class="inp ie" value="${esc(val)}" aria-label="Edit">`;const i=host.querySelector("input");let done=false;
   const fin=ok=>{if(done)return;done=true;ok?save(i.value.trim()):cancel()};
@@ -3744,6 +3813,8 @@ function listEnter(inp,arr,i,selTpl){inp.addEventListener("keydown",e=>{if(e.key
   arr[i]=inp.value;arr.splice(i+1,0,"");commit();refocus(selTpl.replace("#",i+1))})}
 document.addEventListener("input",e=>{const t=e.target;if(!t||!t.id)return;const L=document.querySelector(`[data-links="${t.id}"]`);if(L)L.innerHTML=linkList(t.value)});
 function bindView(v){
+  v.querySelectorAll("[data-attref]").forEach(el=>{const t=el.dataset.attref,i=t.indexOf(":");mountAtt(el,{kind:t.slice(0,i),id:t.slice(i+1)})});
+  bindTodo(v);
   const mn=v.querySelector("#mn-notes");if(mn){let t;mn.oninput=()=>{monthRec(S.ui.month).notes=mn.value;v.querySelector("#mn-st").textContent="Saving…";clearTimeout(t);t=setTimeout(()=>{save();v.querySelector("#mn-st").textContent="Saved"},500)}}
   const pp=v.querySelector("#proj-pick");if(pp)pp.onchange=e=>{S.ui.project=e.target.value;commit()};
   const mg=v.querySelector("#m-gev");if(mg)mg.onchange=()=>{S.settings.gcalMonth=mg.checked;commit()};
