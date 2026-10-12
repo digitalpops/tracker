@@ -196,6 +196,8 @@ main{padding-top:20px;display:grid;gap:18px}
 .fb{display:grid;gap:2px;border-left:3px solid var(--accent);padding:4px 10px}
 .fb .d{font-size:11.5px;color:var(--muted)}
 .chk-list,.fb-list{display:grid;gap:4px}
+.pastbar{display:flex;align-items:center;gap:8px;padding:3px 4px 3px 10px;border-radius:8px;background:var(--stat);border-left:3px solid var(--amber);font-size:13px;font-weight:600;color:var(--muted)}
+.pastbar>span{flex:1}.pastbar .btn.sm{padding:3px 10px;font-size:12px}
 .carry{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--stat);border-radius:9px;padding:8px 10px;font-size:13px}
 .opts .opt-h{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:10px 2px 2px}.opts .opt-h:first-child{padding-top:0}
 .chk-row{align-items:center}.chk-row .ct{flex:1;min-width:0;cursor:text;padding:3px 2px;border-radius:5px;overflow-wrap:anywhere}.chk-row .ct:hover{background:var(--btn)}.chk-row .ie{padding:4px 8px}
@@ -668,7 +670,7 @@ const LPAL_DEF={light:["#CEFBD0","#D5ECC2","#FAF6B7","#F2E3B3","#EDE6D8","#F7D9C
 const LIFE_ORDER=[1,7,2,11,10,5,8,6,12,9,4,3]; /* October 2026 reorder: new slot k shows old slot LIFE_ORDER[k-1] */
 const STATUSES=[["Not Started","--faint"],["In Progress","--accent"],["Submitted","--amber"],["Feedback Received","--p7"],["Revising","--act"],["Approved","--p3"],["Done","--ok"]];
 const SC=Object.fromEntries(STATUSES);
-const APP_VERSION="2026.10.12.07";
+const APP_VERSION="2026.10.12.08";
 const isDone=it=>it.status==="Done"||it.status==="Approved";
 const DEF_NAME="Blue Blaze Project Tracker";
 const appName=()=>((typeof S!=="undefined"&&S&&S.settings&&S.settings.brandName)||"").trim()||DEF_NAME;
@@ -823,10 +825,53 @@ function saveNow(){clearTimeout(saveT);saveT=null;LS.set(K_UI,S.ui);Sync.track()
 addEventListener("pagehide",()=>{if(saveT)saveNow();persistT(true)});
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){if(saveT)saveNow();persistT(true)}});
 
+/* Sync Details: a short technical log of recent syncs (times, counts, errors). No notes, Diary text or file names. */
+const K_SLOG="bbst-synclog";
+function slog(k,m){try{const L=LS.get(K_SLOG,[]);L.push({t:Date.now(),k,m:String(m||"").slice(0,240)});while(L.filter(x=>x.k==="SYNC").length>20)L.splice(L.findIndex(x=>x.k==="SYNC"),1);while(L.length>60)L.shift();LS.set(K_SLOG,L)}catch(e){}}
+addEventListener("error",e=>slog("ERROR",(e.message||"Script error")+(e.lineno?" (line "+e.lineno+")":"")));
+addEventListener("unhandledrejection",e=>{const r=e.reason;slog("ERROR",(r&&r.message)||String(r||"Unhandled"))});
+const KIND={projects:"Projects",templates:"Templates",sessions:"Timer Sessions",plans:"Plan Blocks",note:"Diary Text",weekly:"Weekly Reviews",wm:"Week Lists",mo:"Monthly Reviews",dx:"Day (To-Do, Files)",settings:"Settings",routineSkip:"Schedule Skips",itpl:"Item Templates",ptpl:"Phase Templates",snd:"Sounds",brand:"Branding"};
+function kindsOf(keys){const c={};keys.forEach(k=>{const i=k.indexOf("|"),col=k.slice(0,i),id=k.slice(i+1);const n=KIND[col==="kv"?id.split(":")[0]:col]||"Other";c[n]=(c[n]||0)+1});return Object.entries(c).map(([n,x])=>n+" "+x).join(", ")}
+function deviceLine(){const u=navigator.userAgent||"",ipad=/iPad/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1);
+  const dev=ipad?"iPad":/iPhone/.test(u)?"iPhone":/Android/.test(u)?(/Mobile/.test(u)?"Android Phone":"Android Tablet"):/Windows/.test(u)?"Windows PC":/Mac/.test(u)?"Mac":/Linux/.test(u)?"Linux":"Other";
+  const br=/Edg\//.test(u)?"Edge":/CriOS|Chrome\//.test(u)?"Chrome "+((u.match(/(?:CriOS|Chrome)\/(\d+)/)||[])[1]||""):/Firefox|FxiOS/.test(u)?"Firefox":/Safari/.test(u)?"Safari":"Browser";
+  let inst=false;try{inst=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true}catch(e){}
+  return dev+" · "+br.trim()+" · "+(inst?"Installed App":"Browser Tab")}
+/* the page is rebuilt after syncs and downloads, but never under an open pop-up, a drag, or while you're typing (it waits until you pause) */
+let lastType=0;document.addEventListener("input",()=>{lastType=Date.now()},true);
+const typingEl=a=>!!(a&&a!==document.body&&a.closest&&a.closest("#view")&&a.matches("textarea,select,input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=button])"));
+const sigOf=x=>x.tagName+"|"+(x.id||"")+"|"+[...x.attributes].filter(t=>t.name.startsWith("data-")).map(t=>t.name+"="+t.value).join(",");
+const overlayUp=()=>!!(document.querySelector("#modal-root .ov,#ov2,#viewer-root .vw,.dragging,.is-drag")||(typeof drag!=="undefined"&&drag)||(typeof pinch!=="undefined"&&pinch));
+function focusSnap(){const a=document.activeElement;if(!typingEl(a)||a.classList.contains("ie"))return null;const sig=sigOf(a),all=[...document.querySelectorAll("#view input,#view textarea,#view select")].filter(x=>sigOf(x)===sig);
+  return{sig,n:all.indexOf(a),v:a.value,ss:a.selectionStart,se:a.selectionEnd,st:a.scrollTop}}
+function focusBack(f){if(!f)return;const all=[...document.querySelectorAll("#view input,#view textarea,#view select")].filter(x=>sigOf(x)===f.sig),el=all[f.n]||all[0];if(!el)return;
+  try{el.focus({preventScroll:true})}catch(e){}
+  if(el.value!==f.v){el.value=f.v;el.dispatchEvent(new Event("input",{bubbles:true}))}
+  try{if(f.ss!=null)el.setSelectionRange(f.ss,f.se)}catch(e){}el.scrollTop=f.st}
+/* rebuild the page on screen and keep your cursor where it was */
+function pageRender(why){const a=document.activeElement;if(a&&a.classList&&a.classList.contains("ie")&&a.closest("#view"))a.blur();
+  const f=focusSnap();try{render()}catch(e){slog("ERROR","Page didn't redraw ("+why+"): "+e.message);return false}focusBack(f);return true}
+function syncDetails(){const z=n=>String(n).padStart(2,"0"),tm=t=>{const d=new Date(t);return `${iso(d)} ${z(d.getHours())}:${z(d.getMinutes())}:${z(d.getSeconds())}`};
+  const i=Sync.info(),tz=(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone}catch(e){return ""}})(),fx=Object.keys(FIDX()).length;
+  const L=LS.get(K_SLOG,[]);
+  return ["BLUE BLAZE PROJECT TRACKER - SYNC DETAILS",
+    `Version ${APP_VERSION} · Copied ${tm(Date.now())}${tz?" ("+tz+")":""}`,
+    `Device: ${deviceLine()}`,
+    `Online: ${navigator.onLine?"Yes":"No"} · Connected: ${Sync.connected()?"Yes":"No"} · Changes Waiting to Send: ${i.out} · Uploads Waiting: ${LS.get(K_UPQ,[]).length} · Offline Copies: ${keepOffline()?"On ("+fx+" files)":"Off"}`,
+    `Showing: ${S.ui.view}${S.ui.view==="day"?" "+S.ui.day:S.ui.view==="week"?" "+S.ui.week:""} · Today: ${TODAY()}`,
+    "","RECENT (oldest first)",...(L.length?L.map(x=>`${tm(x.t)}  ${x.k}  ${x.m}`):["Nothing logged yet."])].join("\n")}
+let redrawT=null;
+function redraw(why){clearTimeout(redrawT);redrawT=null;
+  if(overlayUp()){refreshAttViews();redrawT=setTimeout(()=>redraw(why),2500);return}
+  const a=document.activeElement;if(typingEl(a)&&(Date.now()-lastType<2500||a.classList.contains("ie"))){redrawT=setTimeout(()=>redraw(why),1500);return}
+  pageRender(why)}
+
 /* Google Sheet sync: every change is saved on this device first, then sent to your Sheet.
    Offline changes wait in an outbox and go out when a connection comes back. */
 const Sync=(()=>{
-  let conn=LS.get(K_CONN,null),out=LS.get(K_OUT,[]),snap=LS.get(K_SNAP,null),busy=false,offline=false,retryT=null,pullWanted=false;
+  let conn=LS.get(K_CONN,null),out=LS.get(K_OUT,[]),snap=LS.get(K_SNAP,null),busy=false,offline=false,retryT=null,pullWanted=false,again=null,flushWanted=false;
+  /* a sync or a send asked for while another is running runs right after it */
+  const idle=()=>{if(busy)return;if(flushWanted&&out.length){flushWanted=false;flush();return}flushWanted=false;if(again){const w=again;again=null;setTimeout(()=>pull(w),80)}};
   const chip=(cls,t,title)=>{const e=document.getElementById("sync");if(e){e.className="sync "+cls;e.textContent=t;e.title=title||t}};
   function status(){
     if(!conn)return chip("bad","Not Connected","Connect this device to your Google Sheet.");
@@ -836,7 +881,11 @@ const Sync=(()=>{
     chip("ok","Synced","Everything is saved in your Google Sheet.");
   }
   async function api(action,payload,c=conn){
-    const r=await fetch(c.u,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({key:c.k,action,payload}),redirect:"follow"});
+    /* every request has a time limit, so one that stalls (the app sent to the background mid-upload, a dropped VPN) can't block the ones after it */
+    const ac=typeof AbortController!=="undefined"?new AbortController():null,lim=/^(upload|download|linkGet)$/.test(action)?180000:60000,tm=ac?setTimeout(()=>ac.abort(),lim):0;
+    let r;try{r=await fetch(c.u,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({key:c.k,action,payload}),redirect:"follow",signal:ac?ac.signal:undefined})}
+    catch(e){throw new Error(ac&&ac.signal.aborted?"TIMEOUT":(e&&e.message)||"NETWORK")}
+    finally{clearTimeout(tm)}
     let j;try{j=await r.json()}catch(e){throw new Error("NO_JSON")}
     if(!j.ok)throw new Error(j.error||"FAILED");return j.data;
   }
@@ -853,41 +902,56 @@ const Sync=(()=>{
     snap=now;LS.set(K_SNAP,snap);LS.set(K_OUT,out);status();flush();
   }
   async function flush(){
-    if(!conn||busy||!out.length)return;
+    if(!conn||!out.length)return;
+    if(busy){flushWanted=true;return}
     busy=true;status();
     const sending=out.slice(0,150);let ok=false;
     try{await api("batch",sending);out=out.filter(o=>!sending.includes(o));LS.set(K_OUT,out);offline=false;ok=true}
-    catch(e){if(e.message==="BAD_KEY"){busy=false;return badKey()}offline=true}
+    catch(e){if(e.message==="BAD_KEY"){busy=false;return badKey()}offline=true;slog("SEND","Couldn't send "+sending.length+" change"+(sending.length>1?"s":"")+": "+e.message)}
     finally{busy=false;status()}
     if(ok&&out.length)return flush();
+    idle();
     if(out.length&&navigator.onLine){clearTimeout(retryT);retryT=setTimeout(flush,30000)}
   }
   const modalOpen=()=>!!document.querySelector("#modal-root .ov")||!!drag;
-  async function pull(){
-    if(!conn||busy)return;
-    if(modalOpen()){pullWanted=true;return}
+  async function pull(why){
+    why=typeof why==="string"?why:"auto";
+    if(!conn)return;
+    if(busy){if(!again||why==="tap")again=why;if(why==="tap")slog("SYNC","Tap: queued, a sync was already running");return}
+    if(modalOpen()){pullWanted=true;if(why==="tap")slog("SYNC","Tap: waiting for the pop-up to close");return}
     if(saveT)saveNow();
-    await flush();if(out.length||busy)return;
-    busy=true;status();
+    await flush();
+    if(busy){again=again||why;return}
+    if(out.length){slog("SYNC",`${why}: ${out.length} change${out.length>1?"s":""} still waiting to send (offline?)`);return}
+    busy=true;status();const t0=Date.now();let note="";
     try{
       const raw=await api("getAll"),d={};
       COLS.forEach(c=>{d[c]={};Object.entries((raw&&raw[c])||{}).forEach(([id,js])=>{try{d[c][id]=JSON.parse(js)}catch(e){}})});
+      /* anything changed on this device while the sync was fetching (a file just added, a line just typed) is kept on top of
+         what came from the Sheet, and goes out right after; before, the sync could overwrite it */
+      if(saveT)saveNow();
+      let kept=0;out.forEach(o=>{if(!d[o.col])return;kept++;if(o.op==="remove")delete d[o.col][o.id];else{try{d[o.col][o.id]=JSON.parse(o.data)}catch(e){}}});
+      if(kept){flushWanted=true;note="kept "+kept+" change"+(kept>1?"s":"")+" made during the sync; "}
       if(COLS.every(c=>!Object.keys(d[c]).length)){
         const mine=docsOf(S),payload={};COLS.forEach(c=>{payload[c]={};Object.entries(mine[c]).forEach(([id,v])=>payload[c][id]=JSON.stringify(v))});
-        await api("importAll",payload);snap=strs(mine);
+        await api("importAll",payload);snap=strs(mine);note="first copy sent to the Sheet";
       }else{
         const ns=strs(d),ks=Object.keys(ns);
         const same=snap&&ks.length===Object.keys(snap).length&&ks.every(k=>ns[k]===snap[k]);
         if(!same){
-          if(modalOpen()){pullWanted=true;return}
-          const ui=S.ui;S=stateFrom(d,ui);ensureSettings();IX=indexAll();applyPalette();applyAdv();LS.set(K_CACHE,lean(d));IDB.set("sounds",S.sounds||{});sndReady=true;render();
-        }
+          if(modalOpen()){pullWanted=true;slog("SYNC",why+": new data waiting for the pop-up to close");return}
+          const ch=Object.keys(ns).filter(k=>!snap||ns[k]!==snap[k]).concat(snap?Object.keys(snap).filter(k=>!(k in ns)):[]);
+          const ui=S.ui;S=stateFrom(d,ui);ensureSettings();IX=indexAll();applyPalette();applyAdv();LS.set(K_CACHE,lean(d));IDB.set("sounds",S.sounds||{});sndReady=true;
+          const okR=pageRender("sync");note+=`received ${ch.length} change${ch.length===1?"":"s"}${ch.length?" ("+kindsOf(ch)+")":""}${okR?", page redrawn":""}`;
+        }else note+="no new changes";
         snap=ns;
       }
       LS.set(K_SNAP,snap);offline=false;
-    }catch(e){if(e.message==="BAD_KEY"){busy=false;return badKey()}offline=true}
+    }catch(e){if(e.message==="BAD_KEY"){busy=false;slog("SYNC",why+": key no longer matches");return badKey()}offline=true;note="couldn't reach the Sheet: "+e.message}
     finally{busy=false;status()}
+    if(note)slog("SYNC",`${why}: ${note} · ${((Date.now()-t0)/1000).toFixed(1)}s`);
     if(!offline&&conn&&!modalOpen())afterSync();
+    idle();
   }
   function badKey(){conn=null;LS.del(K_CONN);status();connectScreen("The saved key no longer matches your Google Sheet. Paste the current connection details.")}
   function decodeLink(text){
@@ -911,7 +975,7 @@ const Sync=(()=>{
         const c=decodeLink(root.querySelector("#c-link").value)||{u:root.querySelector("#c-url").value.trim(),k:root.querySelector("#c-key").value.trim()};
         if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(c.u)||!c.k){err.hidden=false;err.textContent="Paste a connection link, or both the web app URL (ending in /exec) and the key.";return}
         const btn=root.querySelector("#c-go");btn.disabled=true;btn.textContent="Checking…";
-        try{await api("ping",null,c);conn=c;LS.set(K_CONN,c);closeModal();toast("Connected");pull()}
+        try{await api("ping",null,c);conn=c;LS.set(K_CONN,c);closeModal();toast("Connected");pull("connected")}
         catch(x){btn.disabled=false;btn.textContent="Connect";err.hidden=false;
           err.textContent=x.message==="BAD_KEY"?"That key doesn't match. Run setupKey in Apps Script again and copy the key from the log.":"Couldn't reach that URL. Check it ends in /exec, that the deployment's access is set to Anyone, and that you're online (VPN if needed)."}});
     });
@@ -923,24 +987,26 @@ const Sync=(()=>{
       const fromLink=decodeLink(location.hash);
       if(fromLink){conn=fromLink;LS.set(K_CONN,fromLink);history.replaceState(null,"",location.pathname)}
       if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"))navigator.serviceWorker.register("sw.js").catch(()=>{});
-      document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")pull()});
-      addEventListener("online",()=>pull());
-      setInterval(()=>{if(document.visibilityState==="visible")pull()},300000);
+      document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")pull("back to app")});
+      addEventListener("online",()=>pull("back online"));
+      setInterval(()=>{if(document.visibilityState==="visible")pull("every 5 min")},300000);
       status();
       if(!conn)return connectScreen();
-      pull();
+      pull("app opened");
     },
-    afterModal(){if(pullWanted){pullWanted=false;setTimeout(pull,60)}},
+    info:()=>({out:out.length,busy,offline}),
+    afterModal(){if(pullWanted){pullWanted=false;setTimeout(()=>pull("after pop-up"),60)}},
     extras(el){
       if(!conn){el.innerHTML=`<div class="row"><span class="sub grow">This device isn't connected to your Google Sheet.</span><button class="btn sm primary" id="x-conn">Connect This Device</button></div>`;el.querySelector("#x-conn").onclick=()=>connectScreen();return}
       el.innerHTML=`<div class="linked"><span class="lbl">CONNECT ANOTHER DEVICE</span>
         <span class="sub">Send this link to yourself and open it on your phone or iPad. It contains your private key, so don't share it with anyone else.</span>
-        <div class="row"><button class="btn sm" id="x-copy">Copy Connection Link</button><button class="btn sm ghost" id="x-show">Show Link</button><button class="btn sm ghost" id="x-sync">Sync Now</button><button class="btn sm ghost danger" id="x-off" style="margin-left:auto">Disconnect</button></div>
+        <div class="row"><button class="btn sm" id="x-copy">Copy Connection Link</button><button class="btn sm ghost" id="x-show">Show Link</button><button class="btn sm ghost" id="x-log">Copy Sync Details</button><button class="btn sm ghost" id="x-sync">Sync Now</button><button class="btn sm ghost danger" id="x-off" style="margin-left:auto">Disconnect</button></div>
         <textarea class="inp" id="x-link" rows="3" readonly hidden></textarea></div>`;
       const link=encodeLink(conn),ta=el.querySelector("#x-link");ta.value=link;
       el.querySelector("#x-copy").onclick=()=>(navigator.clipboard?navigator.clipboard.writeText(link):Promise.reject()).then(()=>toast("Link copied"),()=>{ta.hidden=false;ta.select()});
-      el.querySelector("#x-show").onclick=()=>{ta.hidden=false;ta.select()};
-      el.querySelector("#x-sync").onclick=()=>{closeModal();pull()};
+      el.querySelector("#x-show").onclick=()=>{ta.value=link;ta.hidden=false;ta.select()};
+      el.querySelector("#x-log").onclick=()=>{const t=syncDetails();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("Copied"),()=>{ta.hidden=false;ta.value=t;ta.select();toast("Select All and Copy")})};
+      el.querySelector("#x-sync").onclick=()=>{closeModal();pull("tap")};
       armDelete(el.querySelector("#x-off"),()=>{if(out.length){toast("Sync waiting changes first (go online), then disconnect.");return}
         LS.del(K_CONN);LS.del(K_SNAP);conn=null;snap=null;closeModal();status();connectScreen()},"Tap Again to Disconnect");
     }
@@ -1423,7 +1489,8 @@ const driveIdsIn=o=>{const out=[],walk=x=>{(x.files||[]).forEach(a=>{if(a.driveI
 const ownerOf=ref=>ref.kind==="week"?(S.weekly[ref.id]=S.weekly[ref.id]||{}):ref.kind==="month"?monthRec(ref.id):ref.kind==="day"?dayRec(ref.id):ref.kind==="project"?S.projects.find(p=>p.id===ref.id):ref.kind==="phase"?(IX.idx.phase[ref.id]||{}).ph:(IX.idx.item[ref.id]||{}).it;
 const peekOwner=ref=>ref.kind==="week"?S.weekly[ref.id]:ref.kind==="month"?S.monthly[ref.id]:ref.kind==="day"?DX()[ref.id]:ownerOf(ref);
 const homeOfRef=ref=>RVK.has(ref.kind)?(ref.kind==="day"?"dy:":"rv:")+String(ref.id).slice(0,4):"p:"+((projOfRef(ref)||{}).id||"");
-const folderOfHome=h=>{const [g,v]=String(h||"").split(":");if(g==="rv")return "Reviews/"+v;if(g==="dy")return "Diary/"+v;const p=S.projects.find(x=>x.id===v);return p?slugName(p.name):""};
+/* the tracker's own Drive folders are ALL-CAPS; the script finds older ones whatever their capitals or spaces and renames them */
+const folderOfHome=h=>{const [g,v]=String(h||"").split(":");if(g==="rv")return "REVIEWS/"+v;if(g==="dy")return "DIARY/"+v;const p=S.projects.find(x=>x.id===v);return p?slugName(p.name).toUpperCase():""};
 const cardHome=id=>{for(const pl of attPlaces())if((pl.o.files||[]).some(a=>a.id===id))return pl.home;return ""};
 const MONN=["January","February","March","April","May","June","July","August","September","October","November","December"];
 const placeLabel=ref=>ref.kind==="week"?`Week of ${short(ref.id)} Review`:ref.kind==="month"?`${MONN[+ref.id.slice(5,7)-1]} ${ref.id.slice(0,4)} Review`:ref.kind==="day"?`Diary · ${short(ref.id)}`:"";
@@ -1464,6 +1531,11 @@ async function getBlob(a){
 async function localURL(a){if(fileURLs[a.id])return fileURLs[a.id];let b=null;
   if(a.pending){const u=memUp[a.id]||await IDB.get("up:"+a.id);b=u&&u.blob}else if(a.driveId)b=await cacheGet(a.driveId);else if(isDbx(a))b=await cacheGet(dbxKey(a));
   return b?(fileURLs[a.id]=URL.createObjectURL(b)):null}
+/* a thumbnail that won't show (a fresh photo on iPad can be unreadable for a moment) is fetched again from the Drive copy, once */
+const thTried=new Set(),thWait=new Set();
+function thumbRetry(a){if(!a||thTried.has(a.id))return;if(!a.driveId){thWait.add(a.id);return}if(!Sync.connected())return;thTried.add(a.id);
+  try{if(fileURLs[a.id])URL.revokeObjectURL(fileURLs[a.id])}catch(e){}delete fileURLs[a.id];delete memFiles[a.driveId];
+  driveFetch(a).then(b=>cachePut(a.driveId,b)).then(()=>{slog("FILES","Thumbnail reloaded from Drive");refreshAttViews()}).catch(e=>slog("FILES","Thumbnail reload failed: "+e.message))}
 function refreshAttViews(){document.querySelectorAll("[data-attgrid]").forEach(e=>{if(e._draw)e._draw()})}
 /* add files: they wait on this device until they reach Drive, so attaching works offline too */
 async function addFiles(ref,list){
@@ -1475,20 +1547,22 @@ async function addFiles(ref,list){
   const o=ownerOf(ref);if(!o)return;o.files=[...(o.files||[]),...added];
   LS.set(K_UPQ,[...LS.get(K_UPQ,[]),...added.map(a=>a.id)]);commit();runUploads();
 }
-let upRun=false,upWarned=0;
+let upRun=false,upWarned=0,upRetry=null;
 async function runUploads(){
-  if(upRun||!Sync.connected())return;upRun=true;let did=0;
+  if(upRun||!Sync.connected())return;upRun=true;let did=0,failed=false;clearTimeout(upRetry);
   try{let q=LS.get(K_UPQ,[]);
     while(q.length){const id=q[0],f=findAtt(id),u=memUp[id]||await IDB.get("up:"+id);
       if(!f||!f.a.pending||!u){q=LS.get(K_UPQ,[]).filter(x=>x!==id);LS.set(K_UPQ,q);if(!f)await IDB.del("up:"+id);continue}
       const hm=cardHome(id),fd=folderOfHome(hm)||u.folder||"";
       let r;try{r=await Sync.call("upload",{name:f.a.name,mime:f.a.mime||"application/octet-stream",folder:fd,data:await blobB64(u.blob)})}
-      catch(x){if(Date.now()-upWarned>60000){upWarned=Date.now();toast(/Unknown action|NO_DRIVE|permission/i.test(x.message)?driveErr(x):"Files are saved on this device and upload when you're back online.",6000)}break}
+      catch(x){failed=true;slog("UPLOAD","Waiting: "+x.message);if(Date.now()-upWarned>60000){upWarned=Date.now();toast(/Unknown action|NO_DRIVE|permission/i.test(x.message)?driveErr(x):"Files are saved on this device and upload when you're back online.",6000)}break}
       const g=findAtt(id);
-      if(g){Object.assign(g.a,{driveId:r.id,url:r.url,size:r.size||g.a.size,home:hm||undefined});delete g.a.pending;await cachePut(r.id,u.blob);did++;commit()}
+      if(g){Object.assign(g.a,{driveId:r.id,url:r.url,size:r.size||g.a.size,home:hm||undefined});delete g.a.pending;await cachePut(r.id,u.blob);did++;slog("UPLOAD","Saved 1 file to Drive ("+fsize(g.a.size)+")");commit();if(thWait.has(id)){thWait.delete(id);thumbRetry(g.a)}}
       else queueTrash([r.id],0);
       delete memUp[id];await IDB.del("up:"+id);q=LS.get(K_UPQ,[]).filter(x=>x!==id);LS.set(K_UPQ,q)}}
   finally{upRun=false}
+  /* a file that couldn't go up tries again by itself in 30 seconds (and on every sync) */
+  if(failed&&LS.get(K_UPQ,[]).length)upRetry=setTimeout(()=>{if(navigator.onLine)runUploads()},30000);
   if(did){refreshAttViews();toast(did>1?`${did} files saved to Google Drive`:"Saved to Google Drive")}
 }
 /* removed files go to the Drive trash a few seconds later, after the Undo window */
@@ -1507,16 +1581,18 @@ let offRun=false;
 async function syncOffline(){
   if(offRun||!keepOffline()||!Sync.connected()||!navigator.onLine)return;offRun=true;
   try{if(navigator.storage&&navigator.storage.persist&&!syncOffline.asked){syncOffline.asked=1;navigator.storage.persist().catch(()=>{})}}catch(x){}
+  let got=0,fail="";
   try{const live=allDriveIds(),idx=FIDX();attOwners().forEach(o=>(o.files||[]).forEach(a=>{if(isDbx(a))live.add(dbxKey(a))}));
     for(const id of Object.keys(idx))if(!live.has(id)&&!LS.get(K_TRASH,[]).some(x=>x.id===id))await cacheDel(id);
     for(const o of attOwners())for(const a of (o.files||[]).slice()){
       if(a.kind!=="drive"||!a.driveId||isGdoc(a)||FIDX()[a.driveId])continue;
-      try{const b=await driveFetch(a);await cachePut(a.driveId,b);refreshAttViews()}catch(x){if(x.message==="NO_FILE")continue;return}}
+      try{const b=await driveFetch(a);await cachePut(a.driveId,b);got++;refreshAttViews()}catch(x){if(x.message==="NO_FILE")continue;fail=x.message;return}}
     for(const o of attOwners())for(const a of (o.files||[]).slice()){const k=isDbx(a)&&dbxKey(a);if(!k||FIDX()[k]||dbxBad.has(k))continue;
-      try{const b=await dbxFetch(a);await cachePut(k,b);refreshAttViews()}catch(x){if(/Unknown action/i.test(x.message)||!navigator.onLine)return;dbxBad.add(k)}}}
-  finally{offRun=false}
+      try{const b=await dbxFetch(a);await cachePut(k,b);got++;refreshAttViews()}catch(x){if(/Unknown action/i.test(x.message)||!navigator.onLine){fail=x.message;return}dbxBad.add(k)}}}
+  finally{offRun=false;if(got||fail)slog("FILES",(got?`Downloaded ${got} file${got>1?"s":""} for offline use`:"")+(fail?(got?"; ":"")+"stopped: "+fail:""))}
 }
-function afterSync(){migrateColors();migrateFiles();migrateKeys();gScan();gFlush();gFetch();gDates();runUploads().then(()=>{runTrash();return convertDriveLinks()}).then(()=>{runRelocate();return syncOffline()})}
+function afterSync(){migrateColors();migrateFiles();migrateKeys();gScan();gFlush();gFetch();gDates();runUploads().then(()=>{runTrash();return convertDriveLinks()}).then(()=>{runRelocate();return syncOffline()}).catch(e=>slog("ERROR","After sync: "+(e&&e.message)))
+  .then(()=>redraw("after sync"))}
 addEventListener("online",()=>setTimeout(()=>{runUploads();runTrash()},1500));
 /* One-time update (Oct 2026): item "Links to Files" move into the item's notes. */
 /* One-time update (Oct 2026): the Settings shortcut moves from Cmd+, (taken by Chrome on iPad) to "<" */
@@ -1568,7 +1644,8 @@ function mountAtt(el,ref){
     el.innerHTML=`${L.length?`<div class="att-grid">${L.map(a=>attCard(a,cn[shareKey(a)])).join("")}</div>`:""}
       <div class="row"><button class="btn sm" data-att-add>+ Add Files</button><button class="btn sm ghost" data-att-drive>+ From Drive</button><button class="btn sm ghost" data-att-link>+ Add Link</button>${L.length>1?`<button class="btn sm ghost" data-att-sort>Sort</button>`:""}<span class="sub grow">${L.length?(L.length>1?"Hold and Drag a Card to Reorder":""):"JPG, PNG and PDF Open Here. Other Files Open in Google Drive. Up to 15 MB Each."}</span></div>
       <input type="file" multiple hidden data-att-file>`;
-    el.querySelectorAll("[data-th]").forEach(t=>{const a=L.find(x=>x.id===t.dataset.th);if(a)localURL(a).then(u=>{if(u&&t.isConnected){t.insertAdjacentHTML("afterbegin",`<img src="${u}" alt="" draggable="false">`);t.classList.add("has")}}).catch(()=>{})});
+    el.querySelectorAll("[data-th]").forEach(t=>{const a=L.find(x=>x.id===t.dataset.th);if(a)localURL(a).then(u=>{if(u&&t.isConnected){t.insertAdjacentHTML("afterbegin",`<img src="${u}" alt="" draggable="false">`);t.classList.add("has");
+      const im=t.querySelector("img");im.onerror=()=>{im.remove();t.classList.remove("has");thumbRetry(a)}}}).catch(()=>{})});
     const fi=el.querySelector("[data-att-file]"),grid=el.querySelector(".att-grid");
     el.querySelector("[data-att-add]").onclick=()=>fi.click();
     fi.onchange=()=>{const fl=[...fi.files];fi.value="";if(fl.length)addFiles(ref,fl)};
@@ -2347,6 +2424,7 @@ function viewWeek(){
   return `<div class="row"><h2 class="grow">Week of ${short(ws)}</h2><span class="sub tot"><span class="a">${fmtH(total)}</span> of <b>${fmtH(target)}</b> Logged</span>
     <span class="navg"><button class="btn" data-wk="-7" aria-label="Previous week">←</button><button class="btn" data-wk="0">This Week</button><button class="btn" data-wk="7" aria-label="Next week">→</button>
     <button class="btn" data-rv-week="${ws}">Weekly Review</button></span></div>
+  ${we<TODAY()?pastBar("Viewing a Past Week","data-wk","Go to This Week"):""}
   <div class="row"><span class="sub grow">Pinch the Chart to Zoom the Hours. Tap a Day to Plan It in Detail.</span>
     <span class="zoombar"><button class="btn sm" data-zoom="-1" aria-label="Zoom out">−</button><button class="btn sm" data-zoom="0">Fit</button><button class="btn sm" data-zoom="1" aria-label="Zoom in">+</button></span></div>
   <div class="sched-scroll" id="wk-scroll"><div class="sched" id="wk-sched" style="${zoomW(z)}">${hoursHeader()}${rows}</div></div>
@@ -2361,6 +2439,8 @@ function viewWeek(){
       ${tasks.length?tasks.map(({ph,it})=>{const s=itemStats(it);return `<div class="task"><span class="dot" style="--c:var(--${ph.color})"></span><button style="border:0;background:none;padding:0;text-align:left" data-open-item="${it.id}"><b>${esc(it.name)}</b> <span class="sub">${esc(ph.name)}</span></button><span class="chip" style="--sc:var(${SC[it.status]})">${esc(it.status)} · ${AE(s.act,s.est)}${S.settings.weekWarn?pctTag(s.act,s.est):""}</span></div>`}).join(""):`<p class="empty">Set an item's target week to see it here.</p>`}</section>
   </div>`;
 }
+/* a thin line under the date while you're looking at a past day or week; nothing moves on its own */
+const pastBar=(t,attr,b)=>`<div class="pastbar" role="status"><span class="grow">${t}</span><button class="btn sm" ${attr}="0">${b}</button></div>`;
 function listEd(key,arr,wk){return `<div class="list-ed" data-list="${key}" data-wk="${wk||""}">${arr.map((v,i)=>`<div class="li"><span class="n${arr.length>1?" grip":""}" ${arr.length>1?`title="Drag to Reorder"`:""}>${arr.length>1?"⋮⋮ ":""}${i+1}</span><input class="inp" data-li="${i}" value="${esc(v)}" aria-label="Item ${i+1}"><button class="btn sm ghost" data-lx="${i}" aria-label="Remove">✕</button></div>`).join("")}<button class="btn sm ghost" style="justify-self:start" data-ladd>+ Add</button></div>`}
 
 /* ===================== day (vertical, fits the screen) ===================== */
@@ -2380,6 +2460,7 @@ function viewDay(){
   return `<div class="row"><h2 class="grow">${dt.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}</h2>
     <span class="navg"><button class="btn" data-dd="-1" aria-label="Previous day">←</button><button class="btn" data-dd="0">Today</button><button class="btn" data-dd="1" aria-label="Next day">→</button>
     <button class="btn primary" data-addblock="${d}">+ Block</button></span></div>
+  ${d<TODAY()?pastBar("Viewing a Past Day","data-dd","Go to Today"):""}
   <div class="day-grid">
     <div style="display:grid;gap:8px">
       <div class="row"><span class="sub grow">${(S.ui.dzoom||1)>1?"Zoomed In · Scroll for the Rest of the Day":"Whole Day on One Screen"}</span><span class="zoombar"><button class="btn sm" data-dzoom="-1" aria-label="Zoom out">−</button><button class="btn sm" data-dzoom="0">Fit</button><button class="btn sm" data-dzoom="1" aria-label="Zoom in">+</button></span></div>
@@ -3199,7 +3280,7 @@ function runAction(id){
     case"timerStop":{const b=document.getElementById("tm-stop");if(b)b.click();return}
     case"undo":return undoLast();case"projects":return libModal();case"settings":return settingsModal();
     case"theme":{const b=document.getElementById("btn-theme");if(b)b.click();return}
-    case"sync":{if(Sync.connected()){toast("Syncing…");Sync.pull()}else Sync.connectScreen();return}
+    case"sync":{if(Sync.connected()){toast("Syncing…");Sync.pull("tap")}else Sync.connectScreen();return}
     case"help":return kbHelp();
     case"weeklyReview":S.ui.view="review";S.ui.rtab="weekly";S.ui.rweek=iso(weekOf(new Date()));return commit();
     case"monthlyReview":S.ui.view="review";S.ui.rtab="monthly";S.ui.month=TODAY().slice(0,7);return commit();
@@ -3264,7 +3345,7 @@ manual:[
 <h4>The Top Bar</h4>
 <ul>
 <li>Board, Month, Week, Day and Review switch pages. Keys <span class="k">1</span> to <span class="k">5</span> do the same on a keyboard.</li>
-<li>The sync chip: Synced (everything is in your Sheet), X Waiting (saved on this device, will sync), Offline (can't reach Google), Not Connected (tap to connect). Tap it anytime to sync now.</li>
+<li>The sync chip: Synced (everything is in your Sheet), X Waiting (saved on this device, will sync), Offline (can't reach Google), Not Connected (tap to connect). Tap it anytime to sync now. After each sync the page on screen is redrawn with the newest data. If you're typing, it waits until you pause and keeps your cursor where it was, and it never closes a pop-up.</li>
 <li>The ring shows hours logged today against your daily target.</li>
 <li>Light/Dark switches the theme on this device. Projects opens Projects & Templates. Settings has General, Advanced, this Guide and the version.</li>
 <li>On Sundays a Backup banner offers a full backup file.</li>
@@ -3305,6 +3386,7 @@ manual:[
 <h4>Week</h4>
 [[fig:week|Week: plan above, logged time below]]
 <ul>
+<li>When you're looking at a past week, a thin line under the title says Viewing a Past Week, with Go to This Week. Nothing moves on its own.</li>
 <li>Each row is a day from Day Starts to Day Ends (5am to 10pm by default). Tap a day's name to open it.</li>
 <li>Blocks: tap empty space to add one. Project Work blocks belong to a step and take its phase color. Life Blocks (meals, walks, rest) never count toward a budget. Dashed blocks come from schedules.</li>
 <li>Hold a block, then drag to move it, even to another day. On a laptop, just drag. Drag the right edge to change its length.</li>
@@ -3315,6 +3397,7 @@ manual:[
 <h4>Day</h4>
 [[fig:day|Day: one column for the whole day]]
 <ul>
+<li>When you're looking at a past day, a thin line under the date says Viewing a Past Day, with Go to Today. The tracker remembers the date you were on, even overnight, so this line tells you when it isn't today. Nothing moves on its own.</li>
 <li>+ Block adds a block at the current time. Hold a block and drag it up or down; hold its bottom edge to resize. Pinch or use − Fit + to zoom.</li>
 <li>The thin column next to the plan shows logged time. Tap a piece of it to open that step's Time Log.</li>
 <li>Planned Project Time, Logged and Daily Target sit at the top of the side column.</li>
@@ -3341,8 +3424,8 @@ manual:[
 <ul>
 <li>Weekly Review: Logged vs Target, Items Submitted (items with this target week that reached Submitted or later), and the project's budget used. Budget Alerts list phases past the warning point.</li>
 <li>Top to bottom: THIS WEEK'S FOCUS (faintly shows last week's Next Week's Focus until you write your own), WEEKLY PRIORITIES and ACHIEVEMENTS (the same lists as on the Week page; edit them in either place), WHAT WORKED and WHAT TO IMPROVE, FEEDBACK SUMMARY and NEXT WEEK'S FOCUS, then NOTES.</li>
-<li>Everything saves as you type. The arrows move between weeks. Web addresses in any review box (and in the Monthly Review's Focus and Notes) show up as tappable links under that box. The Weekly and Monthly Review NOTES have Attachments too.</li>
-<li>Monthly Review: Focus, hours logged in total and per project, Previous Month Review (Wins and Improvements), Goals (Goal, Why/How, Rewards) and Notes. In Wins and Improvements, Enter saves a line and starts the next. In Goals, Enter moves from Goal to Why / How to Rewards, then starts a new goal; Shift+Enter adds a line break. Wins, Improvements and Goals reorder the same way, with the ⋮⋮ handle.</li>
+<li>Everything saves as you type; the arrows move between weeks. Web addresses in any review box show up as tappable links under it. Both reviews' NOTES have Attachments.</li>
+<li>Monthly Review: Focus, hours logged in total and per project, Previous Month Review (Wins and Improvements), Goals (Goal, Why/How, Rewards) and Notes. In Wins and Improvements, Enter saves a line and starts the next. In Goals, Enter moves from Goal to Why / How to Rewards, then starts a new goal; Shift+Enter adds a line break. Drag ⋮⋮ to reorder.</li>
 <li>Export: Create PDF prints the review on screen (choose Save as PDF in the print window). On iPad the tracker makes the PDF file itself: tap Save or Share PDF, then Save to Files. Export Excel File saves every review in a date range.</li>
 </ul>`},
 {id:"m2",h:"2. Projects, Phases and Items",html:`
@@ -3407,8 +3490,9 @@ manual:[
 </ul>
 <h4>Adding Files</h4>
 <ul>
-<li>+ Add Files: any file up to 15 MB. It's saved in Google Drive > Project Tracker Files: in the project's folder, in Reviews/2026 for files added to a Weekly or Monthly Review, or in Diary/2026 for the Diary (by the year of that review or day). Each folder is made the first time it's needed. The original on your device is never changed.</li>
-<li>Folder and file names the tracker makes follow one rule: no spaces, words joined with "-", parts split with "_", dates as 2026.10.12. For example Sing-Song-Retainer, Project-Tracker_Backup_2026.10.12.json. Your own file names stay as you named them.</li>
+<li>+ Add Files: any file up to 15 MB. It's saved in Google Drive > Project Tracker Files: in the project's folder, in REVIEWS/2026 for files added to a Weekly or Monthly Review, or in DIARY/2026 for the Diary (by the year of that review or day). Each folder is made the first time it's needed. The original on your device is never changed.</li>
+<li>Folder and file names the tracker makes follow one rule: no spaces, words joined with "-", parts split with "_", dates as 2026.10.12. Folders are also in capitals: SING-SONG-RETAINER, REVIEWS, DIARY. Files look like Project-Tracker_Backup_2026.10.12.json. Your own file names stay as you named them.</li>
+<li>Older folders (Reviews, Diary, Sing Song Retainer) are found whatever their capitals or spaces and renamed to capitals the first time they're used, so you never need to rename them yourself, and you never get a second copy.</li>
 <li>+ From Drive: files already in your Drive. Paste a Drive link, open your Project Tracker Files folders, or search your whole Drive by name, then tick files and tap Add. Nothing is copied or uploaded.</li>
 <li>+ Add Link: web pages, or big files in Dropbox, Drive or Proton Drive. Drive file links become normal Drive cards automatically.</li>
 <li>Offline, a new file waits on the device ("Waiting to Upload") and goes to Drive when you're back online.</li>
@@ -3542,7 +3626,8 @@ manual:[
 <li>Link and File Actions (This Device): what each file type or link does when tapped. Reset makes one ask again; Reset All (tap twice) resets every type.</li>
 <li>Check Google Drive Access confirms attachments can reach Drive.</li>
 <li>Clear All Data (tap twice): see Recovering Data in chapter 7.</li>
-<li>Google Sheet: Copy Connection Link (for another device; treat it like a password), Show Link and Sync Now.</li>
+<li>Google Sheet: Copy Connection Link (for another device; treat it like a password), Show Link, Copy Sync Details and Sync Now.</li>
+<li>Copy Sync Details copies a short technical log of the last 20 syncs (times, how many changes came in, errors, version and device type) for troubleshooting. It holds no notes, Diary text, project or file names.</li>
 <li>Disconnect affects only the device you tap it on. That device forgets the web app URL and key and stops syncing; your Sheet and your other devices keep working, and nothing is deleted. If changes are still waiting to sync, it won't disconnect until they're sent. Reconnect by pasting your connection link. Use it when switching to another Sheet or before handing a device to someone else. If a device is lost or the link gets out, run resetKey in Apps Script instead and reconnect your devices.</li></ul>
 <h4>Keyboard Shortcuts</h4><ul><li>The button at the bottom left of the Advanced tab (chapter 10).</li></ul>`},
 {id:"m8",h:"10. Keyboard Shortcuts",html:`
@@ -3606,7 +3691,8 @@ manual:[
 <li>Google Calendar events don't show: check Settings > Advanced > Calendar (Show Google Calendar on, calendars ticked), then tap the sync chip. If it says calendar access isn't allowed, run setupCalendar in Apps Script.</li>
 <li>A calendar from another account is missing: it has to be shared with the account that holds your Sheet, and the invitation accepted there.</li>
 <li>"Too Big to Download Here": Drive files over 50 MB open in the Google Drive app instead.</li>
-<li>A file stays "Waiting to Upload": go online (VPN), then tap the sync chip.</li>
+<li>A file stays "Waiting to Upload": it tries again by itself every 30 seconds while you're online. Go online (VPN if needed), then tap the sync chip. If it still waits, use Copy Sync Details (below).</li>
+<li>Something added on another device doesn't show: check for the Viewing a Past Day line, then tap the sync chip. If it still doesn't show, go to Settings > Advanced > Data > Copy Sync Details on that device and paste it into a message for help.</li>
 <li>Stuck pop-up or viewer: <span class="k">Esc</span>, the Close button, or the back gesture closes it.</li>
 <li>A date won't clear: use the ✕ next to the date box, then Save.</li>
 </ul>
@@ -3615,7 +3701,7 @@ manual:[
 <li>Laptop (Chrome): in the tracker's own window, click ⋮ at the top right > Uninstall. Or go to chrome://apps, right-click the tracker > Remove from Chrome. Or Windows Settings > Apps > Installed Apps > Project Tracker > Uninstall.</li>
 <li>iPad: press and hold the icon > Remove App > Delete from Home Screen. Android: press and hold the icon > Uninstall (or drag it to Uninstall).</li>
 <li>Your data stays in your Google Sheet. If asked whether to also clear data, either choice is fine: it only removes this device's copy and offline files.</li>
-<li>To reinstall, open your tracker's address in the browser and install it again (see the setup guide). On iPad, paste your connection link once.</li>
+<li>To reinstall, open your tracker's address in the browser and install it again (see the setup guide). Then connect it with your connection link: on a device that's still connected, go to Settings > Advanced > Data > Copy Connection Link, send it to yourself, and open it on the reinstalled device (on iPad, paste it into the connect screen once).</li>
 </ul>`},
 {id:"m12",h:"12. Glossary",html:`
 <p>The words used in the tracker and this manual, in alphabetical order.</p>
@@ -3658,16 +3744,17 @@ manual:[
 <dt>Life Block</dt><dd>A block for life outside work (meals, walks, rest). It never counts toward a budget.</dd>
 <dt>⋯ Menu</dt><dd>The three-dot button on an attachment card: Rename, Move To, Copy To, Download (or Download as PDF), Copy Link and Remove.</dd>
 <dt>Monthly Review</dt><dd>The review of a month on the Review page: focus, hours by project, wins, improvements, goals and notes.</dd>
-<dt>Naming Rule</dt><dd>How the tracker names folders and files: no spaces, words joined with "-", parts split with "_", dates as 2026.10.12.</dd>
+<dt>Naming Rule</dt><dd>How the tracker names folders and files: no spaces, words joined with "-", parts split with "_", dates as 2026.10.12. Folders are in capitals (SING-SONG-RETAINER).</dd>
 <dt>Offline Copy</dt><dd>A file saved on the device so it opens without internet. Turn on Keep All Attachments Offline to save every file.</dd>
 <dt>Open in App / Open in Browser</dt><dd>The choices for opening a non-image file: in its own app (Drive, Docs, Photoshop) or in a browser tab.</dd>
+<dt>Past Day Line</dt><dd>The thin line under the date (Viewing a Past Day, or Viewing a Past Week) with a button back to today or this week.</dd>
 <dt>Phase</dt><dd>A stage of a project with its own budget, color, target date and items, such as Broad Exploration or Refinement.</dd>
 <dt>Phase Color</dt><dd>The color of a phase&#x27;s bars, blocks and target dates, picked from your Phase Colors.</dd>
 <dt>Pop-Up</dt><dd>A window that opens over the page, such as Edit Project or an item.</dd>
 <dt>Project</dt><dd>The top level of your work: a client job, a portfolio chapter or a pitch. It holds phases, a budget, pricing and a due date.</dd>
 <dt>Project Color</dt><dd>The color of a project&#x27;s due date on Month, Week and Day (yellow by default), set in Edit Project.</dd>
 <dt>Project Tracker Dates</dt><dd>The Google calendar that holds your due dates and phase target dates as all-day events.</dd>
-<dt>Project Tracker Files</dt><dd>The folder in your Google Drive where the tracker stores uploaded attachments: one folder per project, plus Reviews/2026 and Diary/2026.</dd>
+<dt>Project Tracker Files</dt><dd>The folder in your Google Drive where the tracker stores uploaded attachments: one folder per project, plus REVIEWS/2026 and DIARY/2026.</dd>
 <dt>Project Type</dt><dd>Client (paid work), Internal (your own work, such as a portfolio chapter) or Pitch (a proposal you&#x27;re not paid for yet).</dd>
 <dt>Projected Finish</dt><dd>The date the project would be done at your recent pace (the last 14 days of logged time).</dd>
 <dt>Rate Floor</dt><dd>The lowest hourly rate you&#x27;ll accept. Client projects below it show the Below Your Floor flag.</dd>
@@ -3681,6 +3768,7 @@ manual:[
 <dt>Step</dt><dd>A task inside an item with its own time estimate, such as Sketch or Render. You run the timer on a step.</dd>
 <dt>Sub-Header</dt><dd>The smaller bold title inside a section, such as &quot;The Top Bar&quot;.</dd>
 <dt>Sync Chip</dt><dd>The status button in the top bar: Synced, X Waiting, Offline or Not Connected. Tap it to sync now.</dd>
+<dt>Sync Details</dt><dd>A short technical log of recent syncs, copied with Copy Sync Details (Settings > Advanced > Data) to help troubleshoot.</dd>
 <dt>Target Date</dt><dd>The date a phase should be done. It shows in the phase&#x27;s color on Month, Week and Day.</dd>
 <dt>Target Week</dt><dd>The week an item should be done. It lists the item under This Week&#x27;s Items on Week.</dd>
 <dt>Template</dt><dd>A saved starting point: an item template (steps and checklist), a phase template or a pipeline template (a whole project).</dd>
@@ -3881,7 +3969,7 @@ document.addEventListener("click",e=>{
   if(d.rvMonth){S.ui.view="review";S.ui.rtab="monthly";commit();return}
   if(el.id==="btn-theme"){const dark=el.textContent==="Dark";S.ui.theme=dark?"dark":"light";document.documentElement.setAttribute("data-theme",S.ui.theme);save();renderHeader();return}
   if(el.id==="btn-lib")return libModal();
-  if(el.id==="sync")return Sync.connected()?Sync.pull():Sync.connectScreen();
+  if(el.id==="sync")return Sync.connected()?Sync.pull("tap"):Sync.connectScreen();
   if(el.id==="btn-settings")return settingsModal();
 });
 document.addEventListener("keydown",e=>{
