@@ -670,7 +670,7 @@ const LPAL_DEF={light:["#CEFBD0","#D5ECC2","#FAF6B7","#F2E3B3","#EDE6D8","#F7D9C
 const LIFE_ORDER=[1,7,2,11,10,5,8,6,12,9,4,3]; /* October 2026 reorder: new slot k shows old slot LIFE_ORDER[k-1] */
 const STATUSES=[["Not Started","--faint"],["In Progress","--accent"],["Submitted","--amber"],["Feedback Received","--p7"],["Revising","--act"],["Approved","--p3"],["Done","--ok"]];
 const SC=Object.fromEntries(STATUSES);
-const APP_VERSION="2026.10.12.08";
+const APP_VERSION="2026.10.12.09";
 const isDone=it=>it.status==="Done"||it.status==="Approved";
 const DEF_NAME="Blue Blaze Project Tracker";
 const appName=()=>((typeof S!=="undefined"&&S&&S.settings&&S.settings.brandName)||"").trim()||DEF_NAME;
@@ -3691,6 +3691,7 @@ manual:[
 <li>Google Calendar events don't show: check Settings > Advanced > Calendar (Show Google Calendar on, calendars ticked), then tap the sync chip. If it says calendar access isn't allowed, run setupCalendar in Apps Script.</li>
 <li>A calendar from another account is missing: it has to be shared with the account that holds your Sheet, and the invitation accepted there.</li>
 <li>"Too Big to Download Here": Drive files over 50 MB open in the Google Drive app instead.</li>
+<li>Files named ".tracker-link-..." in Project Tracker Files > .TRACKER-TEMP: temporary copies of big Dropbox files (over 6 MB) while they come to your device in pieces. There's one per link at most; it goes to the trash when the download finishes, or after an hour if it was interrupted. They're hidden from + From Drive. Trashed files still count toward your Google storage until the trash is emptied.</li>
 <li>A file stays "Waiting to Upload": it tries again by itself every 30 seconds while you're online. Go online (VPN if needed), then tap the sync chip. If it still waits, use Copy Sync Details (below).</li>
 <li>Something added on another device doesn't show: check for the Viewing a Past Day line, then tap the sync chip. If it still doesn't show, go to Settings > Advanced > Data > Copy Sync Details on that device and paste it into a message for help.</li>
 <li>Stuck pop-up or viewer: <span class="k">Esc</span>, the Close button, or the back gesture closes it.</li>
@@ -3775,6 +3776,7 @@ manual:[
 <dt>This Week&#x27;s Focus</dt><dd>The one thing a week is about, at the top of the Weekly Review.</dd>
 <dt>Time Log</dt><dd>The list of sessions logged on a step, where you can fix or delete them.</dd>
 <dt>To-Do</dt><dd>The checklist for one day on the Day page. Unfinished ones are offered on the next day you open, with Move to Today or Leave Them.</dd>
+<dt>.TRACKER-TEMP</dt><dd>A folder in Project Tracker Files where big Dropbox files wait briefly while they come to your device. Cleaned up automatically, and hidden from + From Drive.</dd>
 <dt>Two-Tap Button</dt><dd>A button for something hard to undo, such as Delete or Reset All. The first tap arms it, the second tap does it.</dd>
 <dt>Undo</dt><dd>The button that appears for a few seconds after most changes, or Cmd/Ctrl+Z.</dd>
 <dt>Waiting</dt><dd>Changes saved on the device that haven&#x27;t reached your Google Sheet yet. They sync when you&#x27;re back online.</dd>
