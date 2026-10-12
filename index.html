@@ -195,6 +195,15 @@ main{padding-top:20px;display:grid;gap:18px}
 .check.done span{color:var(--faint)}
 .fb{display:grid;gap:2px;border-left:3px solid var(--accent);padding:4px 10px}
 .fb .d{font-size:11.5px;color:var(--muted)}
+.chk-list,.fb-list{display:grid;gap:4px}
+.chk-row{align-items:center}.chk-row .ct{flex:1;min-width:0;cursor:text;padding:3px 2px;border-radius:5px;overflow-wrap:anywhere}.chk-row .ct:hover{background:var(--btn)}.chk-row .ie{padding:4px 8px}
+.chk-row.done .ct{text-decoration:line-through;color:var(--muted)}
+.btn.xs{padding:2px 7px;min-height:0;font-size:12px;color:var(--faint)}.btn.xs:hover{color:var(--over)}
+.fb-row{grid-template-columns:1fr auto;align-items:start;gap:6px}.fb-ed{border:0;background:none;padding:0;text-align:left;display:grid;gap:2px;color:inherit;font:inherit;cursor:text}.fb-ed .ft{overflow-wrap:anywhere}
+.fb-form,.rnd-form{display:grid;gap:6px;grid-column:1/-1}.fb-row.editing{grid-template-columns:1fr}
+.rnd-ed{border:0;background:none;padding:0;text-align:left;color:inherit;font:inherit;cursor:text}.rnd-i.editing{grid-template-columns:auto 1fr}.rnd-i.editing [data-rx]{display:none}
+.grip{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;color:var(--faint);font-size:12px;letter-spacing:-2px;padding:2px 4px 2px 0;white-space:nowrap}.grip:active{cursor:grabbing}
+.dragging{opacity:.65;outline:2px dashed var(--accent);outline-offset:2px;border-radius:6px}
 
 /* week rows */
 .zoombar{display:flex;align-items:center;gap:4px}
@@ -242,7 +251,7 @@ button.slab:hover b{color:var(--accent)}
 .task .chip{color:var(--ink);background:color-mix(in srgb,var(--sc) 18%,var(--surface))}
 .task .chip .a{color:var(--act-hi)}
 .list-ed{display:grid;gap:6px}
-.list-ed .li{display:grid;grid-template-columns:22px 1fr auto;gap:6px;align-items:center}
+.list-ed .li{display:grid;grid-template-columns:34px 1fr auto;gap:6px;align-items:center}
 .list-ed .n{font-size:12px;color:var(--faint);text-align:right}
 
 /* day (vertical) */
@@ -292,9 +301,9 @@ body.timing .dcol{height:clamp(440px,calc(100dvh - 390px),980px)}
 .rv-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 @media (max-width:760px){.rv-grid{grid-template-columns:1fr}}
 .goals{display:grid;gap:8px}
-.goal,.goal-h{display:grid;grid-template-columns:22px 1fr 1fr 1fr auto;gap:8px;align-items:start}
+.goal,.goal-h{display:grid;grid-template-columns:34px 1fr 1fr 1fr auto;gap:8px;align-items:start}
 .goal-h{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-@media (max-width:760px){.goal,.goal-h{grid-template-columns:22px 1fr auto}.goal .why,.goal .rw,.goal-h .why,.goal-h .rw{grid-column:2}}
+@media (max-width:760px){.goal,.goal-h{grid-template-columns:34px 1fr auto}.goal .why,.goal .rw,.goal-h .why,.goal-h .rw{grid-column:2}}
 .rv-prev{background:var(--rv-prev);border-color:transparent}
 .rv-goals{background:var(--rv-goals);border-color:transparent}
 .field{display:grid;gap:5px;min-width:0}
@@ -657,7 +666,7 @@ const LPAL_DEF={light:["#CEFBD0","#D5ECC2","#FAF6B7","#F2E3B3","#EDE6D8","#F7D9C
 const LIFE_ORDER=[1,7,2,11,10,5,8,6,12,9,4,3]; /* October 2026 reorder: new slot k shows old slot LIFE_ORDER[k-1] */
 const STATUSES=[["Not Started","--faint"],["In Progress","--accent"],["Submitted","--amber"],["Feedback Received","--p7"],["Revising","--act"],["Approved","--p3"],["Done","--ok"]];
 const SC=Object.fromEntries(STATUSES);
-const APP_VERSION="2026.10.12.03";
+const APP_VERSION="2026.10.12.04";
 const isDone=it=>it.status==="Done"||it.status==="Approved";
 const DEF_NAME="Blue Blaze Project Tracker";
 const appName=()=>((typeof S!=="undefined"&&S&&S.settings&&S.settings.brandName)||"").trim()||DEF_NAME;
@@ -1193,9 +1202,9 @@ function itemModal(id){
         <div class="acts">${it.steps.length>1?`<button class="ar" data-sup="${st.id}" aria-label="Move step up" ${it.steps[0]===st?"disabled":""}>▲</button><button class="ar" data-sdn="${st.id}" aria-label="Move step down" ${it.steps[it.steps.length-1]===st?"disabled":""}>▼</button>`:""}<button class="btn sm primary" data-start="${st.id}">Start</button><button class="btn sm" data-log="${st.id}">Time Log</button><button class="btn sm" data-editstep="${st.id}">Edit Step</button></div>
         <div class="mini">${bar(a,0,st.est,8)}</div></div>`}).join("")}
       <button class="btn sm ghost" style="justify-self:start" data-addstep="${it.id}">+ Step</button></div></div>
-    <div class="field"><span class="lbl">CHECKLIST</span>${it.checklist.map(c=>`<label class="check ${c.d?"done":""}"><input type="checkbox" data-chk="${c.id}" ${c.d?"checked":""}><span>${esc(c.t)}</span></label>`).join("")}
+    <div class="field"><span class="lbl">CHECKLIST</span><div class="chk-list">${it.checklist.map(c=>`<div class="chk-row check ${c.d?"done":""}" data-cid="${c.id}">${it.checklist.length>1?`<span class="grip" title="Drag to Reorder" aria-label="Drag to reorder">⋮⋮</span>`:""}<input type="checkbox" data-chk="${c.id}" ${c.d?"checked":""} aria-label="Done"><span class="ct" data-ced="${c.id}" tabindex="0" title="Tap to Edit">${esc(c.t)}</span><button class="btn sm ghost xs" data-cx="${c.id}" aria-label="Delete">✕</button></div>`).join("")}</div>
       <div class="row"><input class="inp" id="chk-new" placeholder="Add a Checklist Item" style="flex:1"><button class="btn sm" id="chk-add">Add</button></div></div>
-    <div class="field"><span class="lbl">FEEDBACK</span>${it.feedback.length?it.feedback.map(f=>`<div class="fb"><span class="d">${short(f.d)}</span><span>${esc(f.t)}</span></div>`).join(""):`<p class="empty">Feedback notes for this item land here.</p>`}
+    <div class="field"><span class="lbl">FEEDBACK</span>${it.feedback.length?`<div class="fb-list">${it.feedback.map((f,i)=>`<div class="fb fb-row" data-fi="${i}"><button class="fb-ed" data-fed="${i}" title="Tap to Edit"><span class="d">${short(f.d)}</span><span class="ft">${esc(f.t)}</span></button><button class="btn sm ghost xs" data-fx="${i}" aria-label="Delete">✕</button></div>`).join("")}</div>`:`<p class="empty">Feedback notes for this item land here.</p>`}
       <div class="row"><input class="inp" id="fb-new" placeholder="Add Feedback" style="flex:1"><button class="btn sm" id="fb-add">Add</button></div></div>
     <div class="field"><div class="row"><label for="it-nt" class="grow">NOTES</label><span class="sub" id="it-nst">Saves as You Type</span></div><textarea class="inp" id="it-nt" rows="3" placeholder="Notes for This Item…">${esc(it.notes||"")}</textarea><div class="nt-links" id="it-ntl">${linkList(it.notes)}</div><div id="it-att" class="att-wrap"></div></div>
     <div class="m-actions"><button class="btn danger left" id="it-del">Delete</button><button class="btn" id="it-move">Move to Phase</button><button class="btn" id="it-stpl">Save as Template</button><button class="btn" id="it-ltpl">Load Template</button><button class="btn" data-close>Close</button></div>`,
@@ -1214,11 +1223,23 @@ function itemModal(id){
     root.querySelector("#it-stpl").onclick=()=>askText("Save as Item Template","Template Name",it.name,v=>{const tid=uid();S.itemTemplates[tid]={id:tid,name:v,steps:tplSteps(it.steps),checklist:it.checklist.map(c=>({t:c.t}))};commit();itemModal(id);toast("Item template saved")},()=>itemModal(id));
     root.querySelector("#it-ltpl").onclick=()=>tplPicker("item",t=>{closeModal();undoable(()=>applyItemTemplate(it,t),`${t.name} loaded`);itemModal(id)},()=>itemModal(id));
     root.querySelector("#it-week").onchange=e=>{it.week=e.target.value;commit()};
+    const back=()=>{const m=document.querySelector("#modal-root .modal"),st=m?m.scrollTop:0;if(!IX.idx.item[id])return;itemModal(id);const m2=document.querySelector("#modal-root .modal");if(m2)m2.scrollTop=st},fbSort=()=>{it.feedback=it.feedback.map((f,i)=>({f,i})).sort((a,b)=>String(a.f.d).localeCompare(String(b.f.d))||a.i-b.i).map(x=>x.f)};
+    root.querySelectorAll("[data-cx]").forEach(b=>b.onclick=()=>{const c=it.checklist.find(k=>k.id===b.dataset.cx);if(!c)return;undoable(()=>{it.checklist=it.checklist.filter(k=>k!==c)},`Checklist item deleted`,back);back()});
+    root.querySelectorAll("[data-ced]").forEach(sp=>{const open=()=>{const c=it.checklist.find(k=>k.id===sp.dataset.ced);if(!c||sp.querySelector("input"))return;
+      inlineEdit(sp,c.t,v=>{if(v&&v!==c.t){c.t=v;commit()}back()},back)};sp.onclick=e=>{e.preventDefault();open()};sp.onkeydown=e=>{if(e.key==="Enter"&&e.target===sp){e.preventDefault();e.stopPropagation();open()}}});
+    const cl=root.querySelector(".chk-list");if(cl)dragList(cl,".chk-row",(a,b)=>{const [x]=it.checklist.splice(a,1);it.checklist.splice(b,0,x);commit();back()});
+    root.querySelectorAll("[data-fx]").forEach(b=>b.onclick=()=>{const i=+b.dataset.fx;undoable(()=>{it.feedback.splice(i,1)},"Feedback note deleted",back);back()});
+    root.querySelectorAll("[data-fed]").forEach(b=>b.onclick=()=>{const i=+b.dataset.fed,f=it.feedback[i],row=b.closest(".fb-row");if(!f||row.classList.contains("editing"))return;row.classList.add("editing");
+      row.innerHTML=`<div class="fb-form">${dateBox('data-fd',f.d)}<input class="inp" data-ft value="${esc(f.t)}" aria-label="Feedback"><div class="row"><button class="btn sm primary" data-fs>Save</button><button class="btn sm ghost" data-fc>Cancel</button></div></div>`;
+      const d=row.querySelector("[data-fd]"),t=row.querySelector("[data-ft]"),saveF=()=>{const v=t.value.trim();if(!v)return t.focus();f.t=v;f.d=d.value||f.d;fbSort();commit();back()};
+      row.querySelector("[data-fs]").onclick=saveF;row.querySelector("[data-fc]").onclick=back;
+      [d,t].forEach(x=>x.onkeydown=e=>{if(e.key==="Enter"&&!e.isComposing){e.preventDefault();e.stopPropagation();saveF()}else if(e.key==="Escape"){e.preventDefault();e.stopPropagation();back()}});
+      setTimeout(()=>{t.focus();t.setSelectionRange(t.value.length,t.value.length)},20)});
     root.querySelectorAll("[data-chk]").forEach(c=>c.onchange=()=>{const x=it.checklist.find(k=>k.id===c.dataset.chk);x.d=c.checked;c.parentElement.classList.toggle("done",c.checked);save()});
     let viaKey=false;const reopen=sel=>{const m=root.querySelector(".modal"),st=m?m.scrollTop:0;itemModal(id);const m2=document.querySelector("#modal-root .modal");if(m2)m2.scrollTop=st;if(viaKey){viaKey=false;refocus(sel)}};
     [["#chk-new","#chk-add"],["#fb-new","#fb-add"]].forEach(([i,b])=>root.querySelector(i).onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();e.stopPropagation();if(!e.target.value.trim())return;viaKey=true;root.querySelector(b).click();viaKey=false}});
     root.querySelector("#chk-add").onclick=()=>{const v=root.querySelector("#chk-new").value.trim();if(v){it.checklist.push({id:uid(),t:v,d:false});commit();reopen("#chk-new")}};
-    root.querySelector("#fb-add").onclick=()=>{const v=root.querySelector("#fb-new").value.trim();if(v){it.feedback.push({d:TODAY(),t:v});commit();reopen("#fb-new")}};
+    root.querySelector("#fb-add").onclick=()=>{const v=root.querySelector("#fb-new").value.trim();if(v){it.feedback.push({d:TODAY(),t:v});it.feedback=it.feedback.map((f,i)=>({f,i})).sort((a,b)=>String(a.f.d).localeCompare(String(b.f.d))||a.i-b.i).map(x=>x.f);commit();reopen("#fb-new")}};
     root.querySelectorAll("[data-start]").forEach(b=>b.onclick=()=>startSheet(b.dataset.start));
     root.querySelectorAll("[data-log]").forEach(b=>b.onclick=()=>timeLogModal(b.dataset.log,id));
     root.querySelectorAll("[data-editstep]").forEach(b=>b.onclick=()=>stepModal(it.id,b.dataset.editstep));
@@ -1354,11 +1375,16 @@ function roundsModal(phId){
   const r=IX.idx.phase[phId];if(!r)return;const{p,ph}=r,L=roundsOf(ph),inc=roundsIncl(p),fl=S.settings.flagScope!==false;
   modal(`<h2>${esc(ph.name)} · Feedback Rounds</h2>
     <p class="sub" style="margin:0">Log one round each time the client sends combined feedback on this phase. ${inc>0?`${esc(p.name)} includes ${inc} round${inc>1?"s":""} per phase (change it in Edit Project).`:`${esc(p.name)} has no limit, so rounds are only counted.`}</p>
-    <div class="rnd">${L.map((x,i)=>`<div class="rnd-i"><b>Round ${i+1}</b><span><span class="sub">${short(x.d)}${inc>0&&i>=inc&&fl?" · Over Scope":""}</span>${x.note?`<br><span class="sub" style="color:var(--ink)">${esc(x.note)}</span>`:""}</span><button class="btn sm ghost danger" data-rx="${x.id}">Remove</button></div>`).join("")||`<p class="empty">No feedback rounds logged yet.</p>`}</div>
+    <div class="rnd">${L.map((x,i)=>`<div class="rnd-i" data-ri="${x.id}"><b>Round ${i+1}</b><button class="rnd-ed" data-red="${x.id}" title="Tap to Edit"><span class="sub">${short(x.d)}${inc>0&&i>=inc&&fl?" · Over Scope":""}</span>${x.note?`<br><span class="sub" style="color:var(--ink)">${esc(x.note)}</span>`:`<br><span class="sub">Tap to Add a Note</span>`}</button><button class="btn sm ghost danger" data-rx="${x.id}">Remove</button></div>`).join("")||`<p class="empty">No feedback rounds logged yet.</p>`}</div>
     <div class="field"><span class="lbl">LOG ROUND ${L.length+1}</span><input class="inp" type="date" id="rd-d" value="${TODAY()}" style="width:auto"><textarea class="inp" id="rd-n" rows="2" placeholder="What the Feedback Asked For (Optional)"></textarea></div>
     ${inc>0&&L.length>=inc&&fl?`<p class="sub" style="margin:0;color:var(--amber);font-weight:700">Round ${L.length+1} Goes Past the ${inc} Included. Worth Agreeing on Extra Rounds With the Client Before Starting.</p>`:""}
     <div class="m-actions"><button class="btn" data-close>Close</button><button class="btn primary" id="rd-add">Log Round ${L.length+1}</button></div>`,root=>{
-    root.querySelectorAll("[data-rx]").forEach(b=>armDelete(b,()=>{undoable(()=>{ph.rounds=roundsOf(ph).filter(x=>x.id!==b.dataset.rx)},"Round removed");roundsModal(phId)},"Tap Again"));
+    root.querySelectorAll("[data-rx]").forEach(b=>armDelete(b,()=>{undoable(()=>{ph.rounds=roundsOf(ph).filter(x=>x.id!==b.dataset.rx)},"Round removed",()=>roundsModal(phId));roundsModal(phId)},"Tap Again"));
+    root.querySelectorAll("[data-red]").forEach(b=>b.onclick=()=>{const x=roundsOf(ph).find(r=>r.id===b.dataset.red),host=b.closest(".rnd-i");if(!x||host.classList.contains("editing"))return;host.classList.add("editing");
+      b.outerHTML=`<div class="rnd-form">${dateBox('data-rd',x.d)}<textarea class="inp" data-rn rows="2" placeholder="What the Feedback Asked For (Optional)">${esc(x.note||"")}</textarea><div class="row"><button class="btn sm primary" data-rs>Save</button><button class="btn sm ghost" data-rc>Cancel</button></div></div>`;
+      const d=host.querySelector("[data-rd]"),n=host.querySelector("[data-rn]"),saveR=()=>{x.d=d.value||x.d;x.note=n.value.trim();ph.rounds=roundsOf(ph).slice().sort((a,c)=>a.d.localeCompare(c.d));commit();roundsModal(phId)};
+      host.querySelector("[data-rs]").onclick=saveR;host.querySelector("[data-rc]").onclick=()=>roundsModal(phId);
+      [d,n].forEach(el=>el.addEventListener("keydown",e=>{if(e.key==="Escape"){e.preventDefault();e.stopPropagation();roundsModal(phId)}else if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing&&(el===d||!e.shiftKey)){e.preventDefault();e.stopPropagation();saveR()}}))});
     root.querySelector("#rd-add").onclick=()=>{const d=root.querySelector("#rd-d").value||TODAY(),n=root.querySelector("#rd-n").value.trim();closeModal();
       undoable(()=>{ph.rounds=[...roundsOf(ph),{id:uid(),d,note:n}].sort((a,b)=>a.d.localeCompare(b.d))},`Round ${L.length+1} logged for ${ph.name}`)}});
 }
@@ -2294,7 +2320,7 @@ function viewWeek(){
       ${tasks.length?tasks.map(({ph,it})=>{const s=itemStats(it);return `<div class="task"><span class="dot" style="--c:var(--${ph.color})"></span><button style="border:0;background:none;padding:0;text-align:left" data-open-item="${it.id}"><b>${esc(it.name)}</b> <span class="sub">${esc(ph.name)}</span></button><span class="chip" style="--sc:var(${SC[it.status]})">${esc(it.status)} · ${AE(s.act,s.est)}${S.settings.weekWarn?pctTag(s.act,s.est):""}</span></div>`}).join(""):`<p class="empty">Set an item's target week to see it here.</p>`}</section>
   </div>`;
 }
-function listEd(key,arr,wk){return `<div class="list-ed" data-list="${key}" data-wk="${wk||""}">${arr.map((v,i)=>`<div class="li"><span class="n">${i+1}</span><input class="inp" data-li="${i}" value="${esc(v)}" aria-label="Item ${i+1}"><button class="btn sm ghost" data-lx="${i}" aria-label="Remove">✕</button></div>`).join("")}<button class="btn sm ghost" style="justify-self:start" data-ladd>+ Add</button></div>`}
+function listEd(key,arr,wk){return `<div class="list-ed" data-list="${key}" data-wk="${wk||""}">${arr.map((v,i)=>`<div class="li"><span class="n${arr.length>1?" grip":""}" ${arr.length>1?`title="Drag to Reorder"`:""}>${arr.length>1?"⋮⋮ ":""}${i+1}</span><input class="inp" data-li="${i}" value="${esc(v)}" aria-label="Item ${i+1}"><button class="btn sm ghost" data-lx="${i}" aria-label="Remove">✕</button></div>`).join("")}<button class="btn sm ghost" style="justify-self:start" data-ladd>+ Add</button></div>`}
 
 /* ===================== day (vertical, fits the screen) ===================== */
 function viewDay(){
@@ -2520,7 +2546,7 @@ function monthlyReview(){
   const [y,m]=mk.split("-").map(Number),from=iso(new Date(y,m-1,1)),to=iso(new Date(y,m,0));
   const ses=S.sessions.filter(s=>s.date>=from&&s.date<=to),l=ses.reduce((a,s)=>a+s.dur,0);
   const per={};ses.forEach(s=>{const x=IX.idx.step[s.step];if(x)per[x.p.name]=(per[x.p.name]||0)+s.dur});
-  const lst=(k,arr)=>`<div class="list-ed" data-mlist="${k}">${arr.map((v,i)=>`<div class="li"><span class="n">${i+1}</span><input class="inp" data-mi="${i}" value="${esc(v)}" aria-label="${k} ${i+1}"><button class="btn sm ghost" data-mx="${i}" aria-label="Remove">✕</button></div>`).join("")}<button class="btn sm ghost" style="justify-self:start" data-madd>+ Add</button></div>`;
+  const lst=(k,arr)=>`<div class="list-ed" data-mlist="${k}">${arr.map((v,i)=>`<div class="li"><span class="n${arr.length>1?" grip":""}" ${arr.length>1?`title="Drag to Reorder"`:""}>${arr.length>1?"⋮⋮ ":""}${i+1}</span><input class="inp" data-mi="${i}" value="${esc(v)}" aria-label="${k} ${i+1}"><button class="btn sm ghost" data-mx="${i}" aria-label="Remove">✕</button></div>`).join("")}<button class="btn sm ghost" style="justify-self:start" data-madd>+ Add</button></div>`;
   return `<div class="row"><h2 class="grow">${new Date(y,m-1,1).toLocaleDateString(undefined,{month:"long",year:"numeric"})}</h2>
     <span class="navg"><button class="btn" data-mr="-1" aria-label="Previous month">←</button><button class="btn" data-mr="0">This Month</button><button class="btn" data-mr="1" aria-label="Next month">→</button>
     <button class="btn" data-rv-export="monthly">Export</button></span></div>
@@ -2531,7 +2557,7 @@ function monthlyReview(){
     <div class="rv-grid"><div class="field"><span class="lbl">WINS</span>${lst("wins",r.wins)}</div><div class="field"><span class="lbl">IMPROVEMENTS</span>${lst("improve",r.improve)}</div></div></section>
   <section class="panel rv-goals" style="display:grid;gap:10px"><h3>Goals</h3>
     <div class="goal-h"><span></span><span>Goal</span><span class="why">Why / How</span><span class="rw">Rewards</span><span></span></div>
-    <div class="goals">${r.goals.map((g,i)=>`<div class="goal"><span class="n" style="color:var(--faint);padding-top:8px;text-align:right;font-size:12px">${i+1}</span>
+    <div class="goals">${r.goals.map((g,i)=>`<div class="goal"><span class="n${r.goals.length>1?" grip":""}" style="color:var(--faint);padding-top:8px;text-align:right;font-size:12px" ${r.goals.length>1?`title="Drag to Reorder"`:""}>${r.goals.length>1?"⋮⋮ ":""}${i+1}</span>
       <textarea class="inp" rows="2" data-goal="${i}" data-gk="g" aria-label="Goal ${i+1}">${esc(g.g)}</textarea><textarea class="inp why" rows="2" data-goal="${i}" data-gk="w" aria-label="Why / How ${i+1}">${esc(g.w)}</textarea><textarea class="inp rw" rows="2" data-goal="${i}" data-gk="r" aria-label="Rewards ${i+1}">${esc(g.r)}</textarea>
       <button class="btn sm ghost" data-gx="${i}" aria-label="Remove goal">✕</button></div>`).join("")}</div>
     <button class="btn sm" style="justify-self:start" id="goal-add">+ Goal</button></section>
@@ -2671,7 +2697,7 @@ function libModal(){
       ${S.projects.filter(p=>(S.ui.ptf||"All")==="All"||ptype(p)===S.ui.ptf).map(p=>`<div class="tpl"><div><b>${esc(p.name)}</b> <span class="chip type">${ptype(p)}</span> <span class="sub">${p.client?esc(p.client)+" · ":""}${esc(p.subtitle||"")}${p.archived?" · Archived":""}</span>${dmMissing(p)?` <span class="chip flag">No Decision-Maker Named</span>`:""}</div>
       <div class="row"><button class="btn sm" data-lib-open="${p.id}">Open</button><button class="btn sm" data-lib-edit="${p.id}">Edit</button><button class="btn sm" data-lib-cr="${p.id}">Client Report</button><button class="btn sm" data-lib-tpl="${p.id}">Save as Template</button><button class="btn sm" data-lib-dl="${p.id}">Download</button><button class="btn sm ghost" data-lib-arch="${p.id}">${p.archived?"Unarchive":"Archive"}</button><button class="btn sm" data-lib-xp="${p.id}">Export Report</button><button class="btn sm ghost danger" data-lib-del="${p.id}">Delete</button></div></div>`).join("")||`<p class="empty">No ${S.ui.ptf==="Pitch"?"pitches":esc((S.ui.ptf||"").toLowerCase())+" projects"} yet.</p>`}</section>
     <section style="display:grid"><h3 style="margin-bottom:4px">Pipeline Templates</h3>${S.templates.map(t=>`<div class="tpl"><div><b>${esc(t.name)}</b> <span class="sub">${esc(t.note||"")}${t.archived?" · Archived":""}</span></div>
-      <div class="row"><button class="btn sm primary" data-tpl-new="${t.id}">New Project from This</button><button class="btn sm" data-tpl-dl="${t.id}">Download</button><button class="btn sm ghost" data-tpl-arch="${t.id}">${t.archived?"Unarchive":"Archive"}</button><button class="btn sm ghost danger" data-tpl-del="${t.id}">Delete</button></div></div>`).join("")}</section>
+      <div class="row"><button class="btn sm primary" data-tpl-new="${t.id}">New Project from This</button><button class="btn sm" data-tpl-ren="${t.id}">Rename</button><button class="btn sm" data-tpl-dl="${t.id}">Download</button><button class="btn sm ghost" data-tpl-arch="${t.id}">${t.archived?"Unarchive":"Archive"}</button><button class="btn sm ghost danger" data-tpl-del="${t.id}">Delete</button></div></div>`).join("")}</section>
     <p class="sub" style="margin:0">A template keeps phases, budgets, items, steps, stage timers and checklists, with no logged time. A project download includes its logged time. Load from File accepts either.</p>`,
   root=>{
     root.querySelector("#lib-blank").onclick=()=>{const p={id:uid(),name:"Untitled Project",subtitle:"",archived:false,phases:[]};S.projects.push(p);S.ui.project=p.id;S.ui.view="board";commit();projectModal(p.id,true)};
@@ -2686,6 +2712,7 @@ function libModal(){
     root.querySelectorAll("[data-lib-del]").forEach(b=>armDelete(b,()=>{const dp=S.projects.find(x=>x.id===b.dataset.libDel);if(dp)queueTrash(driveIdsIn(dp),3000);S.projects=S.projects.filter(x=>x.id!==b.dataset.libDel);S.ui.project=(S.projects[0]||{}).id;commit();libModal()},"Delete Project + Time"));
     root.querySelectorAll("[data-tpl-new]").forEach(b=>b.onclick=()=>{const t=S.templates.find(x=>x.id===b.dataset.tplNew);const p=fromStructure(t.data,"");S.projects.push(p);S.ui.project=p.id;S.ui.view="board";commit();projectModal(p.id,false);toast("Project created with zero hours logged. Give it a name.")});
     root.querySelectorAll("[data-tpl-arch]").forEach(b=>b.onclick=()=>{const t=S.templates.find(x=>x.id===b.dataset.tplArch);t.archived=!t.archived;commit();libModal()});
+    root.querySelectorAll("[data-tpl-ren]").forEach(b=>b.onclick=()=>{const t=S.templates.find(x=>x.id===b.dataset.tplRen);if(!t)return;askText("Rename Template","Template Name",t.name,v=>{t.name=v;commit();libModal();toast("Template renamed")},()=>libModal(),"Rename")});
     root.querySelectorAll("[data-tpl-del]").forEach(b=>armDelete(b,()=>{S.templates=S.templates.filter(x=>x.id!==b.dataset.tplDel);commit();libModal()}));
     root.querySelectorAll("[data-lib-dl]").forEach(b=>b.onclick=()=>{const p=S.projects.find(x=>x.id===b.dataset.libDl);downloadFile(`${p.name} Project ${TODAY()}.json`,JSON.stringify(projectFile(p)));toast("Project downloaded")});
     root.querySelectorAll("[data-tpl-dl]").forEach(b=>b.onclick=()=>{const t=S.templates.find(x=>x.id===b.dataset.tplDl);downloadFile(`${t.name} Template.json`,JSON.stringify({kind:"bbst-template",name:t.name,note:t.note,data:t.data}));toast("Template downloaded")});
@@ -3217,7 +3244,7 @@ manual:[
 <li>Tap the name to rename it. Status: Not Started, In Progress, Submitted, Feedback Received, Revising, Approved, Done. Starting the timer moves Not Started to In Progress for you.</li>
 <li>Target Week puts the item in This Week's Items on the Week page.</li>
 <li>Steps: each has an estimate and optional timer stages. Start runs the timer, Time Log fixes logged sessions, Edit Step changes the estimate and stages. The arrows reorder steps.</li>
-<li>Checklist and Feedback keep their own lists. Type an entry and press Enter: it's added and the box is ready for the next one. Notes has a writing box, any links you type become tappable, and Attachments sits below it.</li>
+<li>Checklist and Feedback keep their own lists. Type an entry and press Enter: it's added and the box is ready for the next one. Notes has a writing box, any links you type become tappable, and Attachments sits below it. Tap a checklist line's text to edit it (Enter saves, Esc cancels), tap ✕ to delete it (with Undo), and hold the ⋮⋮ handle to drag it up or down. Tap a feedback note to edit its text or date; notes stay in date order. ✕ deletes a note (with Undo).</li>
 <li>At the bottom: Delete, Move to Phase, Save as Template and Load Template.</li>
 </ul>
 <h4>Month</h4>
@@ -3237,7 +3264,7 @@ manual:[
 <li>Hold a block, then drag to move it, even to another day. On a laptop, just drag. Drag the right edge to change its length.</li>
 <li>Pinch the chart, or use − Fit +, to zoom the hours.</li>
 <li>Striped blocks are Google Calendar events. Under each day's name: project due dates, phase target dates and all-day events (+2 means two more). Tap a striped block for its details.</li>
-<li>Hours by Phase compares actual and planned time this week. Weekly Priorities (green) and Achievements (the Goals card color) are simple lists: Enter saves a line and starts the next one; Enter on an empty line finishes. They also appear in the Weekly Review. This Week's Items lists items with this target week.</li>
+<li>Hours by Phase compares actual and planned time this week. Weekly Priorities (green) and Achievements (the Goals card color) are simple lists: Enter saves a line and starts the next one; Enter on an empty line finishes. They also appear in the Weekly Review. This Week's Items lists items with this target week. Hold the ⋮⋮ handle next to a line's number to drag it to a new place.</li>
 </ul>
 <h4>Day</h4>
 [[fig:day|Day: one column for the whole day]]
@@ -3267,7 +3294,7 @@ manual:[
 <li>Weekly Review: Logged vs Target, Items Submitted (items with this target week that reached Submitted or later), and the project's budget used. Budget Alerts list phases past the warning point.</li>
 <li>Top to bottom: THIS WEEK'S FOCUS (faintly shows last week's Next Week's Focus until you write your own), WEEKLY PRIORITIES and ACHIEVEMENTS (the same lists as on the Week page; edit them in either place), WHAT WORKED and WHAT TO IMPROVE, FEEDBACK SUMMARY and NEXT WEEK'S FOCUS, then NOTES.</li>
 <li>Everything saves as you type. The arrows move between weeks.</li>
-<li>Monthly Review: Focus, hours logged in total and per project, Previous Month Review (Wins and Improvements), Goals (Goal, Why/How, Rewards) and Notes. In Wins and Improvements, Enter saves a line and starts the next. In Goals, Enter moves from Goal to Why / How to Rewards, then starts a new goal; Shift+Enter adds a line break.</li>
+<li>Monthly Review: Focus, hours logged in total and per project, Previous Month Review (Wins and Improvements), Goals (Goal, Why/How, Rewards) and Notes. In Wins and Improvements, Enter saves a line and starts the next. In Goals, Enter moves from Goal to Why / How to Rewards, then starts a new goal; Shift+Enter adds a line break. Wins, Improvements and Goals reorder the same way, with the ⋮⋮ handle.</li>
 <li>Export: Create PDF prints the review on screen (choose Save as PDF in the print window). On iPad the tracker makes the PDF file itself: tap Save or Share PDF, then Save to Files. Export Excel File saves every review in a date range.</li>
 </ul>`},
 {id:"m2",h:"2. Projects, Phases and Items",html:`
@@ -3310,7 +3337,7 @@ manual:[
 <h4>Phase Templates and Pipeline Templates</h4>
 <ul>
 <li>Phase template (Edit Phase > Save as Template): budget, color, schedule, default item template and items. Load it into any phase.</li>
-<li>Pipeline template (Projects > Save as Template): the whole project structure, ready for New Project from This.</li>
+<li>Pipeline template (Projects > Save as Template): the whole project structure, ready for New Project from This. Rename it from Projects & Templates.</li>
 </ul>`},
 {id:"m3",h:"3. The Timer",html:`
 [[fig:timer|The timer bar during a stage]]
@@ -3399,7 +3426,7 @@ manual:[
 </ul>
 <h4>Feedback Rounds</h4>
 <ul>
-<li>Open a phase and tap Feedback Rounds to log a round with its date and a note. When you set an item to Feedback Received, the tracker offers to log the round for you.</li>
+<li>Open a phase and tap Feedback Rounds to log a round with its date and a note. When you set an item to Feedback Received, the tracker offers to log the round for you. Tap a logged round to fix its date or note; rounds stay in date order and renumber.</li>
 <li>Past the included rounds, the phase shows Over Scope · Round 2 of 1. Set the number per project in Edit Project; 0 counts rounds without a limit.</li>
 </ul>
 <h4>Deadline Forecast</h4>
@@ -3551,7 +3578,7 @@ manual:[
 <dt>Branding</dt><dd>The App Name, Home Screen Name, logo and home-screen icon (Settings &gt; Advanced &gt; Branding).</dd>
 <dt>Budget</dt><dd>The hours a project, phase or item is allowed. The bars fill as you log time against it.</dd>
 <dt>Budget Meter</dt><dd>The colors that show how full a budget is: teal for used, yellow past the warning point, pink over budget. Each can be switched off.</dd>
-<dt>Checklist</dt><dd>A simple tick list inside an item.</dd>
+<dt>Checklist</dt><dd>A simple tick list inside an item. Tap a line to edit it, ✕ to delete it, ⋮⋮ to drag it.</dd>
 <dt>Clear (✕)</dt><dd>The small ✕ next to a date box. It empties the date; then tap Save.</dd>
 <dt>Client Report</dt><dd>A clean summary of a project to share with a client, with options for which numbers to show (Projects &gt; Client Report or the Board).</dd>
 <dt>Connection Link</dt><dd>A single link that holds your web app URL and key. Opening or pasting it connects a device. Treat it like a password.</dd>
@@ -3559,6 +3586,7 @@ manual:[
 <dt>Daily Target</dt><dd>The hours you aim to log each day (6 by default). Month shades days by how close you got.</dd>
 <dt>Decision-Maker</dt><dd>The person on a client project who signs off. A flag appears when a Client project has none.</dd>
 <dt>Diary</dt><dd>The writing box on the Day page for notes about that day.</dd>
+<dt>Drag Handle (⋮⋮)</dt><dd>The dots next to a list line. Hold and drag them to move the line up or down (checklists, Weekly Priorities, Achievements, Wins, Improvements, Goals).</dd>
 <dt>Due Date</dt><dd>The date a whole project is due. It shows in the project&#x27;s color on Month, Week and Day, and drives the deadline forecast.</dd>
 <dt>Effective Rate</dt><dd>What you actually earn per hour logged on a project or phase.</dd>
 <dt>Estimate</dt><dd>The time you expect a step to take. Item and phase estimates add up from their steps; the thin line on a bar marks it.</dd>
@@ -3657,11 +3685,11 @@ function armDelete(btn,fn,armedText="Tap Again to Delete"){if(!btn)return;const 
   btn.addEventListener("click",()=>{if(btn.classList.contains("armed")){clearTimeout(tm);fn()}else{btn.classList.add("armed");btn.textContent=armedText;clearTimeout(tm);tm=setTimeout(()=>{if(btn.isConnected&&btn.classList.contains("armed")){btn.classList.remove("armed");btn.textContent=orig}},3000)}})}
 const undoSnap=()=>JSON.stringify({projects:S.projects,templates:S.templates,sessions:S.sessions,plans:S.plans,routineSkip:S.routineSkip,settings:S.settings,notes:S.notes,weekly:S.weekly,weekMeta:S.weekMeta,monthly:S.monthly,itemTemplates:S.itemTemplates,phaseTemplates:S.phaseTemplates,brand:S.brand});
 let lastUndo=null;
-function undoable(fn,msg){
+function undoable(fn,msg,after){
   const before=undoSnap();
   fn();commit();
   const label=typeof msg==="function"?msg():msg,t=toast(label,6000);
-  const run=()=>{if(lastUndo!==rec)return;lastUndo=null;Object.assign(S,JSON.parse(before));t.remove();applyPalette();applyAdv();commit();toast("Undone")};
+  const run=()=>{if(lastUndo!==rec)return;lastUndo=null;Object.assign(S,JSON.parse(before));t.remove();applyPalette();applyAdv();commit();toast("Undone");if(after)after()};
   const rec={run,after:undoSnap(),label};lastUndo=rec;
   const u=document.createElement("button");u.className="undo";u.textContent="Undo";u.onclick=run;t.appendChild(u);
 }
@@ -3688,6 +3716,19 @@ function render(){
   bindView(v);
   growAll(v);
 }
+/* tap text to edit it in place: Enter or leaving the box saves, Esc cancels */
+function inlineEdit(host,val,save,cancel){host.innerHTML=`<input class="inp ie" value="${esc(val)}" aria-label="Edit">`;const i=host.querySelector("input");let done=false;
+  const fin=ok=>{if(done)return;done=true;ok?save(i.value.trim()):cancel()};
+  i.onkeydown=e=>{if(e.key==="Enter"&&!e.isComposing){e.preventDefault();e.stopPropagation();fin(true)}else if(e.key==="Escape"){e.preventDefault();e.stopPropagation();fin(false)}};
+  i.onblur=()=>setTimeout(()=>fin(true),0);i.onclick=e=>e.stopPropagation();setTimeout(()=>{i.focus();i.setSelectionRange(i.value.length,i.value.length)},20)}
+/* hold the ⋮⋮ handle and drag a line up or down (mouse, finger or pen) */
+function dragList(box,rowSel,onDrop){box.querySelectorAll(rowSel).forEach(row=>{const g=row.querySelector(".grip");if(!g)return;
+  g.addEventListener("pointerdown",e=>{if(e.button>0)return;e.preventDefault();const rows=()=>[...box.querySelectorAll(rowSel)],from=rows().indexOf(row);row.classList.add("dragging");
+    const move=ev=>{const others=rows().filter(r=>r!==row);let before=null;for(const r of others){const b=r.getBoundingClientRect();if(ev.clientY<b.top+b.height/2){before=r;break}}
+      if(before){if(row.nextElementSibling!==before)before.before(row)}else{const last=others[others.length-1];if(last&&last.nextElementSibling!==row)last.after(row)}};
+    /* moving the line in the page drops the pointer capture, so follow the pointer on the whole window */
+    const up=()=>{removeEventListener("pointermove",move,true);removeEventListener("pointerup",up,true);removeEventListener("pointercancel",up,true);row.classList.remove("dragging");const to=rows().indexOf(row);if(to!==from&&to>=0)onDrop(from,to)};
+    addEventListener("pointermove",move,true);addEventListener("pointerup",up,true);addEventListener("pointercancel",up,true)})})}
 /* Enter in a list line: save it and start a new line below; Enter on an empty line removes it and finishes */
 function refocus(sel){const go=()=>{const x=document.querySelector(sel);if(x&&document.activeElement!==x){x.focus({preventScroll:false});try{const n=x.value.length;x.setSelectionRange(n,n)}catch(e){}}return !!x};if(!go())requestAnimationFrame(go)}
 function listEnter(inp,arr,i,selTpl){inp.addEventListener("keydown",e=>{if(e.key!=="Enter"||e.shiftKey||e.isComposing||e.altKey||e.metaKey||e.ctrlKey)return;e.preventDefault();e.stopPropagation();
@@ -3701,6 +3742,7 @@ function bindView(v){
   v.querySelectorAll("[data-list]").forEach(L=>{const wk=L.dataset.wk||S.ui.week,M=S.weekMeta[wk]=S.weekMeta[wk]||{priorities:[],achievements:[]},arr=M[L.dataset.list==="pri"?"priorities":"achievements"];
     L.querySelectorAll("[data-li]").forEach(i=>{i.oninput=()=>{arr[i.dataset.li]=i.value;save()};listEnter(i,arr,+i.dataset.li,`[data-list="${L.dataset.list}"][data-wk="${L.dataset.wk}"] [data-li="#"]`)});
     L.querySelectorAll("[data-lx]").forEach(b=>b.onclick=()=>{arr.splice(b.dataset.lx,1);commit()});
+    dragList(L,".li",(a,b)=>{const [x]=arr.splice(a,1);arr.splice(b,0,x);commit()});
     L.querySelector("[data-ladd]").onclick=()=>{arr.push("");commit();const ins=document.querySelectorAll(`[data-list="${L.dataset.list}"] [data-li]`);ins[ins.length-1]?.focus()}});
   v.querySelectorAll("[data-wr]").forEach(t=>t.oninput=()=>{S.weekly[S.ui.rweek][t.dataset.wr]=t.value;save()});
   const mr=S.monthly[S.ui.month];
@@ -3710,6 +3752,7 @@ function bindView(v){
     v.querySelectorAll("[data-mlist]").forEach(L=>{const arr=mr[L.dataset.mlist];
       L.querySelectorAll("[data-mi]").forEach(i=>{i.oninput=()=>{arr[i.dataset.mi]=i.value;save()};listEnter(i,arr,+i.dataset.mi,`[data-mlist="${L.dataset.mlist}"] [data-mi="#"]`)});
       L.querySelectorAll("[data-mx]").forEach(b=>b.onclick=()=>{arr.splice(b.dataset.mx,1);commit()});
+      dragList(L,".li",(a,b)=>{const [x]=arr.splice(a,1);arr.splice(b,0,x);commit()});
       L.querySelector("[data-madd]").onclick=()=>{arr.push("");commit();refocus(`[data-mlist="${L.dataset.mlist}"] [data-mi="${arr.length-1}"]`)}});
     v.querySelectorAll("[data-goal]").forEach(t=>{t.oninput=()=>{mr.goals[t.dataset.goal][t.dataset.gk]=t.value;save()};
       t.addEventListener("keydown",e=>{if(e.key!=="Enter"||e.shiftKey||e.isComposing||e.altKey||e.metaKey||e.ctrlKey)return;e.preventDefault();e.stopPropagation();
@@ -3718,6 +3761,7 @@ function bindView(v){
         const g=mr.goals[i];if(!(g.g||"").trim()&&!(g.w||"").trim()&&!(g.r||"").trim())return void t.blur();
         mr.goals.splice(i+1,0,{g:"",w:"",r:""});commit();refocus(`[data-goal="${i+1}"][data-gk="g"]`)})});
     v.querySelectorAll("[data-gx]").forEach(b=>b.onclick=()=>{mr.goals.splice(b.dataset.gx,1);commit()});
+    const gl=v.querySelector(".goals");if(gl)dragList(gl,".goal",(a,b)=>{const [x]=mr.goals.splice(a,1);mr.goals.splice(b,0,x);commit()});
     v.querySelector("#goal-add").onclick=()=>{mr.goals.push({g:"",w:"",r:""});commit();refocus(`[data-goal="${mr.goals.length-1}"][data-gk="g"]`)};
   }
 }
