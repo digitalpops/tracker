@@ -566,6 +566,7 @@ input[type="date"].inp::-webkit-date-and-time-value,input[type="time"].inp::-web
 .vw-in{min-width:100%;min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:12px;box-sizing:border-box;width:max-content}
 .vw-in img{display:block;user-select:none;-webkit-user-drag:none;max-width:none}
 .vw-in canvas{display:block;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.4)}
+#vw:focus{outline:none}
 .vw-audio{display:grid;gap:14px;justify-items:center;padding:30px;max-width:520px;width:min(520px,90vw);text-align:center}
 .vw-audio b{font-size:15px;overflow-wrap:anywhere;color:#fff}.vw-audio audio{display:none}
 .ap{gap:18px;background:rgba(20,24,34,.92);border:1px solid #333a48;border-radius:18px;color:#E8ECF3;padding:28px 26px 22px}
@@ -656,7 +657,7 @@ const LPAL_DEF={light:["#CEFBD0","#D5ECC2","#FAF6B7","#F2E3B3","#EDE6D8","#F7D9C
 const LIFE_ORDER=[1,7,2,11,10,5,8,6,12,9,4,3]; /* October 2026 reorder: new slot k shows old slot LIFE_ORDER[k-1] */
 const STATUSES=[["Not Started","--faint"],["In Progress","--accent"],["Submitted","--amber"],["Feedback Received","--p7"],["Revising","--act"],["Approved","--p3"],["Done","--ok"]];
 const SC=Object.fromEntries(STATUSES);
-const APP_VERSION="2026.10.11.05";
+const APP_VERSION="2026.10.12.02";
 const isDone=it=>it.status==="Done"||it.status==="Approved";
 const DEF_NAME="Blue Blaze Project Tracker";
 const appName=()=>((typeof S!=="undefined"&&S&&S.settings&&S.settings.brandName)||"").trim()||DEF_NAME;
@@ -1371,7 +1372,7 @@ const fileURLs={},memFiles={},inflight={},memUp={};
 const extOf=n=>{const m=String(n||"").toLowerCase().split(/[?#]/)[0].match(/\.([a-z0-9]{1,10})$/);return m?m[1]:""};
 const MIMES={jpg:"image/jpeg",jpeg:"image/jpeg",png:"image/png",gif:"image/gif",webp:"image/webp",pdf:"application/pdf",psd:"image/vnd.adobe.photoshop",svg:"image/svg+xml",zip:"application/zip",mp4:"video/mp4",mov:"video/quicktime",txt:"text/plain"};
 const mimeOf=n=>MIMES[extOf(n)]||"application/octet-stream";
-const kindOf=a=>{if(a.kind==="link")return"other";const e=extOf(a.name),m=a.mime||"";if(/^image\/(jpeg|png|gif|webp)$/.test(m)||["jpg","jpeg","png","gif","webp"].includes(e))return"img";if(m==="application/pdf"||e==="pdf")return"pdf";if(/^audio\/(mpeg|mp3|mp4|x-m4a|wav|x-wav|aac)$/.test(m)||["mp3","m4a","wav","aac"].includes(e))return"audio";return"other"};
+const kindOf=a=>{if(a.kind==="link"&&!isDbx(a))return"other";const e=extOf(a.name)||(a.kind==="link"?extOf(a.url):""),m=a.kind==="link"?"":a.mime||"";if(/^image\/(jpeg|png|gif|webp)$/.test(m)||["jpg","jpeg","png","gif","webp"].includes(e))return"img";if(m==="application/pdf"||e==="pdf")return"pdf";if(/^audio\/(mpeg|mp3|mp4|x-m4a|wav|x-wav|aac)$/.test(m)||["mp3","m4a","wav","aac"].includes(e))return"audio";return"other"};
 const BADGE_C={psd:"#1A3D9C",psb:"#1A3D9C",procreate:"#4A4A55",ai:"#E07B00",eps:"#E07B00",pdf:"#A73A3A",jpg:"#2E9E6A",jpeg:"#2E9E6A",png:"#2E9E6A",gif:"#2E9E6A",webp:"#2E9E6A",heic:"#2E9E6A",tif:"#2E9E6A",tiff:"#2E9E6A",svg:"#C79A00",zip:"#6F7482",rar:"#6F7482",mp4:"#8A4FD8",mov:"#8A4FD8",blend:"#E87D0D",clip:"#C0457A",kra:"#3A6FD8",fig:"#A259FF",doc:"#2B5FB4",docx:"#2B5FB4",xls:"#1F7A45",xlsx:"#1F7A45",ppt:"#C4502A",pptx:"#C4502A",key:"#2B6BD8",txt:"#6F7482",drive:"#1A73E8",dropbox:"#0061FE",proton:"#6D4AFF",gdoc:"#1A73E8",mp3:"#000000",wav:"#000000",m4a:"#000000",aac:"#000000",flac:"#000000"};
 const MIME_EXT={"application/pdf":"pdf","image/jpeg":"jpg","image/png":"png","image/gif":"gif","image/webp":"webp","image/heic":"heic","image/svg+xml":"svg","image/tiff":"tif","image/vnd.adobe.photoshop":"psd","application/x-photoshop":"psd","application/illustrator":"ai","application/postscript":"ai","audio/mpeg":"mp3","audio/mp3":"mp3","audio/wav":"wav","audio/x-wav":"wav","audio/mp4":"m4a","audio/x-m4a":"m4a","video/mp4":"mp4","video/quicktime":"mov","application/zip":"zip","application/x-zip-compressed":"zip","text/plain":"txt","application/msword":"doc","application/vnd.openxmlformats-officedocument.wordprocessingml.document":"docx","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":"xlsx","application/vnd.openxmlformats-officedocument.presentationml.presentation":"pptx"};
 const GTYPE={"application/vnd.google-apps.document":{t:"DOC",c:"#538ED1",l:"Google Doc",app:"googledocs",path:"document"},"application/vnd.google-apps.spreadsheet":{t:"SHEET",c:"#0F9D58",l:"Google Sheet",app:"googlesheets",path:"spreadsheets"},"application/vnd.google-apps.presentation":{t:"SLIDES",c:"#B8923A",l:"Google Slides",app:"googleslides",path:"presentation"}};
@@ -1406,6 +1407,8 @@ async function driveFetch(a){const parts=[];let n=1,mime=a.mime;
   for(let i=0;i<n;i++){const r=await Sync.call("download",{id:a.driveId,part:i});n=r.parts||1;mime=r.mime||mime;parts.push(b64ToBytes(r.data||""))}
   return new Blob(parts,{type:mime||"application/octet-stream"})}
 async function getBlob(a){
+  if(isDbx(a)){const k=dbxKey(a);let b=await cacheGet(k);if(b)return b;if(!Sync.connected())throw new Error("NOT_CONNECTED");
+    b=await(inflight[k]=inflight[k]||dbxFetch(a).finally(()=>delete inflight[k]));await cachePut(k,b);return b}
   if(a.kind==="link")return null;
   if(a.pending){const u=memUp[a.id]||await IDB.get("up:"+a.id);if(u&&u.blob)return u.blob;throw new Error("ELSEWHERE")}
   if(isGdoc(a)){if(!Sync.connected())throw new Error("NOT_CONNECTED");return driveFetch(a)}
@@ -1414,7 +1417,7 @@ async function getBlob(a){
   b=await(inflight[a.driveId]=inflight[a.driveId]||driveFetch(a).finally(()=>delete inflight[a.driveId]));
   await cachePut(a.driveId,b);return b}
 async function localURL(a){if(fileURLs[a.id])return fileURLs[a.id];let b=null;
-  if(a.pending){const u=memUp[a.id]||await IDB.get("up:"+a.id);b=u&&u.blob}else if(a.driveId)b=await cacheGet(a.driveId);
+  if(a.pending){const u=memUp[a.id]||await IDB.get("up:"+a.id);b=u&&u.blob}else if(a.driveId)b=await cacheGet(a.driveId);else if(isDbx(a))b=await cacheGet(dbxKey(a));
   return b?(fileURLs[a.id]=URL.createObjectURL(b)):null}
 function refreshAttViews(){document.querySelectorAll("[data-attgrid]").forEach(e=>{if(e._draw)e._draw()})}
 /* add files: they wait on this device until they reach Drive, so attaching works offline too */
@@ -1458,11 +1461,13 @@ let offRun=false;
 async function syncOffline(){
   if(offRun||!keepOffline()||!Sync.connected()||!navigator.onLine)return;offRun=true;
   try{if(navigator.storage&&navigator.storage.persist&&!syncOffline.asked){syncOffline.asked=1;navigator.storage.persist().catch(()=>{})}}catch(x){}
-  try{const live=allDriveIds(),idx=FIDX();
+  try{const live=allDriveIds(),idx=FIDX();attOwners().forEach(o=>(o.files||[]).forEach(a=>{if(isDbx(a))live.add(dbxKey(a))}));
     for(const id of Object.keys(idx))if(!live.has(id)&&!LS.get(K_TRASH,[]).some(x=>x.id===id))await cacheDel(id);
     for(const o of attOwners())for(const a of (o.files||[]).slice()){
       if(a.kind!=="drive"||!a.driveId||isGdoc(a)||FIDX()[a.driveId])continue;
-      try{const b=await driveFetch(a);await cachePut(a.driveId,b);refreshAttViews()}catch(x){if(x.message==="NO_FILE")continue;return}}}
+      try{const b=await driveFetch(a);await cachePut(a.driveId,b);refreshAttViews()}catch(x){if(x.message==="NO_FILE")continue;return}}
+    for(const o of attOwners())for(const a of (o.files||[]).slice()){const k=isDbx(a)&&dbxKey(a);if(!k||FIDX()[k]||dbxBad.has(k))continue;
+      try{const b=await dbxFetch(a);await cachePut(k,b);refreshAttViews()}catch(x){if(/Unknown action/i.test(x.message)||!navigator.onLine)return;dbxBad.add(k)}}}
   finally{offRun=false}
 }
 function afterSync(){migrateColors();migrateFiles();migrateKeys();gScan();gFlush();gFetch();gDates();runUploads().then(()=>{runTrash();return convertDriveLinks()}).then(()=>syncOffline())}
@@ -1481,6 +1486,15 @@ const isGdoc=a=>/^application\/vnd\.google-apps/.test(a.mime||"");
 const driveIdOf=u=>{const s=String(u||"");if(!/(drive|docs)\.google\.com/.test(s))return null;const m=s.match(/(?:\/file\/d\/|\/document\/d\/|\/spreadsheets\/d\/|\/presentation\/d\/|[?&]id=)([A-Za-z0-9_-]{10,})/);return m?m[1]:null};
 const linkHost=u=>{const s=String(u||"").toLowerCase();return /(drive|docs)\.google\.com/.test(s)?"drive":/(^|\/\/|\.)dropbox\.com|db\.tt/.test(s)?"dropbox":/proton\.me|protondrive/.test(s)?"proton":"web"};
 const dropboxDl=u=>{try{const x=new URL(u);x.searchParams.set("dl","1");return x.toString()}catch(e){return u}};
+/* Dropbox shared links come through your Google Sheet's script, so they open in the viewer, download and stay offline like Drive files */
+function isDbx(a){return !!a&&a.kind==="link"&&linkHost(a.url)==="dropbox"}
+const dbxKey=a=>{let h=0;const t=String(a.url||"");for(let i=0;i<t.length;i++)h=(h*31+t.charCodeAt(i))|0;return "dbx_"+(h>>>0).toString(36)+"_"+t.length};
+const dbxBad=new Set();
+async function dbxFetch(a){const parts=[];let n=1,mime="";
+  for(let i=0;i<n;i++){const r=await Sync.call("linkGet",{url:a.url,part:i});n=r.parts||1;mime=r.mime||mime;parts.push(b64ToBytes(r.data||""))}
+  return new Blob(parts,{type:mime||mimeOf(a.name)||"application/octet-stream"})}
+function dbxErr(x){const m=String(x&&x.message||x);
+  return m==="NO_LINKS"?"Dropbox access isn't allowed yet. In Apps Script, run setupLinks once and approve it.":/Unknown action/i.test(m)?"Update your Google Sheet script first: paste the new Code.gs, run setupLinks, then deploy a new version.":m==="LINK_PRIVATE"?"This Dropbox link needs a login. In Dropbox, share it as \"Anyone with the link\", or use Open in Browser.":m==="TOO_BIG"?"Over 50 MB: too big to bring through the tracker. Use Open in Browser.":/^LINK_FAIL/.test(m)?"Dropbox didn't send the file ("+m.replace(/^LINK_FAIL:?\s*/,"")+"). Check the link, or use Open in Browser.":driveErr(x)}
 const shareKey=a=>a.driveId?"d:"+a.driveId:a.kind==="link"?"u:"+a.url:"a:"+a.id;
 const attUrl=a=>a.url||(a.driveId?`https://drive.google.com/file/d/${a.driveId}/view`:"");
 const isTouch=()=>matchMedia("(pointer:coarse)").matches;
@@ -1490,7 +1504,7 @@ function placeList(p){const out=[{ref:{kind:"project",id:p.id},label:"Project No
 function placesOf(a,except){const k=shareKey(a),out=[];S.projects.forEach(p=>placeList(p).forEach(x=>{const o=ownerOf(x.ref);if(o&&o!==except&&(o.files||[]).some(y=>shareKey(y)===k))out.push(x.lvl?`${x.label} (${(IX.idx.item[x.ref.id]||{}).ph?.name||""})`:x.label)}));return out}
 function attCard(a,cnt){
   const k=kindOf(a),bd=badgeOf(a),st=a.pending?"Waiting to Upload":a.kind==="link"?"Link":isGdoc(a)?((GTYPE[a.mime]||{}).l||"Google File"):fsize(a.size);
-  return `<div class="att ${a.pending?"pending":""}" data-att="${a.id}"><button class="att-open" data-att-open="${a.id}" title="${esc(a.name)}"><span class="th" ${k==="img"&&a.kind==="drive"?`data-th="${a.id}"`:""}><span class="bdg" style="--bc:${bd.c};${bd.ink?`color:${bd.ink}`:""}">${esc(bd.t)}</span></span><span class="nm">${esc(a.name)}</span><span class="sz"><span>${st}</span>${cnt>1?`<b class="cnt" title="In ${cnt} Places">${cnt}x</b>`:""}</span></button><button class="att-x" data-att-menu="${a.id}" aria-label="Options for ${esc(a.name)}">⋯</button></div>`}
+  return `<div class="att ${a.pending?"pending":""}" data-att="${a.id}"><button class="att-open" data-att-open="${a.id}" title="${esc(a.name)}"><span class="th" ${k==="img"&&(a.kind==="drive"||isDbx(a))?`data-th="${a.id}"`:""}><span class="bdg" style="--bc:${bd.c};${bd.ink?`color:${bd.ink}`:""}">${esc(bd.t)}</span></span><span class="nm">${esc(a.name)}</span><span class="sz"><span>${st}</span>${cnt>1?`<b class="cnt" title="In ${cnt} Places">${cnt}x</b>`:""}</span></button><button class="att-x" data-att-menu="${a.id}" aria-label="Options for ${esc(a.name)}">⋯</button></div>`}
 /* a small pop-up on top of the notes pop-up */
 function sheet(title,sub,body,onMount){
   document.getElementById("ov2")?.remove();
@@ -1672,9 +1686,9 @@ function actKey(a){if(a.kind==="link"){const h=linkHost(a.url);return h==="web"?
 function actOptions(a){const h=a.kind==="link"?linkHost(a.url):"drive",o=[];
   /* on iPad and iPhone, Google sends regular Drive files to its app even from preview links, so only Docs, Sheets and Slides get Open in Browser there */
   const driveFile=h==="drive"&&!/docs\.google\.com/.test(gUrl(a))&&!isGdoc(a);
-  if(h==="drive"&&isTouch())o.push("app");if(!(IS_IOS&&driveFile))o.push("browser");if(canDownload(a))o.push("download");o.push("copy");return o}
+  if(h==="drive"&&isTouch())o.push("app");if(h==="dropbox"&&IS_IOS)o.push("app");else if(!(IS_IOS&&driveFile))o.push("browser");if(canDownload(a))o.push("download");o.push("copy");return o}
 function openInApp(url){
-  if(!IS_IOS)return void window.open(url,"_blank","noopener");
+  if(!IS_IOS||linkHost(url)==="dropbox")return void window.open(url,"_blank","noopener");
   const sc=appScheme(url);location.href=sc+"://"+url.replace(/^https?:\/\//,"");
   setTimeout(()=>{if(document.visibilityState==="visible")toast(`Couldn't open the ${APP_N[sc]}. Try Open in Browser or Copy Link.`,5000)},2000)}
 function runAct(a,act){const u=gUrl(a);
@@ -1682,11 +1696,11 @@ function runAct(a,act){const u=gUrl(a);
   window.open(browserUrl(a),"_blank","noopener")}
 function openAtt(ref,id){
   const o=ownerOf(ref),a=o&&(o.files||[]).find(x=>x.id===id);if(!a)return;
-  if(a.kind==="drive"&&kindOf(a)!=="other")return openViewer(ref,id);
+  if((a.kind==="drive"||isDbx(a))&&kindOf(a)!=="other")return openViewer(ref,id);
   if(a.pending)return toast("This file is waiting to upload. It opens once it's in Google Drive.",4000);
   const K=actKey(a);if(!K)return void window.open(a.url,"_blank","noopener");
   const opts=actOptions(a),saved=LS.get(K_ACT,{})[K.k];if(saved&&opts.includes(saved))return runAct(a,saved);
-  sheet(esc(a.name),`How should ${esc(K.l)} open on this device?`,`<div class="opts">${opts.map(x=>`<button class="opt" data-act-o="${x}">${x==="download"?dlLabel(a):ACT_L[x]}${x==="app"?` <span class="sub">${APP_N[appScheme(gUrl(a))]}</span>`:x==="download"&&a.kind==="link"?` <span class="sub">Starts the Download in the Browser</span>`:x==="browser"&&IS_IOS&&linkHost(gUrl(a))==="drive"?` <span class="sub">Read-Only Preview</span>`:""}</button>`).join("")}</div>
+  sheet(esc(a.name),`How should ${esc(K.l)} open on this device?`,`<div class="opts">${opts.map(x=>`<button class="opt" data-act-o="${x}">${x==="download"?dlLabel(a):ACT_L[x]}${x==="app"?` <span class="sub">${isDbx(a)?"Dropbox App":APP_N[appScheme(gUrl(a))]}</span>`:x==="download"&&a.kind==="link"&&!isDbx(a)?` <span class="sub">Starts the Download in the Browser</span>`:x==="browser"&&IS_IOS&&linkHost(gUrl(a))==="drive"?` <span class="sub">Read-Only Preview</span>`:""}</button>`).join("")}</div>
     <label class="check"><input type="checkbox" id="act-rem"><span>Remember for ${esc(K.l)}</span></label><span class="sub">Change it later in Settings > Advanced > Data > Link and File Actions.</span>`,(h,close)=>{
     h.querySelectorAll("[data-act-o]").forEach(b=>b.onclick=()=>{const act=b.dataset.actO;if(h.querySelector("#act-rem").checked&&act!=="copy"){const A=LS.get(K_ACT,{});A[K.k]=act;LS.set(K_ACT,A)}close();runAct(a,act)})});
 }
@@ -1696,7 +1710,10 @@ function actsBox(el){const A=LS.get(K_ACT,{}),ks=Object.keys(A);
   el.querySelectorAll("[data-act-r]").forEach(b=>b.onclick=()=>{const k=b.dataset.actR,A2=LS.get(K_ACT,{});delete A2[k];LS.set(K_ACT,A2);actsBox(el);toast("Reset. It asks again next time.")});
   armDelete(el.querySelector("[data-act-all]"),()=>{LS.set(K_ACT,{});actsBox(el);toast("All reset. Each type asks again next time.")},"Tap Again to Reset All")}
 async function downloadAtt(a){
-  if(a.kind==="link"){if(linkHost(a.url)==="dropbox")return void window.open(dropboxDl(a.url),"_blank","noopener");return toast("This link can't be downloaded from here. Open it instead.")}
+  if(isDbx(a)){const t=toast("Preparing "+a.name+"…",60000);let b;
+    try{b=await getBlob(a)}catch(x){t.remove();if(/Unknown action/i.test(x.message)){window.open(dropboxDl(a.url),"_blank","noopener");return toast("Update your Google Sheet script to download Dropbox files inside the tracker. Opening Dropbox instead.",6000)}return toast(dbxErr(x),7000)}
+    t.remove();const ex=extOf(a.url),nm=extOf(a.name)||!ex?a.name:a.name+"."+ex;return deliverFile(nm,b)}
+  if(a.kind==="link")return toast("This link can't be downloaded from here. Open it instead.");
   if(!isGdoc(a)&&(a.size||0)>MAX_DOWN)return toast("Too Big to Download Here. Open It in the Google Drive App.",5000);
   const t=toast("Preparing "+a.name+"…",30000);let b;
   try{b=await getBlob(a)}catch(x){
@@ -1813,7 +1830,7 @@ let VW=null,vwPop=false;
 function openViewer(ref,id){
   const o=ownerOf(ref);if(!o)return;const list=(o.files||[]).filter(a=>kindOf(a)!=="other");let i=Math.max(0,list.findIndex(a=>a.id===id));
   const root=document.getElementById("viewer-root");
-  root.innerHTML=`<div class="vw" id="vw" role="dialog" aria-modal="true" aria-label="File viewer"><div class="vw-top"><span class="vw-t"><b id="vw-n"></b><span id="vw-c"></span></span>
+  root.innerHTML=`<div class="vw" id="vw" tabindex="-1" role="dialog" aria-modal="true" aria-label="File viewer"><div class="vw-top"><span class="vw-t"><b id="vw-n"></b><span id="vw-c"></span></span>
     <span class="row" style="gap:6px"><button class="btn sm" id="vw-out" aria-label="Zoom out">−</button><button class="btn sm" id="vw-fit">Fit</button><button class="btn sm" id="vw-zin" aria-label="Zoom in">+</button><button class="btn sm" id="vw-dl">Download</button><button class="btn sm" id="vw-drive">Open in Drive</button><button class="btn sm" id="vw-x">Close</button></span></div>
     <div class="vw-stage" id="vw-stage"><div class="vw-in" id="vw-box"></div></div>
     ${list.length>1?`<button class="vw-nav prev" id="vw-prev" aria-label="Previous">‹</button><button class="vw-nav next" id="vw-next" aria-label="Next">›</button>`:""}</div>`;
@@ -1831,9 +1848,9 @@ function openViewer(ref,id){
       if(tok!==VW.tok)return;const t=cs[n].getContext("2d");cs[n].width=vp.width;cs[n].height=vp.height;t.drawImage(c,0,0);cs[n].dataset.r=1}}
   async function show(){
     const a=VW.list[VW.i];VW.tok++;VW.pdf=null;VW.au=null;VW.zoom=1;VW.base=null;VW.kind=kindOf(a);const tok=VW.tok;
-    q("#vw-n").textContent=a.name;q("#vw-c").textContent=`${VW.list.length>1?`${VW.i+1} of ${VW.list.length} · `:""}${a.pending?"Waiting to Upload":fsize(a.size)}`;
-    q("#vw-drive").hidden=!a.driveId;q("#vw-dl").hidden=!canDownload(a)&&!a.pending;box.innerHTML=`<div class="vw-msg">Opening…</div>`;
-    let b;try{b=await getBlob(a)}catch(x){if(tok===VW.tok)box.innerHTML=`<div class="vw-msg">${x.message==="ELSEWHERE"?"This file was added on another device and hasn't reached Google Drive yet. It opens once that device is back online.":x.message==="NOT_CONNECTED"||!navigator.onLine?"This file isn't saved on this device yet. Open it once while online (VPN if needed), or turn on Keep All Attachments Offline in Settings > Advanced.":esc(driveErr(x))}</div>`;return}
+    q("#vw-n").textContent=a.name;q("#vw-c").textContent=`${VW.list.length>1?`${VW.i+1} of ${VW.list.length} · `:""}${a.pending?"Waiting to Upload":isDbx(a)?"Dropbox Link":fsize(a.size)}`;
+    q("#vw-drive").hidden=!a.driveId&&!isDbx(a);q("#vw-drive").textContent=isDbx(a)?"Open in Dropbox":"Open in Drive";q("#vw-dl").hidden=!canDownload(a)&&!a.pending;box.innerHTML=`<div class="vw-msg">Opening…</div>`;
+    let b;try{b=await getBlob(a)}catch(x){if(tok===VW.tok)box.innerHTML=`<div class="vw-msg">${isDbx(a)&&x.message!=="NOT_CONNECTED"&&navigator.onLine?esc(dbxErr(x)):x.message==="ELSEWHERE"?"This file was added on another device and hasn't reached Google Drive yet. It opens once that device is back online.":x.message==="NOT_CONNECTED"||!navigator.onLine?"This file isn't saved on this device yet. Open it once while online (VPN if needed), or turn on Keep All Attachments Offline in Settings > Advanced.":esc(driveErr(x))}</div>`;return}
     if(tok!==VW.tok)return;const r=st.getBoundingClientRect(),aw=r.width-24,ah=r.height-24;
     ["#vw-out","#vw-fit","#vw-zin"].forEach(x=>{const e=q(x);if(e)e.hidden=VW.kind==="audio"});
     if(VW.kind==="audio"){const u=fileURLs[a.id]||(fileURLs[a.id]=URL.createObjectURL(b));if(tok!==VW.tok)return;
@@ -1861,16 +1878,16 @@ function openViewer(ref,id){
     const tick=()=>{if(!drag&&au.duration)sk.value=Math.round(au.currentTime/au.duration*1000);cu.textContent=mmss(au.currentTime);sk.style.setProperty("--p",(sk.value/10)+"%")};
     au.addEventListener("loadedmetadata",()=>{du.textContent=mmss(au.duration);tick()});au.addEventListener("timeupdate",tick);
     ["play","pause","ended"].forEach(ev=>au.addEventListener(ev,paint));
-    pl.onclick=e=>{apToggle();pl.blur()};
-    box.querySelectorAll("[data-ap]").forEach(b=>b.onclick=()=>{apSeek(+b.dataset.ap);b.blur()});
-    mu.onclick=()=>{apMute();mu.blur()};
+    pl.onclick=()=>{apToggle();vwFocus()};
+    box.querySelectorAll("[data-ap]").forEach(b=>b.onclick=()=>{apSeek(+b.dataset.ap);vwFocus()});
+    mu.onclick=()=>{apMute();vwFocus()};
     sk.addEventListener("pointerdown",()=>drag=true);sk.addEventListener("input",()=>{if(au.duration){au.currentTime=sk.value/1000*au.duration;cu.textContent=mmss(au.currentTime);sk.style.setProperty("--p",(sk.value/10)+"%")}});
-    sk.addEventListener("change",()=>{drag=false;sk.blur()});
+    sk.addEventListener("change",()=>{drag=false;vwFocus()});
     VW.au=au;const p=au.play();if(p&&p.catch)p.catch(()=>{if(tok===VW.tok)paint()})}
-  const go=d=>{if(VW.list.length<2)return;document.querySelectorAll("#viewer-root audio").forEach(x=>{try{x.pause()}catch(e){}});VW.i=(VW.i+d+VW.list.length)%VW.list.length;show()};
+  const go=d=>{if(VW.list.length<2)return;document.querySelectorAll("#viewer-root audio").forEach(x=>{try{x.pause()}catch(e){}});VW.i=(VW.i+d+VW.list.length)%VW.list.length;show();vwFocus()};
   q("#vw-x").onclick=()=>closeViewer();q("#vw-zin").onclick=()=>zoomTo(VW.zoom*1.4);q("#vw-out").onclick=()=>zoomTo(VW.zoom/1.4);q("#vw-fit").onclick=()=>zoomTo(1);
   q("#vw-dl").onclick=()=>{const a=VW.list[VW.i];if(a.pending){getBlob(a).then(b=>deliverFile(a.name,b)).catch(()=>{})}else downloadAtt(a)};
-  q("#vw-drive").onclick=()=>{const a=VW.list[VW.i];if(a.driveId)window.open(a.url||`https://drive.google.com/file/d/${a.driveId}/view`,"_blank","noopener")};
+  q("#vw-drive").onclick=()=>{const a=VW.list[VW.i];if(isDbx(a))return void window.open(a.url,"_blank","noopener");if(a.driveId)window.open(a.url||`https://drive.google.com/file/d/${a.driveId}/view`,"_blank","noopener")};
   if(q("#vw-prev")){q("#vw-prev").onclick=()=>go(-1);q("#vw-next").onclick=()=>go(1)}
   st.addEventListener("wheel",e=>{if(e.ctrlKey||e.metaKey||VW.kind==="img"){e.preventDefault();const r=st.getBoundingClientRect();zoomTo(VW.zoom*Math.exp(-e.deltaY*(e.ctrlKey?.01:.002)),e.clientX-r.left,e.clientY-r.top)}},{passive:false});
   st.addEventListener("dblclick",e=>{const r=st.getBoundingClientRect();zoomTo(VW.zoom>1.05?1:2.5,e.clientX-r.left,e.clientY-r.top)});
@@ -1888,11 +1905,12 @@ function openViewer(ref,id){
   addEventListener("pointerup",()=>{pan=null;st.classList.remove("dragging")});
   VW.key=e=>{if(!VW)return;
     if(VW.kind==="audio"&&VW.au&&!e.metaKey&&!e.ctrlKey&&!e.altKey){const k=e.key;
-      if(k===" "||k==="Spacebar"||k==="m"||k==="M"||(e.shiftKey&&(k==="ArrowLeft"||k==="ArrowRight"))){e.preventDefault();e.stopImmediatePropagation();if(document.activeElement&&document.activeElement.closest&&document.activeElement.closest("#viewer-root"))document.activeElement.blur();
+      if(k===" "||k==="Spacebar"||k==="m"||k==="M"||(e.shiftKey&&(k==="ArrowLeft"||k==="ArrowRight"))){e.preventDefault();e.stopImmediatePropagation();vwFocus();
         if(k==="m"||k==="M")apMute();else if(k==="ArrowLeft")apSeek(-10);else if(k==="ArrowRight")apSeek(10);else apToggle();return}}
     if(e.key==="Escape"){e.preventDefault();e.stopImmediatePropagation();closeViewer()}else if(e.key==="ArrowRight"){e.preventDefault();e.stopImmediatePropagation();go(1)}else if(e.key==="ArrowLeft"){e.preventDefault();e.stopImmediatePropagation();go(-1)}
     else if(e.key==="+"||e.key==="="){e.preventDefault();e.stopImmediatePropagation();zoomTo(VW.zoom*1.4)}else if(e.key==="-"){e.preventDefault();e.stopImmediatePropagation();zoomTo(VW.zoom/1.4)}else if(e.key==="0"){e.preventDefault();e.stopImmediatePropagation();zoomTo(1)}else e.stopImmediatePropagation()};
   document.addEventListener("keydown",VW.key,true);
+  root.querySelector("#vw").addEventListener("click",e=>{if(!(e.target.closest&&e.target.closest("input")))setTimeout(vwFocus,0)});vwFocus();
   try{history.pushState({bbv:1},"")}catch(x){}
   show();
 }
@@ -1901,7 +1919,9 @@ const AP_IC={play:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v1
 const mmss=t=>{if(!isFinite(t))return"–:––";t=Math.max(0,Math.floor(t));const h=Math.floor(t/3600),m=Math.floor(t%3600/60),x=String(t%60).padStart(2,"0");return h?`${h}:${String(m).padStart(2,"0")}:${x}`:`${m}:${x}`};
 function apToggle(){const au=VW&&VW.au;if(!au)return;if(au.paused){const p=au.play();if(p&&p.catch)p.catch(()=>{})}else au.pause()}
 function apSeek(d){const au=VW&&VW.au;if(!au)return;au.currentTime=Math.max(0,Math.min((au.duration||0)-0.05,au.currentTime+d));au.dispatchEvent(new Event("timeupdate"))}
-function apMute(){const au=VW&&VW.au;if(!au)return;VW.muted=au.muted=!au.muted;const b=document.getElementById("ap-mute");if(b)b.textContent=au.muted?"Unmute":"Mute";toast(au.muted?"Muted":"Sound On")}
+function apMute(){const au=VW&&VW.au;if(!au)return;VW.muted=au.muted=!au.muted;const b=document.getElementById("ap-mute");if(b)b.textContent=au.muted?"Unmute":"Mute";}
+/* the viewer keeps keyboard focus while it's open: on iPad, Safari stops sending keys to the page when nothing has focus */
+function vwFocus(){const v=document.getElementById("vw");if(v&&document.activeElement!==v){try{v.focus({preventScroll:true})}catch(x){}}}
 function closeViewer(fromPop){if(!VW)return;document.querySelectorAll("#viewer-root audio").forEach(x=>{try{x.pause()}catch(e){}});document.removeEventListener("keydown",VW.key,true);VW.tok++;VW=null;document.getElementById("viewer-root").innerHTML="";if(!fromPop){vwPop=true;try{history.back()}catch(x){vwPop=false}}}
 
 /* date boxes with a ✕ to empty them (Android's picker has no Clear, and iPad's Reset puts the saved date back) */
@@ -2512,6 +2532,15 @@ function printReview(kind){
 }
 function printHTML(h){
   const P=document.getElementById("print-root");P.innerHTML=`<div class="pr">${h}</div>`;document.body.classList.add("printing");
+  /* iPad: Safari only prints straight from a tap, and keeps its print window open without telling the page,
+     so a Ready window holds the report until you print or close it */
+  if(IS_IOS){const clean=()=>{removeEventListener("afterprint",clean);if(P.firstChild&&P.firstChild.dataset.k===k){document.body.classList.remove("printing");P.innerHTML=""}};
+    const k=String(Date.now());P.firstChild.dataset.k=k;addEventListener("afterprint",clean);
+    const imgs=[...P.querySelectorAll("img")];
+    return void Promise.all(imgs.map(i=>i.complete?0:new Promise(r=>{i.onload=i.onerror=r}))).then(()=>{
+      let closeSheet=null;closeSheet=sheet("Report Ready","Tap Print, then choose Save to Files (Print Options > Share) for a PDF, or pick a printer.",`<div class="opts"><button class="opt" id="pr-go" style="text-align:center;font-size:16px">Print / Save as PDF</button></div>`,(hh,close)=>{
+        hh.querySelector("#pr-go").onclick=()=>{try{window.print()}catch(x){toast("Printing isn't available here.")}};
+        const x=hh.querySelector("[data-sx]");x.onclick=()=>{close();clean()}})})}
   const done=()=>{document.body.classList.remove("printing");P.innerHTML="";removeEventListener("afterprint",done)};addEventListener("afterprint",done);
   const imgs=[...P.querySelectorAll("img")];
   Promise.all(imgs.map(i=>i.complete?0:new Promise(r=>{i.onload=i.onerror=r}))).then(()=>setTimeout(()=>{try{window.print()}catch(x){toast("Printing isn't available here.")}setTimeout(()=>{if(!matchMedia("print").matches)done()},1500)},60));
@@ -3276,6 +3305,7 @@ manual:[
 <ul>
 <li>MP3, M4A and WAV files play in the tracker's own audio player as soon as they open, offline too once saved on the device. If the iPad holds the sound back, tap the big Play button once. Back 10 and Forward 10 sit on either side, and the bar underneath jumps to any point. Keys: <span class="k">Space</span> play or pause, <span class="k">Shift+←</span> <span class="k">Shift+→</span> 10 seconds back or forward, <span class="k">M</span> mute, <span class="k">←</span> <span class="k">→</span> other files, <span class="k">Esc</span> close. Moving to another file or closing stops the sound.</li>
 <li>JPG, PNG and PDF open in the tracker's viewer: pinch or + and − to zoom (double-click on a laptop), swipe sideways or use the arrow keys for the next file, swipe down or Close to go back.</li>
+<li>Dropbox links (shared as "Anyone with the link") come through your Google Sheet's script: JPG, PNG, PDF and audio open in the tracker's viewer, other files download, and they get offline copies like Drive files. On iPad, Open in Dropbox App replaces Open in Browser. A link that needs a login can only be opened in Dropbox.</li>
 <li>Other files (PSD, Procreate, AI and so on), Google Docs, Sheets and Slides, and Dropbox or Proton links: the tracker asks how to open that type on this device: Open in App, Open in Browser, Download or Copy Link. Tick Remember for that type and it opens straight away next time. Change it in Settings > Advanced > Data > Link and File Actions.</li>
 <li>Open in App goes straight to the right Google app: Docs, Sheets, Slides, or Drive for everything else.</li>
 <li>On iPad and iPhone, Google always sends regular Drive files (PSD, Procreate and so on) to the Drive app, so those offer Open in App, Download and Copy Link only. Docs open in the browser as usual; Sheets and Slides show Google's read-only preview there. To edit, use Open in App.</li>
@@ -3290,7 +3320,7 @@ manual:[
 <li>Move To…: moves the card to Project Notes, another phase's notes or any item in the same project.</li>
 <li>Copy To…: adds a second card for the same Drive file somewhere else. Both cards show 2x next to the file size. Nothing is duplicated in Drive or on your device.</li>
 <li>Download as PDF (Google Docs, Sheets and Slides): your script makes the PDF. If Google won't make it, the tracker opens Google's own PDF download instead.</li>
-<li>Download: Drive files up to 50 MB save to Downloads on a laptop or Android; on iPad the share sheet opens (Save to Files, or send to Photoshop or Procreate). With an offline copy it works without internet. Dropbox links start Dropbox's direct download. Proton Drive links can only be opened.</li>
+<li>Download: Drive files up to 50 MB save to Downloads on a laptop or Android; on iPad the share sheet opens (Save to Files, or send to Photoshop or Procreate). With an offline copy it works without internet. Dropbox files up to 50 MB download the same way, through the tracker. Proton Drive links can only be opened.</li>
 <li>Copy Link copies the file's link.</li>
 <li>Remove (tap twice): if the file is in another place too, only this card goes. If it was the last card for a file the tracker uploaded, the file moves to the Drive trash a few seconds later (Undo first if it was a mistake). Files you added with From Drive always stay in Drive.</li>
 <li>Deleting an item, phase or project moves the files the tracker uploaded for it to the Drive trash. Drive keeps trashed files for 30 days.</li>
@@ -3344,6 +3374,7 @@ manual:[
 [[fig:creport|Client Report options]]
 <ul>
 <li>On the Board or in Projects: a clean PDF with phases, item status, progress, revision rounds and image thumbnails. Hours, Rates and Value, and Private Notes stay out unless you tick them. Pick the phases to include, then Create PDF.</li>
+<li>On iPad a Report Ready window opens: tap Print / Save as PDF (Safari only prints straight from a tap), then Share > Save to Files for a PDF. Close the window when you're done.</li>
 <li>A file shared in several places appears once.</li>
 </ul>`},
 {id:"m7",h:"7. Exports and Backups",html:`
@@ -3425,20 +3456,20 @@ manual:[
 <tr><td><span class="k">Enter</span></td><td>Confirm (Save, Add, Create)</td></tr>
 <tr><td><span class="k">Cmd/Ctrl+Enter</span></td><td>Confirm while typing in a writing box</td></tr>
 <tr><td><span class="k">Backspace</span> twice</td><td>Delete (the first press arms the Delete button)</td></tr>
-<tr><td><span class="k">Esc</span></td><td>Close the pop-up</td></tr>
+<tr><td><span class="k">Esc</span> or <span class="k">Cmd+.</span></td><td>Close the pop-up (Cmd+. for iPad keyboards without Esc)</td></tr>
 <tr><td><span class="k">Shift+Enter</span></td><td>New phase (on the Board)</td></tr>
 <tr><td>Shift+click a phase</td><td>Open or close all phases (on the Board)</td></tr>
 <tr class="g"><td colspan="2">File Viewer</td></tr>
 <tr><td><span class="k">←</span> <span class="k">→</span></td><td>Previous or next file</td></tr>
 <tr><td><span class="k">+</span> <span class="k">−</span> <span class="k">0</span></td><td>Zoom in, zoom out, fit</td></tr>
-<tr><td><span class="k">Esc</span></td><td>Close the viewer</td></tr>
+<tr><td><span class="k">Esc</span> or <span class="k">Cmd+.</span></td><td>Close the viewer</td></tr>
 <tr class="g"><td colspan="2">Audio Player</td></tr>
 <tr><td><span class="k">Space</span></td><td>Play or pause</td></tr>
 <tr><td><span class="k">Shift+←</span> <span class="k">Shift+→</span></td><td>10 seconds back or forward</td></tr>
 <tr><td><span class="k">M</span></td><td>Mute or unmute</td></tr>
 </tbody></table>
 <ul>
-<li>The audio player keys only work while a track is open, so Space still pauses the timer everywhere else. Shortcuts never fire while you're typing in a box.</li>
+<li>The audio player keys only work while a track is open, so Space still pauses the timer everywhere else. Shortcuts never fire while you're typing in a box. On Android, Esc works like the Back button: it closes the viewer, then the pop-up, and leaves the app when nothing is open.</li>
 <li>Change any of them in Settings > Advanced > Keyboard Shortcuts. ✕ clears a shortcut to Empty. Extra actions start Empty: Open This Week's Review, Open This Month's Review, Edit Project, Project Notes, Export Everything (Backup) and Open the Guide.</li>
 </ul>
 `},
@@ -3450,6 +3481,7 @@ manual:[
 <li>"Update your Google Sheet script first": paste the newest Code.gs, run the setup it names, then Deploy > Manage deployments > New version.</li>
 <li>"Google Drive access isn't allowed yet": in Apps Script, run setupDrive and approve it.</li>
 <li>A device doesn't show a new feature: compare the Version in Settings on each device. Close the app fully and open it again while online.</li>
+<li>"This Dropbox link needs a login": in Dropbox, share the file as "Anyone with the link" and add the new link. "Dropbox access isn't allowed yet": in Apps Script, run setupLinks once and approve it.</li>
 <li>A Drive or Dropbox file opens a blank page on iPad: choose Open in App or Copy Link for that type (Settings > Advanced > Data > Link and File Actions). Close the blank page with the ✕ at its top left.</li>
 <li>Google Calendar events don't show: check Settings > Advanced > Calendar (Show Google Calendar on, calendars ticked), then tap the sync chip. If it says calendar access isn't allowed, run setupCalendar in Apps Script.</li>
 <li>A calendar from another account is missing: it has to be shared with the account that holds your Sheet, and the invitation accepted there.</li>
@@ -3557,6 +3589,14 @@ function guideModal(tab="quick",back){
 const effTheme=()=>S.ui.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
 function restoreTheme(){if(S.ui.theme)document.documentElement.setAttribute("data-theme",S.ui.theme);else document.documentElement.removeAttribute("data-theme")}
 function closeModal(){document.getElementById("modal-root").innerHTML="";document.getElementById("ov2")?.remove();restoreTheme();applyPalette();applyAdv();Sync.afterModal()}
+/* Cmd+. works like Esc (iPad keyboards often have no Esc key). On Android, Esc is the system Back:
+   the Back below closes the top layer, so the page doesn't also close something on the key press. */
+const IS_ANDROID=/Android/i.test(navigator.userAgent);
+addEventListener("keydown",e=>{
+  if(e.metaKey&&!e.ctrlKey&&!e.altKey&&(e.key==="."||e.code==="Period")){e.preventDefault();e.stopImmediatePropagation();
+    (document.activeElement||document.body).dispatchEvent(new KeyboardEvent("keydown",{key:"Escape",code:"Escape",bubbles:true,cancelable:true}));return}
+  if(IS_ANDROID&&e.isTrusted&&e.key==="Escape"&&(VW||document.getElementById("ov")||document.getElementById("ov2")))e.stopImmediatePropagation();
+},true);
 /* Back (Android swipe, mouse back button, Alt+Left, Cmd+[) closes a pop-up instead of leaving the app */
 let histArmed=false;
 addEventListener("popstate",()=>{if(vwPop){vwPop=false;return}if(VW){closeViewer(true);return}document.getElementById("ov2")?.remove();histArmed=false;if(document.getElementById("ov"))closeModal()});
