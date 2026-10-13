@@ -683,7 +683,7 @@ const LPAL_DEF={light:["#CEFBD0","#D5ECC2","#FAF6B7","#F2E3B3","#EDE6D8","#F7D9C
 const LIFE_ORDER=[1,7,2,11,10,5,8,6,12,9,4,3]; /* October 2026 reorder: new slot k shows old slot LIFE_ORDER[k-1] */
 const STATUSES=[["Not Started","--faint"],["In Progress","--accent"],["Submitted","--amber"],["Feedback Received","--p7"],["Revising","--act"],["Approved","--p3"],["Done","--ok"]];
 const SC=Object.fromEntries(STATUSES);
-const APP_VERSION="2026.10.12.11";
+const APP_VERSION="2026.10.12.12";
 const isDone=it=>it.status==="Done"||it.status==="Approved";
 const DEF_NAME="Blue Blaze Project Tracker";
 const appName=()=>((typeof S!=="undefined"&&S&&S.settings&&S.settings.brandName)||"").trim()||DEF_NAME;
@@ -700,9 +700,13 @@ const KEY_ACTIONS=[
   ["prev","Previous Week, Month or Day"],["next","Next Week, Month or Day"],["today","This Week, This Month or Today"],["newBlock","New Block (Day and Week)"],
   ["timerPause","Pause / Resume the Timer"],["timerStop","Stop the Timer"],["undo","Undo the Last Change"],["projects","Projects & Templates"],["settings","Settings"],
   ["theme","Light / Dark Theme"],["sync","Sync Now"],["help","Show Keyboard Shortcuts"],
-  ["weeklyReview","Open This Week's Review"],["monthlyReview","Open This Month's Review"],["editProject","Edit Project"],["projectNotes","Project Notes"],["backup","Export Everything (Backup)"],["guide","Open the Guide"]];
+  ["weeklyReview","Open This Week's Review"],["monthlyReview","Open This Month's Review"],["editProject","Edit Project"],["projectNotes","Project Notes"],["backup","Export Everything (Backup)"],["guide","Open the Guide"],
+  ["vwEdit","Edit Text File"],["vwDownload","Download File"]];
+/* File Viewer shortcuts only count while the viewer is open; the viewer's own fixed keys can't be used for them */
+const KEY_VIEWER=new Set(["vwEdit","vwDownload"]);
+const VIEWER_FIXED=["ArrowLeft","ArrowRight","ArrowUp","ArrowDown","Shift+ArrowLeft","Shift+ArrowRight","+","=","-","0","Space","Shift+Space","M","Shift+M","Mod+S","Mod+A","Mod+C","PageUp","PageDown","Home","End"];
 const KEY_EXTRA=new Set(["weeklyReview","monthlyReview","editProject","projectNotes","backup","guide"]);
-const KEY_DEF={viewBoard:"1",viewMonth:"2",viewWeek:"3",viewDay:"4",viewReview:"5",prev:"ArrowLeft",next:"ArrowRight",today:"T",newBlock:"N",timerPause:"Space",timerStop:"Shift+T",undo:"Mod+Z",projects:"P",settings:"<",theme:"Shift+D",sync:"Shift+S",help:"?",weeklyReview:"",monthlyReview:"",editProject:"",projectNotes:"",backup:"",guide:""};
+const KEY_DEF={viewBoard:"1",viewMonth:"2",viewWeek:"3",viewDay:"4",viewReview:"5",prev:"ArrowLeft",next:"ArrowRight",today:"T",newBlock:"N",timerPause:"Space",timerStop:"Shift+T",undo:"Mod+Z",projects:"P",settings:"<",theme:"Shift+D",sync:"Shift+S",help:"?",weeklyReview:"",monthlyReview:"",editProject:"",projectNotes:"",backup:"",guide:"",vwEdit:"Shift+E",vwDownload:"Shift+D"};
 const KEY_RESERVED=["Mod+T","Mod+W","Mod+N","Mod+Q","Mod+R","Mod+L","Mod+Tab","Mod+Shift+T","Mod+Shift+N","Mod+Shift+W","Alt+F4","Alt+ArrowLeft","Alt+ArrowRight","Mod+[","Mod+]","Tab","Shift+Tab","Enter","Escape","Backspace","Delete","Mod+C","Mod+V","Mod+X","Mod+A","Mod+P","Mod+F"];
 function comboOf(e){
   if(["Shift","Control","Alt","Meta","CapsLock","Dead","Unidentified"].includes(e.key))return null;
@@ -2151,7 +2155,7 @@ function openViewer(ref,id){
   function vwAsk(title,msg,btns){return new Promise(res=>{const w=document.createElement("div");w.className="vw-ask";w.innerHTML=`<div class="vw-ask-box" role="alertdialog" aria-label="${esc(title)}"><b>${esc(title)}</b><p>${esc(msg)}</p><div class="row">${btns.map(([k,l],i)=>`<button class="btn sm ${i===0?"primary":""}" data-k="${k}">${esc(l)}</button>`).join("")}</div></div>`;
     q("#vw").appendChild(w);VW.ask=k=>{w.remove();VW.ask=null;res(k)};w.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>VW.ask(b.dataset.k));setTimeout(()=>w.querySelector("[data-k]").focus(),0)})}
   q("#vw-edit").onclick=()=>startEdit();q("#vw-save").onclick=()=>doSave();q("#vw-cancel").onclick=()=>cancelEdit();
-  VW.saveKey=()=>doSave();VW.cancelKey=()=>cancelEdit();
+  VW.saveKey=()=>doSave();VW.cancelKey=()=>cancelEdit();VW.editKey=()=>startEdit();
   const go=async d=>{if(VW.list.length<2)return;if(!(await VW.guard()))return;document.querySelectorAll("#viewer-root audio").forEach(x=>{try{x.pause()}catch(e){}});VW.i=(VW.i+d+VW.list.length)%VW.list.length;show();vwFocus()};
   q("#vw-x").onclick=()=>closeViewer();q("#vw-zin").onclick=()=>zoomTo(VW.zoom*1.4);q("#vw-out").onclick=()=>zoomTo(VW.zoom/1.4);q("#vw-fit").onclick=()=>zoomTo(1);
   q("#vw-copy").onclick=()=>{const t=VW.text||"";(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("Text copied"),()=>{const r=document.createRange(),tx=box.querySelector(".vw-text");if(tx){r.selectNodeContents(tx);const sl=getSelection();sl.removeAllRanges();sl.addRange(r);toast("Selected. Copy with your device's Copy.")}});vwFocus()};
@@ -2179,6 +2183,9 @@ function openViewer(ref,id){
     if(VW.kind==="audio"&&VW.au&&!e.metaKey&&!e.ctrlKey&&!e.altKey){const k=e.key;
       if(k===" "||k==="Spacebar"||k==="m"||k==="M"||(e.shiftKey&&(k==="ArrowLeft"||k==="ArrowRight"))){e.preventDefault();e.stopImmediatePropagation();vwFocus();
         if(k==="m"||k==="M")apMute();else if(k==="ArrowLeft")apSeek(-10);else if(k==="ArrowRight")apSeek(10);else apToggle();return}}
+    {const c=comboOf(e),K=S.settings.keys||{};
+      if(c&&K.vwEdit&&c===K.vwEdit){e.preventDefault();e.stopImmediatePropagation();if(!q("#vw-edit").hidden)VW.editKey();else toast(VW.kind==="text"?"This text file can't be edited here (Dropbox link, over 2 MB, or not uploaded yet).":"Only text files (TXT, MD, CSV, TSV, JSON, LOG) can be edited.",4500);return}
+      if(c&&K.vwDownload&&c===K.vwDownload){e.preventDefault();e.stopImmediatePropagation();if(!q("#vw-dl").hidden)q("#vw-dl").click();else toast("This file can't be downloaded here.",4000);return}}
     if(VW.kind==="text"&&!e.altKey){const k=e.key,stg=document.getElementById("vw-stage"),pg=stg?stg.clientHeight*.85:400,sc={ArrowDown:40,ArrowUp:-40,PageDown:pg,PageUp:-pg," ":e.shiftKey?-pg:pg}[k];
       if(stg&&sc!==undefined&&!e.metaKey&&!e.ctrlKey){e.preventDefault();e.stopImmediatePropagation();stg.scrollBy({top:sc});return}
       if(stg&&(k==="Home"||k==="End")){e.preventDefault();e.stopImmediatePropagation();stg.scrollTop=k==="Home"?0:stg.scrollHeight;return}
@@ -3346,8 +3353,9 @@ function kbModal(back,D){
   const row=([id,l])=>`<div class="kb-row"><span class="kb-l">${l}</span><button class="kb-key ${dk[id]?"":"empty"} ${rec===id?"rec":""}" data-kb="${id}">${rec===id?"Press Keys…":keyLabel(dk[id])}</button><button class="ar" data-kx="${id}" aria-label="Clear ${l}" ${dk[id]?"":"disabled"}>✕</button></div>`;
   const draw=root=>{
     root.querySelector("#kb-body").innerHTML=`<div style="display:grid;gap:8px">${SW.map(([k,l,sub])=>`<label class="tgl"><span>${l}<small>${sub}</small></span><input type="checkbox" data-ksw="${k}" ${sw[k]?"checked":""}></label>`).join("")}</div>
-      <span class="lbl">SHORTCUTS</span><div class="kb-list">${KEY_ACTIONS.filter(a=>!KEY_EXTRA.has(a[0])).map(row).join("")}</div>
+      <span class="lbl">SHORTCUTS</span><div class="kb-list">${KEY_ACTIONS.filter(a=>!KEY_EXTRA.has(a[0])&&!KEY_VIEWER.has(a[0])).map(row).join("")}</div>
       <span class="lbl">EXTRA ACTIONS</span><div class="kb-list">${KEY_ACTIONS.filter(a=>KEY_EXTRA.has(a[0])).map(row).join("")}</div>
+      <span class="lbl">FILE VIEWER</span><span class="sub" style="margin-top:-6px">Only while a file is open in the viewer, so they can match a page shortcut.</span><div class="kb-list">${KEY_ACTIONS.filter(a=>KEY_VIEWER.has(a[0])).map(row).join("")}</div>
       ${note?`<p class="sub" style="margin:0;color:var(--amber);font-weight:700">${esc(note)}</p>`:""}
       <span class="sub">Tap a key to record a new one. ✕ clears it to Empty. Esc always closes a pop-up. Shortcuts need a keyboard; on touch alone nothing changes.</span>`;
     root.querySelectorAll("[data-ksw]").forEach(c=>c.onchange=()=>{sw[c.dataset.ksw]=c.checked});
@@ -3361,7 +3369,9 @@ function kbModal(back,D){
       if(e.key==="Escape"){rec=null;kbRecording=false;draw(root);return}
       const c=comboOf(e);if(!c)return;
       if(KEY_RESERVED.includes(c)){note=`${keyLabel(c)} is reserved by your browser or the app. Try another.`;rec=null;kbRecording=false;return draw(root)}
-      const other=Object.keys(dk).find(k=>k!==rec&&dk[k]===c);
+      const vw=KEY_VIEWER.has(rec);
+      if(vw&&VIEWER_FIXED.includes(c)){note=`${keyLabel(c)} is already used inside the viewer. Try another.`;rec=null;kbRecording=false;return draw(root)}
+      const other=Object.keys(dk).find(k=>k!==rec&&dk[k]===c&&KEY_VIEWER.has(k)===vw);
       if(other){dk[other]="";note=`${keyLabel(c)} moved from "${KEY_ACTIONS.find(a=>a[0]===other)[1]}", which is now Empty.`}else note="";
       dk[rec]=c;rec=null;kbRecording=false;draw(root)};
     document.addEventListener("keydown",onKey,true);
@@ -3374,7 +3384,7 @@ function kbModal(back,D){
 }
 function kbHelp(){
   const k=S.settings.keys,list=KEY_ACTIONS.filter(a=>k[a[0]]);
-  modal(`<h2>Keyboard Shortcuts</h2><div class="kb-list">${list.map(([id,l])=>`<div class="kb-row"><span class="kb-l">${l}</span><span class="kb-key">${keyLabel(k[id])}</span></div>`).join("")}
+  modal(`<h2>Keyboard Shortcuts</h2><div class="kb-list">${list.map(([id,l])=>`<div class="kb-row"><span class="kb-l">${l}${KEY_VIEWER.has(id)?" (File Viewer)":""}</span><span class="kb-key">${keyLabel(k[id])}</span></div>`).join("")}
     ${S.settings.kbEnter?`<div class="kb-row"><span class="kb-l">Confirm a Pop-Up</span><span class="kb-key">Enter</span></div>`:""}
     ${S.settings.kbDelete?`<div class="kb-row"><span class="kb-l">Delete in a Pop-Up (Press Twice)</span><span class="kb-key">Backspace</span></div>`:""}
     ${S.settings.kbShiftEnter?`<div class="kb-row"><span class="kb-l">New Phase (Board)</span><span class="kb-key">Shift+Enter</span></div>`:""}
@@ -3613,7 +3623,7 @@ manual:[
 <ul>
 <li>MP3, M4A and WAV files play in the tracker's own audio player as soon as they open, offline too once saved on the device. If the iPad holds the sound back, tap the big Play button once. Back 10 and Forward 10 sit on either side, and the bar underneath jumps to any point. Keys: <span class="k">Space</span> play or pause, <span class="k">Shift+←</span> <span class="k">Shift+→</span> 10 seconds back or forward, <span class="k">M</span> mute, <span class="k">←</span> <span class="k">→</span> other files, <span class="k">Esc</span> close. Moving to another file or closing stops the sound.</li>
 <li>Text files (TXT, MD, CSV, TSV, JSON, LOG) open in the viewer too, as plain text with tappable links. + and − change the text size, Copy All copies it, and their cards show the first lines. Files over 2 MB show the first 2 MB.</li>
-<li>Edit (in the viewer) changes a text file: Save or Ctrl+S / Cmd+S writes it back into the same Drive file, so every card that shows it stays linked; Cancel or Esc discards (it asks first if you made changes). Closing or moving to another file with unsaved changes asks Save, Discard or Keep Editing. If the file changed somewhere else after you opened it, you choose Replace It or Save as a Copy. Offline, the edit is kept on the device (the card says Waiting to Save) and goes to Drive when you're back online. Dropbox links and files over 2 MB are view-only. Google Drive keeps earlier versions (Manage versions).</li>
+<li>Edit (in the viewer, or Shift+E) changes a text file: Save or Ctrl+S / Cmd+S writes it back into the same Drive file, so every card that shows it stays linked; Cancel or Esc discards (it asks first if you made changes). Closing or moving to another file with unsaved changes asks Save, Discard or Keep Editing. If the file changed somewhere else after you opened it, you choose Replace It or Save as a Copy. Offline, the edit is kept on the device (the card says Waiting to Save) and goes to Drive when you're back online. Dropbox links and files over 2 MB are view-only. Google Drive keeps earlier versions (Manage versions).</li>
 <li>JPG, PNG and PDF open in the tracker's viewer: pinch or + and − to zoom (double-click on a laptop), swipe sideways or use the arrow keys for the next file, swipe down or Close to go back.</li>
 <li>Dropbox links (shared as "Anyone with the link") come through your Google Sheet's script: JPG, PNG, PDF, audio and text files open in the tracker's viewer, other files download, and they get offline copies like Drive files. On iPad, Open in Dropbox App replaces Open in Browser. A link that needs a login can only be opened in Dropbox.</li>
 <li>Other files (PSD, Procreate, AI and so on), Google Docs, Sheets and Slides, and Dropbox or Proton links: the tracker asks how to open that type on this device: Open in App, Open in Browser, Download or Copy Link. Tick Remember for that type and it opens straight away next time. Change it in Settings > Advanced > Data > Link and File Actions.</li>
@@ -3778,6 +3788,9 @@ manual:[
 <tr><td><span class="k">←</span> <span class="k">→</span></td><td>Previous or next file</td></tr>
 <tr><td><span class="k">+</span> <span class="k">−</span> <span class="k">0</span></td><td>Zoom in, zoom out, fit</td></tr>
 <tr><td><span class="k">Esc</span> or <span class="k">Cmd/Ctrl+.</span></td><td>Close the viewer</td></tr>
+<tr><td><span class="k">Shift+E</span></td><td>Edit a text file (change it in Keyboard Shortcuts)</td></tr>
+<tr><td><span class="k">Shift+D</span></td><td>Download the file on screen (change it in Keyboard Shortcuts)</td></tr>
+<tr><td><span class="k">Cmd/Ctrl+S</span></td><td>Save while editing a text file (Esc cancels)</td></tr>
 <tr class="g"><td colspan="2">Audio Player</td></tr>
 <tr><td><span class="k">Space</span></td><td>Play or pause</td></tr>
 <tr><td><span class="k">Shift+←</span> <span class="k">Shift+→</span></td><td>10 seconds back or forward</td></tr>
@@ -4122,7 +4135,7 @@ document.addEventListener("keydown",e=>{
   if(isField(t))return;
   if(e.key==="Enter"&&e.shiftKey&&st.kbShiftEnter&&S.ui.view==="board"&&!mod){e.preventDefault();return phaseModal(null)}
   const c=comboOf(e);if(!c)return;
-  const id=Object.keys(st.keys||{}).find(k=>st.keys[k]===c);if(!id)return;
+  const id=Object.keys(st.keys||{}).find(k=>st.keys[k]===c&&!KEY_VIEWER.has(k));if(!id)return;
   if(id==="timerPause"&&!(T&&T.kind==="work"))return;
   e.preventDefault();runAction(id);
 });
