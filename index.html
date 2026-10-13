@@ -21,7 +21,7 @@
   --bg:#D7D7DB; --surface:#FFFFFF; --stat:#EEF0F4; --btn:#FFFFFF; --tabbar:#EEF0F4; --tabsel:#FFFFFF; --field:#FFFFFF;
   --line:#DCDFE6; --line2:#C9CED8; --ink:#1A1F2B; --muted:#3F4657; --faint:#7D8496; --label:#3F4657;
   --accent:#006BC2; --accent-ink:#FFFFFF;
-  --act:#38B2C3; --act-hi:#13707D; --left:#CFE1EC; --over:#FF52A6; --warn-bg:#FFDF00; --warn-fg:#FF52A6; --ok:#1E9C74; --amber:#C98200;
+  --act:#38B2C3; --act-hi:#13707D; --left:#CFE1EC; --over:#FF52A6; --dis-fg:#FF1D76; --warn-bg:#FFDF00; --warn-fg:#FF52A6; --ok:#1E9C74; --amber:#C98200;
   --act-empty:#E2E6ED;
   --cal:#FFFFFF; --rvp:#FFFFFF; --bbg:#D7D7DB; --card:#FFFFFF; --warn:#EFD22F; --warn-tx:#E7C400; --tz:1;
   --rv-prev:#B6D6C5; --rv-goals:#E0BAD0; --stat-rv:#FFFFFF;
@@ -38,7 +38,7 @@
   --bg:#19212F; --surface:#0B1324; --stat:#3E4D6F; --btn:#2E394E; --tabbar:#2E394E; --tabsel:#445170; --field:#333B4B;
   --line:#243049; --line2:#3A4763; --ink:#E9ECF2; --muted:#A5ADC0; --faint:#6E7891; --label:#A5ADC0;
   --accent:#4DA6F0; --accent-ink:#0B1324;
-  --act:#38B2C3; --act-hi:#22F8FF; --left:#494E72; --over:#FF2E90; --over-hi:#FF63AE; --ok:#3CC79A; --amber:#E6A93C;
+  --act:#38B2C3; --act-hi:#22F8FF; --left:#494E72; --over:#FF2E90; --dis-fg:#FF3A87; --dis-bg:#282E3B; --ok:#3CC79A; --amber:#E6A93C;
   --act-empty:#23304F;
   --cal:#0B1324; --rvp:#0B1324; --bbg:#2B364A; --card:#1B1E25; --warn:#EFD22F; --warn-tx:#EFD22F;
   --rv-prev:#32575C; --rv-goals:#6B496B; --stat-rv:#3E4D6F;
@@ -52,7 +52,7 @@
   --bg:#19212F; --surface:#0B1324; --stat:#3E4D6F; --btn:#2E394E; --tabbar:#2E394E; --tabsel:#445170; --field:#333B4B;
   --line:#243049; --line2:#3A4763; --ink:#E9ECF2; --muted:#A5ADC0; --faint:#6E7891; --label:#A5ADC0;
   --accent:#4DA6F0; --accent-ink:#0B1324;
-  --act:#38B2C3; --act-hi:#22F8FF; --left:#494E72; --over:#FF2E90; --over-hi:#FF63AE; --ok:#3CC79A; --amber:#E6A93C;
+  --act:#38B2C3; --act-hi:#22F8FF; --left:#494E72; --over:#FF2E90; --dis-fg:#FF3A87; --dis-bg:#282E3B; --ok:#3CC79A; --amber:#E6A93C;
   --act-empty:#23304F;
   --cal:#0B1324; --rvp:#0B1324; --bbg:#2B364A; --card:#1B1E25; --warn:#EFD22F; --warn-tx:#EFD22F;
   --rv-prev:#32575C; --rv-goals:#6B496B; --stat-rv:#3E4D6F;
@@ -99,7 +99,7 @@ h3{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercas
 /* a faint outline for a few quiet buttons (Edit Phase, Notes on the phase bar) */
 .btn.ghost.faint{border-color:var(--line)}
 /* Disconnect: filled like its neighbours, red text and outline (a touch brighter in Dark) */
-#x-off:not(.armed){color:var(--over-hi,var(--over));border-color:var(--over-hi,var(--over))}
+#x-off:not(.armed){color:var(--dis-fg,var(--over));border-color:var(--dis-fg,var(--over));background:var(--dis-bg,var(--btn))}
 .inp{border:1px solid var(--line2);background:var(--field);border-radius:8px;padding:7px 10px;width:100%;min-width:0}
 .inp:focus{outline:none;border-color:var(--accent)}
 textarea.inp{resize:none;overflow:hidden;line-height:1.55;min-height:64px}
@@ -688,7 +688,7 @@ const LPAL_DEF={light:["#CEFBD0","#D5ECC2","#FAF6B7","#F2E3B3","#EDE6D8","#F7D9C
 const LIFE_ORDER=[1,7,2,11,10,5,8,6,12,9,4,3]; /* October 2026 reorder: new slot k shows old slot LIFE_ORDER[k-1] */
 const STATUSES=[["Not Started","--faint"],["In Progress","--accent"],["Submitted","--amber"],["Feedback Received","--p7"],["Revising","--act"],["Approved","--p3"],["Done","--ok"]];
 const SC=Object.fromEntries(STATUSES);
-const APP_VERSION="2026.10.12.14";
+const APP_VERSION="2026.10.13.01";
 const isDone=it=>it.status==="Done"||it.status==="Approved";
 const DEF_NAME="Blue Blaze Project Tracker";
 const appName=()=>((typeof S!=="undefined"&&S&&S.settings&&S.settings.brandName)||"").trim()||DEF_NAME;
