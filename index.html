@@ -510,6 +510,19 @@ body.timing .toast{bottom:calc(130px + env(safe-area-inset-bottom,0px))}
 .vw-stage.is-text .vw-in{width:100%;justify-content:flex-start;align-items:stretch}
 .vw-text{max-width:860px;width:100%;box-sizing:border-box;margin:0 auto;padding:22px 26px 60px;background:var(--card);color:var(--ink);border-radius:10px;font:400 15px/1.6 var(--sans);white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;text-align:left;user-select:text;-webkit-user-select:text;box-shadow:0 2px 12px rgba(0,0,0,.25)}
 .vw-text a{color:var(--accent);text-decoration:underline}
+.vw-text.md{white-space:normal;line-height:1.6}
+.vw-text.md>:first-child{margin-top:0}
+.vw-text.md h1,.vw-text.md h2,.vw-text.md h3,.vw-text.md h4,.vw-text.md h5,.vw-text.md h6{line-height:1.25;margin:1.2em 0 .5em;font-weight:800;letter-spacing:-.01em;text-transform:none;color:var(--ink);font-family:var(--sans)}
+.vw-text.md h1{font-size:1.85em}.vw-text.md h2{font-size:1.45em}.vw-text.md h3{font-size:1.2em}.vw-text.md h4{font-size:1.05em}.vw-text.md h5{font-size:.95em}.vw-text.md h6{font-size:.9em;color:var(--muted)}
+.vw-text.md h1,.vw-text.md h2{padding-bottom:.25em;border-bottom:1px solid var(--line)}
+.vw-text.md.nolines h1,.vw-text.md.nolines h2{border-bottom:0;padding-bottom:0}
+.vw-text.md p{margin:0 0 .8em}.vw-text.md ul,.vw-text.md ol{margin:0 0 .8em;padding-left:1.5em}.vw-text.md li{margin:.15em 0}.vw-text.md li>ul,.vw-text.md li>ol{margin:.15em 0 .2em}
+.vw-text.md li.md-task{list-style:none;margin-left:-1.3em}.vw-text.md li.md-task input{margin:0 .4em 0 0;vertical-align:-1px}
+.vw-text.md blockquote{margin:0 0 .8em;padding:.1em 0 .1em .9em;border-left:3px solid var(--line2);color:var(--muted)}
+.vw-text.md code{font:.9em ui-monospace,Menlo,Consolas,monospace;background:var(--stat);padding:.1em .35em;border-radius:4px}
+.vw-text.md pre{background:var(--stat);padding:.8em 1em;border-radius:8px;overflow:auto;margin:0 0 .8em}.vw-text.md pre code{background:none;padding:0;white-space:pre}
+.vw-text.md hr{border:0;border-top:1px solid var(--line);margin:1.2em 0}
+.vw-text.md .md-tw{overflow:auto;margin:0 0 .8em}.vw-text.md table{border-collapse:collapse}.vw-text.md th,.vw-text.md td{border:1px solid var(--line);padding:.35em .7em;text-align:left;vertical-align:top}.vw-text.md th{background:var(--stat)}
 .vw-edit{flex:1 1 auto;display:block;width:100%;max-width:860px;min-height:300px;margin:0 auto;box-sizing:border-box;padding:22px 26px;border-radius:10px;border:2px solid var(--accent);background:var(--card);color:var(--ink);font:400 15px/1.6 var(--sans);resize:none;outline:none;white-space:pre-wrap;overflow-wrap:anywhere}
 #vw.editing .vw-nav{display:none}
 .vw-ask{position:absolute;inset:0;background:rgba(0,0,0,.5);display:grid;place-items:center;z-index:20;padding:16px}
@@ -688,7 +701,7 @@ const LPAL_DEF={light:["#CEFBD0","#D5ECC2","#FAF6B7","#F2E3B3","#EDE6D8","#F7D9C
 const LIFE_ORDER=[1,7,2,11,10,5,8,6,12,9,4,3]; /* October 2026 reorder: new slot k shows old slot LIFE_ORDER[k-1] */
 const STATUSES=[["Not Started","--faint"],["In Progress","--accent"],["Submitted","--amber"],["Feedback Received","--p7"],["Revising","--act"],["Approved","--p3"],["Done","--ok"]];
 const SC=Object.fromEntries(STATUSES);
-const APP_VERSION="2026.10.13.04";
+const APP_VERSION="2026.10.13.05";
 const isDone=it=>it.status==="Done"||it.status==="Approved";
 const DEF_NAME="Blue Blaze Project Tracker";
 const appName=()=>((typeof S!=="undefined"&&S&&S.settings&&S.settings.brandName)||"").trim()||DEF_NAME;
@@ -706,12 +719,12 @@ const KEY_ACTIONS=[
   ["timerPause","Pause / Resume the Timer"],["timerStop","Stop the Timer"],["undo","Undo the Last Change"],["projects","Projects & Templates"],["settings","Settings"],
   ["theme","Light / Dark Theme"],["sync","Sync Now"],["help","Show Keyboard Shortcuts"],
   ["weeklyReview","Open This Week's Review"],["monthlyReview","Open This Month's Review"],["editProject","Edit Project"],["projectNotes","Project Notes"],["backup","Export Everything (Backup)"],["guide","Open the Guide"],["newText","New Text File"],
-  ["vwEdit","Edit Text File"],["vwDownload","Download File"]];
+  ["vwEdit","Edit Text File"],["vwDownload","Download File"],["vwView","Switch Markdown View"]];
 /* File Viewer shortcuts only count while the viewer is open; the viewer's own fixed keys can't be used for them */
-const KEY_VIEWER=new Set(["vwEdit","vwDownload"]);
+const KEY_VIEWER=new Set(["vwEdit","vwDownload","vwView"]);
 const VIEWER_FIXED=["ArrowLeft","ArrowRight","ArrowUp","ArrowDown","Shift+ArrowLeft","Shift+ArrowRight","+","=","-","0","Space","Shift+Space","M","Shift+M","Mod+S","Mod+A","Mod+C","PageUp","PageDown","Home","End"];
 const KEY_EXTRA=new Set(["weeklyReview","monthlyReview","editProject","projectNotes","backup","guide","newText"]);
-const KEY_DEF={viewBoard:"1",viewMonth:"2",viewWeek:"3",viewDay:"4",viewReview:"5",prev:"ArrowLeft",next:"ArrowRight",today:"T",newBlock:"N",timerPause:"Space",timerStop:"Shift+T",undo:"Mod+Z",projects:"P",settings:"<",theme:"Shift+D",sync:"Shift+S",help:"?",weeklyReview:"",monthlyReview:"",editProject:"",projectNotes:"",backup:"",guide:"",newText:"Shift+N",vwEdit:"Shift+E",vwDownload:"Shift+D"};
+const KEY_DEF={viewBoard:"1",viewMonth:"2",viewWeek:"3",viewDay:"4",viewReview:"5",prev:"ArrowLeft",next:"ArrowRight",today:"T",newBlock:"N",timerPause:"Space",timerStop:"Shift+T",undo:"Mod+Z",projects:"P",settings:"<",theme:"Shift+V",sync:"Shift+S",help:"?",weeklyReview:"",monthlyReview:"",editProject:"",projectNotes:"",backup:"",guide:"",newText:"Shift+N",vwEdit:"Shift+E",vwDownload:"Shift+D",vwView:"Shift+F"};
 const KEY_RESERVED=["Mod+T","Mod+W","Mod+N","Mod+Q","Mod+R","Mod+L","Mod+Tab","Mod+Shift+T","Mod+Shift+N","Mod+Shift+W","Alt+F4","Alt+ArrowLeft","Alt+ArrowRight","Mod+[","Mod+]","Tab","Shift+Tab","Enter","Escape","Backspace","Delete","Mod+C","Mod+V","Mod+X","Mod+A","Mod+P","Mod+F"];
 function comboOf(e){
   if(["Shift","Control","Alt","Meta","CapsLock","Dead","Unidentified"].includes(e.key))return null;
@@ -765,7 +778,7 @@ function applyAdv(st){st=st||S.settings;
     if(all)css+=`${mq}{${all}}}${at}{${all}}`;
     if(mm)css+=`${mq} body.pg-board{${mm}}}${at} body.pg-board{${mm}}`});
   let el=document.getElementById("adv");if(!el){el=document.createElement("style");el.id="adv";document.body.appendChild(el)}el.textContent=css}
-function ensureSettings(){const d=JSON.parse(JSON.stringify(ADV_DEF));for(const k in d)if(S.settings[k]===undefined)S.settings[k]=d[k];S.itemTemplates=S.itemTemplates||{};S.sounds=S.sounds||{};S.settings.keys={...KEY_DEF,...(S.settings.keys||{})};S.phaseTemplates=S.phaseTemplates||{};S.brand=S.brand||{}}
+function ensureSettings(){const d=JSON.parse(JSON.stringify(ADV_DEF));for(const k in d)if(S.settings[k]===undefined)S.settings[k]=d[k];S.itemTemplates=S.itemTemplates||{};S.sounds=S.sounds||{};S.settings.keys={...KEY_DEF,...(S.settings.keys||{})};if(!S.settings.keyMig1){if(S.settings.keys.theme==="Shift+D")S.settings.keys.theme="Shift+V";S.settings.keyMig1=true};S.phaseTemplates=S.phaseTemplates||{};S.brand=S.brand||{}}
 
 /* ===================== color slot moves ===================== */
 /* Blocks and phases remember a color by slot (p1…p12, lf1…lf12). When colors move to new slots,
@@ -1581,6 +1594,45 @@ async function textPeek(a){const pk=a.id+"|"+(a.rev||"")+(edPending(a)?"|ed":"")
   if(!b){if(a.pending){const u=memUp[a.id]||await IDB.get("up:"+a.id);b=u&&u.blob}else if(a.driveId)b=await cacheGet(a.driveId);else if(isDbx(a))b=await cacheGet(dbxKey(a))}
   if(!b)return null;const t=(await blobText(b,1200)).trim().split("\n").slice(0,8).join("\n").slice(0,320);return peekCache[pk]=t}
 const linkText=t=>{let out="",i=0;String(t).replace(LINK_RE,(m,at)=>{const u=m.replace(/[.,;:!?]+$/,"");out+=esc(t.slice(i,at))+(u.length<5?esc(u):`<a href="${esc(/^https?:\/\//i.test(u)?u:"https://"+u)}" target="_blank" rel="noopener">${esc(u)}</a>`);i=at+u.length;return m});return out+esc(t.slice(i))};
+/* ---- Markdown: .md files show formatted (made here, so it works offline). Everything is escaped first; only links to http(s) become links. ---- */
+const MD_EXT=["md","markdown"],isMd=a=>MD_EXT.includes(extOf(a&&a.name||""));
+const MDV=["lines","clean","plain"],MDV_L={lines:"Formatted",clean:"Formatted · No Lines",plain:"Plain"};
+const mdView=()=>{const v=LS.get("bbst-mdview","lines");return MDV.includes(v)?v:"lines"};
+function mdInline(t){const keep=[],hold=h=>"\u0000"+(keep.push(h)-1)+"\u0001";
+  t=esc(t);
+  t=t.replace(/`([^`]+)`/g,(m,c)=>hold(`<code>${c}</code>`));
+  t=t.replace(/\[([^\]]+)\]\(((?:https?:\/\/|www\.)[^)\s]+)\)/g,(m,x,u)=>hold(`<a href="${/^www\./.test(u)?"https://"+u:u}" target="_blank" rel="noopener">${x}</a>`));
+  t=t.replace(LINK_RE,m=>{const u=m.replace(/[.,;:!?]+$/,""),rest=m.slice(u.length);if(u.length<5)return m;return hold(`<a href="${/^https?:\/\//i.test(u)?u:"https://"+u}" target="_blank" rel="noopener">${u}</a>`)+rest});
+  t=t.replace(/\*\*(?=\S)([\s\S]*?\S)\*\*/g,"<strong>$1</strong>").replace(/__(?=\S)([\s\S]*?\S)__/g,"<strong>$1</strong>");
+  t=t.replace(/(^|[^*])\*(?=\S)([^*]*?\S)\*(?!\*)/g,"$1<em>$2</em>").replace(/(^|[^\w_])_(?=\S)([^_]*?\S)_(?![\w_])/g,"$1<em>$2</em>");
+  t=t.replace(/~~(?=\S)([\s\S]*?\S)~~/g,"<del>$1</del>");
+  return t.replace(/\u0000(\d+)\u0001/g,(m,i)=>keep[+i])}
+function mdToHtml(src){
+  const L=String(src||"").replace(/\r\n?/g,"\n").replace(/\t/g,"    ").split("\n"),out=[];let i=0,para=[];
+  const flush=()=>{if(para.length){out.push(`<p>${para.map(mdInline).join("<br>")}</p>`);para=[]}};
+  const LI=/^(\s*)([-*+]|\d{1,9}[.)])\s+(.*)$/,TSEP=/^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/;
+  const cells=r=>r.trim().replace(/^\||\|$/g,"").split("|").map(c=>c.trim());
+  while(i<L.length){const ln=L[i];
+    if(/^\s*```/.test(ln)){flush();const code=[];i++;while(i<L.length&&!/^\s*```/.test(L[i]))code.push(L[i++]);i++;out.push(`<pre><code>${esc(code.join("\n"))}</code></pre>`);continue}
+    if(!ln.trim()){flush();i++;continue}
+    let m=ln.match(/^\s{0,3}(#{1,6})\s+(.*?)\s*#*\s*$/);if(m){flush();out.push(`<h${m[1].length}>${mdInline(m[2])}</h${m[1].length}>`);i++;continue}
+    if(/^\s{0,3}([-*_])(\s*\1){2,}\s*$/.test(ln)){flush();out.push("<hr>");i++;continue}
+    if(/^\s{0,3}>/.test(ln)){flush();const q=[];while(i<L.length&&/^\s{0,3}>/.test(L[i]))q.push(L[i++].replace(/^\s{0,3}>\s?/,""));out.push(`<blockquote>${mdToHtml(q.join("\n"))}</blockquote>`);continue}
+    if(ln.includes("|")&&i+1<L.length&&TSEP.test(L[i+1])&&L[i+1].includes("-")){flush();const h=cells(ln);i+=2;const rows=[];while(i<L.length&&L[i].includes("|")&&L[i].trim())rows.push(cells(L[i++]));
+      out.push(`<div class="md-tw"><table><thead><tr>${h.map(c=>`<th>${mdInline(c)}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${h.map((_,k)=>`<td>${mdInline(r[k]||"")}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`);continue}
+    if(LI.test(ln)){flush();const items=[];
+      while(i<L.length){const x=L[i].match(LI);if(x){items.push({ind:x[1].length,ol:/\d/.test(x[2]),ord:/\d/.test(x[2])?parseInt(x[2]):0,text:x[3]});i++;continue}
+        if(L[i].trim()&&/^\s{2,}/.test(L[i])&&items.length){items[items.length-1].text+="\n"+L[i].trim();i++;continue}break}
+      out.push(mdList(items));continue}
+    para.push(ln.trim());i++}
+  flush();return out.join("")}
+function mdList(items){const base=items[0].ind,ol=items[0].ol,ord=items[0].ord;let h=ol?`<ol${ord>1?` start="${ord}"`:""}>`:"<ul>",i=0;
+  while(i<items.length){const it=items[i];
+    if(it.ind<=base&&it.ol!==ol)return h+(ol?"</ol>":"</ul>")+mdList(items.slice(i));
+    if(it.ind>base){let j=i;while(j<items.length&&items[j].ind>base)j++;h=h.replace(/<\/li>$/,"")+mdList(items.slice(i,j))+"</li>";i=j;continue}
+    let t=it.text,cb="";const c=t.match(/^\[([ xX])\]\s+(.*)$/s);if(c){cb=`<input type="checkbox" disabled ${c[1]!==" "?"checked":""}> `;t=c[2]}
+    h+=`<li${cb?' class="md-task"':""}>${cb}${t.split("\n").map(mdInline).join("<br>")}</li>`;i++}
+  return h+(ol?"</ol>":"</ul>")}
 /* ---- editing text files: Save writes into the same Drive file (same ID, same cards) ---- */
 async function sha256hex(b){try{if(!(crypto&&crypto.subtle))return "";const h=await crypto.subtle.digest("SHA-256",await b.arrayBuffer());return [...new Uint8Array(h)].map(x=>x.toString(16).padStart(2,"0")).join("")}catch(e){return ""}}
 const sameFile=id=>{const out=[];attOwners().forEach(o=>(o.files||[]).forEach(a=>{if(a.driveId===id)out.push(a)}));return out};
@@ -2130,7 +2182,7 @@ function openViewer(ref,id){
   const o=ownerOf(ref);if(!o)return;const list=(o.files||[]).filter(a=>kindOf(a)!=="other");let i=Math.max(0,list.findIndex(a=>a.id===id));
   const root=document.getElementById("viewer-root");
   root.innerHTML=`<div class="vw" id="vw" tabindex="-1" role="dialog" aria-modal="true" aria-label="File viewer"><div class="vw-top"><span class="vw-t"><b id="vw-n"></b><span id="vw-c"></span></span>
-    <span class="row" style="gap:6px"><button class="btn sm" id="vw-out" aria-label="Zoom out">−</button><button class="btn sm" id="vw-fit">Fit</button><button class="btn sm" id="vw-zin" aria-label="Zoom in">+</button><button class="btn sm" id="vw-edit" hidden>Edit</button><button class="btn sm" id="vw-cancel" hidden>Cancel</button><button class="btn sm primary" id="vw-save" hidden>Save</button><button class="btn sm" id="vw-copy" hidden>Copy All</button><button class="btn sm" id="vw-dl">Download</button><button class="btn sm" id="vw-drive">Open in Drive</button><button class="btn sm" id="vw-x">Close</button></span></div>
+    <span class="row" style="gap:6px"><button class="btn sm" id="vw-out" aria-label="Zoom out">−</button><button class="btn sm" id="vw-fit">Fit</button><button class="btn sm" id="vw-zin" aria-label="Zoom in">+</button><button class="btn sm" id="vw-mdv" hidden>Formatted</button><button class="btn sm" id="vw-edit" hidden>Edit</button><button class="btn sm" id="vw-cancel" hidden>Cancel</button><button class="btn sm primary" id="vw-save" hidden>Save</button><button class="btn sm" id="vw-copy" hidden>Copy All</button><button class="btn sm" id="vw-dl">Download</button><button class="btn sm" id="vw-drive">Open in Drive</button><button class="btn sm" id="vw-x">Close</button></span></div>
     <div class="vw-stage" id="vw-stage"><div class="vw-in" id="vw-box"></div></div>
     ${list.length>1?`<button class="vw-nav prev" id="vw-prev" aria-label="Previous">‹</button><button class="vw-nav next" id="vw-next" aria-label="Next">›</button>`:""}</div>`;
   const st=root.querySelector("#vw-stage"),box=root.querySelector("#vw-box");
@@ -2155,7 +2207,9 @@ function openViewer(ref,id){
     if(tok!==VW.tok)return;const r=st.getBoundingClientRect(),aw=r.width-24,ah=r.height-24;
     ["#vw-out","#vw-fit","#vw-zin"].forEach(x=>{const e=q(x);if(e)e.hidden=VW.kind==="audio"});q("#vw-copy").hidden=VW.kind!=="text";st.classList.toggle("is-text",VW.kind==="text");
     if(VW.kind==="text"){let t;try{t=await blobText(b)}catch(x){if(tok===VW.tok)box.innerHTML=`<div class="vw-msg">This file couldn't be read as text.</div>`;return}if(tok!==VW.tok)return;
-      VW.text=t;VW.blob=b;VW.base={w:1};q("#vw-edit").hidden=!(a.kind==="drive"&&a.driveId&&!a.pending&&!isGdoc(a)&&b.size<=TEXT_MAX);box.innerHTML=`<div class="vw-text">${t.trim()?linkText(t):`<span class="sub">This file is empty.</span>`}</div>${b.size>TEXT_MAX?`<div class="vw-msg">Showing the first 2 MB of ${fsize(b.size)}. Download for the rest.</div>`:""}`;
+      VW.text=t;VW.blob=b;VW.base={w:1};q("#vw-edit").hidden=!(a.kind==="drive"&&a.driveId&&!a.pending&&!isGdoc(a)&&b.size<=TEXT_MAX);
+      const md=isMd(a),mv=md?mdView():"plain";q("#vw-mdv").hidden=!md;q("#vw-mdv").textContent=MDV_L[mv];q("#vw-mdv").title="Switch View (Shift+F)";
+      box.innerHTML=`<div class="vw-text${mv!=="plain"?" md"+(mv==="clean"?" nolines":""):""}">${!t.trim()?`<span class="sub">This file is empty.</span>`:mv!=="plain"?mdToHtml(t):linkText(t)}</div>${b.size>TEXT_MAX?`<div class="vw-msg">Showing the first 2 MB of ${fsize(b.size)}. Download for the rest.</div>`:""}`;
       st.scrollTop=0;setW();vwFocus();return}
     if(VW.kind==="audio"){const u=fileURLs[a.id]||(fileURLs[a.id]=URL.createObjectURL(b));if(tok!==VW.tok)return;
       box.innerHTML=`<div class="vw-audio ap"><span class="bdg" style="--bc:#000">${esc(badgeOf(a).t)}</span><b>${esc(a.name)}</b><audio preload="auto" src="${u}"></audio>
@@ -2191,7 +2245,7 @@ function openViewer(ref,id){
     VW.au=au;const p=au.play();if(p&&p.catch)p.catch(()=>{if(tok===VW.tok)paint()});vwFocus()}
   /* ---- edit mode ---- */
   function edButtons(){const ed=!!(VW&&VW.edit);["#vw-out","#vw-fit","#vw-zin"].forEach(x=>{const e=q(x);if(e&&ed)e.hidden=false});
-    ["#vw-copy","#vw-dl","#vw-drive","#vw-edit"].forEach(x=>{const e=q(x);if(e&&ed)e.hidden=true});q("#vw-save").hidden=!ed;q("#vw-cancel").hidden=!ed;q("#vw").classList.toggle("editing",ed);if(!ed)q("#vw-edit").hidden=true}
+    ["#vw-copy","#vw-dl","#vw-drive","#vw-edit","#vw-mdv"].forEach(x=>{const e=q(x);if(e&&ed)e.hidden=true});q("#vw-save").hidden=!ed;q("#vw-cancel").hidden=!ed;q("#vw").classList.toggle("editing",ed);if(!ed)q("#vw-edit").hidden=true}
   const dirty=()=>!!(VW&&VW.edit&&q("#vw-ed")&&q("#vw-ed").value!==VW.orig);
   async function startEdit(){const a=VW.list[VW.i];if(VW.kind!=="text"||!VW.blob)return;
     const qe=edQ().find(e=>e.driveId===a.driveId);VW.origHash=qe?qe.hash:await sha256hex(VW.blob);VW.origForce=qe?!!qe.force:false;VW.orig=VW.text;VW.edit=true;edButtons();
@@ -2215,11 +2269,17 @@ function openViewer(ref,id){
     if(c==="save"){const r=await doSave();return r==="ok"||r==="queued"||r==="copy"}if(c==="discard"){VW.edit=false;return true}return false};
   function vwAsk(title,msg,btns){return new Promise(res=>{const w=document.createElement("div");w.className="vw-ask";w.innerHTML=`<div class="vw-ask-box" role="alertdialog" aria-label="${esc(title)}"><b>${esc(title)}</b><p>${esc(msg)}</p><div class="row">${btns.map(([k,l],i)=>`<button class="btn sm ${i===0?"primary":""}" data-k="${k}">${esc(l)}</button>`).join("")}</div></div>`;
     q("#vw").appendChild(w);VW.ask=k=>{w.remove();VW.ask=null;res(k)};w.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>VW.ask(b.dataset.k));setTimeout(()=>w.querySelector("[data-k]").focus(),0)})}
+  VW.cycleView=()=>{const v=mdView(),n=MDV[(MDV.indexOf(v)+1)%MDV.length];LS.set("bbst-mdview",n);const r=st.scrollTop/Math.max(1,st.scrollHeight-st.clientHeight);VW.keepZoom=true;VW.edit=false;show().then(()=>{st.scrollTop=r*(st.scrollHeight-st.clientHeight)});toast(MDV_L[n],1500)};
+  q("#vw-mdv").onclick=()=>{VW.cycleView();vwFocus()};
   q("#vw-edit").onclick=()=>startEdit();q("#vw-save").onclick=()=>doSave();q("#vw-cancel").onclick=()=>cancelEdit();
   VW.saveKey=()=>doSave();VW.cancelKey=()=>cancelEdit();VW.editKey=()=>startEdit();
   const go=async d=>{if(VW.list.length<2)return;if(!(await VW.guard()))return;document.querySelectorAll("#viewer-root audio").forEach(x=>{try{x.pause()}catch(e){}});VW.i=(VW.i+d+VW.list.length)%VW.list.length;show();vwFocus()};
   q("#vw-x").onclick=()=>closeViewer();q("#vw-zin").onclick=()=>zoomTo(VW.zoom*1.4);q("#vw-out").onclick=()=>zoomTo(VW.zoom/1.4);q("#vw-fit").onclick=()=>zoomTo(1);
-  q("#vw-copy").onclick=()=>{const t=VW.text||"";(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("Text copied"),()=>{const r=document.createRange(),tx=box.querySelector(".vw-text");if(tx){r.selectNodeContents(tx);const sl=getSelection();sl.removeAllRanges();sl.addRange(r);toast("Selected. Copy with your device's Copy.")}});vwFocus()};
+  q("#vw-copy").onclick=()=>{const t=VW.text||"",fm=box.querySelector(".vw-text.md");
+    /* formatted Markdown copies as formatted text (headings, bold, lists paste into Docs, Word, email); plain copies the Markdown itself */
+    if(fm){const html=fm.innerHTML,plain=fm.innerText;let p;try{p=navigator.clipboard&&window.ClipboardItem?navigator.clipboard.write([new ClipboardItem({"text/html":new Blob([html],{type:"text/html"}),"text/plain":new Blob([plain],{type:"text/plain"})})]):Promise.reject()}catch(x){p=Promise.reject()}
+      p.then(()=>toast("Copied with formatting"),()=>{const r=document.createRange();r.selectNodeContents(fm);const sl=getSelection();sl.removeAllRanges();sl.addRange(r);let ok=false;try{ok=document.execCommand("copy")}catch(x){}sl.removeAllRanges();toast(ok?"Copied with formatting":"Couldn't copy here. Select the text and use your device's Copy.")});vwFocus();return}
+    (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("Text copied"),()=>{const r=document.createRange(),tx=box.querySelector(".vw-text");if(tx){r.selectNodeContents(tx);const sl=getSelection();sl.removeAllRanges();sl.addRange(r);toast("Selected. Copy with your device's Copy.")}});vwFocus()};
   q("#vw-dl").onclick=()=>{const a=VW.list[VW.i];if(a.pending){getBlob(a).then(b=>deliverFile(a.name,b)).catch(()=>{})}else downloadAtt(a)};
   q("#vw-drive").onclick=()=>{const a=VW.list[VW.i];if(isDbx(a))return void window.open(a.url,"_blank","noopener");if(a.driveId)window.open(a.url||`https://drive.google.com/file/d/${a.driveId}/view`,"_blank","noopener")};
   if(q("#vw-prev")){q("#vw-prev").onclick=()=>go(-1);q("#vw-next").onclick=()=>go(1)}
@@ -2246,6 +2306,8 @@ function openViewer(ref,id){
         if(k==="m"||k==="M")apMute();else if(k==="ArrowLeft")apSeek(-10);else if(k==="ArrowRight")apSeek(10);else apToggle();return}}
     {const c=comboOf(e),K=S.settings.keys||{};
       if(c&&K.vwEdit&&c===K.vwEdit){e.preventDefault();e.stopImmediatePropagation();if(!q("#vw-edit").hidden)VW.editKey();else toast(VW.kind==="text"?"This text file can't be edited here (Dropbox link, over 2 MB, or not uploaded yet).":"Only text files (TXT, MD, CSV, TSV, JSON, LOG) can be edited.",4500);return}
+      if(c&&K.vwView&&c===K.vwView){e.preventDefault();e.stopImmediatePropagation();if(!q("#vw-mdv").hidden)VW.cycleView();else toast("Switch Markdown View works on .md files.",3500);return}
+      if(c&&K.theme&&c===K.theme&&!Object.keys(K).some(k=>KEY_VIEWER.has(k)&&K[k]===c)){e.preventDefault();e.stopImmediatePropagation();toggleTheme();return}
       if(c&&K.vwDownload&&c===K.vwDownload){e.preventDefault();e.stopImmediatePropagation();if(!q("#vw-dl").hidden)q("#vw-dl").click();else toast("This file can't be downloaded here.",4000);return}}
     if(VW.kind==="text"&&!e.altKey){const k=e.key,stg=document.getElementById("vw-stage"),pg=stg?stg.clientHeight*.85:400,sc={ArrowDown:40,ArrowUp:-40,PageDown:pg,PageUp:-pg," ":e.shiftKey?-pg:pg}[k];
       if(stg&&sc!==undefined&&!e.metaKey&&!e.ctrlKey){e.preventDefault();e.stopImmediatePropagation();stg.scrollBy({top:sc});return}
@@ -3155,6 +3217,7 @@ function settingsModal(tab="general",D){
       <div class="inl"><span class="sub">Ask After</span>${num("idleMin",D.idleMin,5,120,5)}<span class="sub">Minutes Without Activity</span></div></section>
     <section><h3>Data</h3>
       <div class="row"><button class="btn sm" id="st-exp">Export Everything</button><button class="btn sm" id="st-imp">Import Backup</button></div>
+      <div class="row"><button class="btn sm" id="st-sexp">Export Settings</button><button class="btn sm" id="st-simp">Import Settings</button><span class="sub grow">General, Advanced and Keyboard Shortcuts in one file. No projects, connection key, logo or sound files.</span></div>
       ${tgl("backupReminder","Sunday Backup Reminder")}
       <span class="lbl">ATTACHMENTS (THIS DEVICE)</span>
       <div class="tgl"><span>Keep All Attachments Offline<small>Saves a copy of every attached file on this device so it opens without internet, like when traveling without a VPN. Links aren't downloaded.</small></span><input type="checkbox" id="st-off" ${keepOffline()?"checked":""}></div>
@@ -3226,6 +3289,8 @@ function settingsModal(tab="general",D){
       on("st-pal",()=>paletteModal(()=>settingsModal("general",D)));
       on("st-lpal",()=>paletteModal(()=>settingsModal("general",D),"life"));
       on("st-exp",backupNow);
+      on("st-sexp",()=>{exportSettings();toast("Settings exported")});
+      on("st-simp",()=>pickJSON(d=>importSettingsSheet(d)));
       on("st-imp",()=>document.getElementById("upload-bk").click());
       const cb=body.querySelector("#st-conn");if(cb)Sync.extras(cb);
       armDelete(body.querySelector("#st-reset"),()=>{closeModal();T=null;persistT(true);drawTimer();undoable(()=>{S.projects=[];S.sessions=[];S.plans=[];S.notes={};S.weekly={};S.weekMeta={};S.monthly={};S.dayx={};S.routineSkip={}},"All data cleared")},"Tap Again to Clear Everything");
@@ -3420,7 +3485,7 @@ function kbModal(back,D){
     root.querySelectorAll("[data-kx]").forEach(b=>b.onclick=()=>{dk[b.dataset.kx]="";note="";draw(root)});
   };
   modal(`<h2>Keyboard Shortcuts</h2><div id="kb-body" style="display:grid;gap:12px"></div>
-    <div class="m-actions"><button class="btn left" id="kb-def">Revert to Defaults</button><button class="btn" id="kb-cancel">Cancel</button><button class="btn primary" id="kb-save">Save</button></div>`,root=>{
+    <div class="m-actions"><button class="btn left" id="kb-def">Revert to Defaults</button><button class="btn" id="kb-exp">Export</button><button class="btn" id="kb-imp">Import</button><button class="btn" id="kb-cancel">Cancel</button><button class="btn primary" id="kb-save">Save</button></div>`,root=>{
     draw(root);
     const onKey=e=>{if(!rec)return;e.preventDefault();e.stopImmediatePropagation();
       if(e.key==="Escape"){rec=null;kbRecording=false;draw(root);return}
@@ -3429,16 +3494,47 @@ function kbModal(back,D){
       const vw=KEY_VIEWER.has(rec);
       if(vw&&VIEWER_FIXED.includes(c)){note=`${keyLabel(c)} is already used inside the viewer. Try another.`;rec=null;kbRecording=false;return draw(root)}
       const other=Object.keys(dk).find(k=>k!==rec&&dk[k]===c&&KEY_VIEWER.has(k)===vw);
-      if(other){dk[other]="";note=`${keyLabel(c)} moved from "${KEY_ACTIONS.find(a=>a[0]===other)[1]}", which is now Empty.`}else note="";
+      const vwSame=rec==="theme"&&Object.keys(dk).find(k=>KEY_VIEWER.has(k)&&dk[k]===c);
+      if(other){dk[other]="";note=`${keyLabel(c)} moved from "${KEY_ACTIONS.find(a=>a[0]===other)[1]}", which is now Empty.`}else note=vwSame?`${keyLabel(c)} is also "${KEY_ACTIONS.find(a=>a[0]===vwSame)[1]}" in the File Viewer, so Light / Dark won't work there.`:"";
       dk[rec]=c;rec=null;kbRecording=false;draw(root)};
     document.addEventListener("keydown",onKey,true);
     const done=()=>{document.removeEventListener("keydown",onKey,true);kbRecording=false};
+    root.querySelector("#kb-exp").onclick=()=>{downloadFile(`Project-Tracker_Shortcuts_${d8()}.json`,JSON.stringify({type:"bbst-shortcuts",v:1,app:APP_VERSION,shortcuts:{keys:{...dk},...sw}},null,1));toast("Shortcuts exported")};
+    root.querySelector("#kb-imp").onclick=()=>pickJSON(d=>{const p=readSettingsFile(d);if(!p||!p.shortcuts){toast("That file has no keyboard shortcuts in it.",4500);return}
+      const r=cleanShortcuts(p.shortcuts);let n=0;Object.keys(r.keys).forEach(k=>{if(dk[k]!==r.keys[k]){dk[k]=r.keys[k];n++}});Object.keys(sw).forEach(k=>{if(r.sw[k]!==undefined&&sw[k]!==r.sw[k]){sw[k]=r.sw[k];n++}});
+      note=`${n?`${n} change${n>1?"s":""} loaded.`:"No changes: it matches what you have."}${r.dropped.length?` Left out (reserved or unknown): ${r.dropped.join(", ")}.`:""}${n?" Tap Save to keep them.":""}`;rec=null;kbRecording=false;draw(root)});
     root.querySelector("#kb-def").onclick=()=>{Object.assign(dk,KEY_DEF);Object.keys(sw).forEach(k=>sw[k]=true);note="Defaults restored. Tap Save to keep them.";rec=null;kbRecording=false;draw(root)};
     root.querySelector("#kb-cancel").onclick=()=>{done();back?back():closeModal()};
     root.querySelector("#kb-save").onclick=()=>{done();st.keys={...dk};Object.assign(st,sw);if(D){D.keys={...dk};Object.assign(D,sw)}commit();toast("Shortcuts saved");back?back():closeModal()};
     const ov=root.querySelector("#ov");new MutationObserver((m,o)=>{if(!ov.isConnected){done();o.disconnect()}}).observe(document.getElementById("modal-root"),{childList:true});
   },"wide");
 }
+/* ---- export / import settings and shortcuts ---- */
+const SET_SC=["kbEnter","kbDelete","kbShiftEnter","kbShiftClick"];
+const SET_GEN=["dayStart","dayEnd","target","days","sprint","sprints","routine","palette","lifePalette","rate","hpd","rateFloor","roundsIncl","mxn","showMXN","showValue","weekStart","clock24","backupReminder"];
+const SET_SKIP=["keys","keyMig1",...SET_SC];
+function settingsParts(st){st=JSON.parse(JSON.stringify(st||S.settings));const g={},a={};
+  Object.keys(st).forEach(k=>{if(SET_SKIP.includes(k))return;(SET_GEN.includes(k)?g:a)[k]=st[k]});
+  const sc={keys:{...KEY_DEF,...(st.keys||{})}};SET_SC.forEach(k=>sc[k]=st[k]);return{general:g,advanced:a,shortcuts:sc}}
+function exportSettings(){downloadFile(`Project-Tracker_Settings_${d8()}.json`,JSON.stringify({type:"bbst-settings",v:1,app:APP_VERSION,...settingsParts()},null,1))}
+function readSettingsFile(d){if(!d||typeof d!=="object")return null;if(d.type==="bbst-shortcuts")return d.shortcuts?{shortcuts:d.shortcuts}:null;if(d.type!=="bbst-settings")return null;
+  const o={};["general","advanced","shortcuts"].forEach(k=>{if(d[k]&&typeof d[k]==="object")o[k]=d[k]});return Object.keys(o).length?o:null}
+function cleanShortcuts(sc){const keys={},dropped=[],swv={};Object.entries((sc&&sc.keys)||{}).forEach(([k,v])=>{if(!(k in KEY_DEF)||typeof v!=="string"){dropped.push(k);return}
+    if(v&&KEY_RESERVED.includes(v)){dropped.push(keyLabel(v));return}if(v&&KEY_VIEWER.has(k)&&VIEWER_FIXED.includes(v)){dropped.push(keyLabel(v));return}keys[k]=v});
+  SET_SC.forEach(k=>{if(typeof (sc||{})[k]==="boolean")swv[k]=sc[k]});return{keys,sw:swv,dropped}}
+function pickJSON(cb){const i=document.createElement("input");i.type="file";i.accept=".json,application/json";i.style.display="none";document.body.appendChild(i);
+  i.onchange=async()=>{const f=i.files[0];i.remove();if(!f)return;let d;try{d=JSON.parse(await f.text())}catch(e){toast("That isn't a settings or shortcuts file.",4500);return}cb(d)};i.click()}
+function importSettingsSheet(d){const p=readSettingsFile(d);if(!p){toast("That isn't a settings or shortcuts file.",4500);return}
+  const cur=settingsParts(),diff=(a,b)=>Object.keys(a||{}).filter(k=>JSON.stringify(a[k])!==JSON.stringify((b||{})[k])).length;
+  const n={general:diff(p.general,cur.general),advanced:diff(p.advanced,cur.advanced),shortcuts:p.shortcuts?diff(cleanShortcuts(p.shortcuts).keys,cur.shortcuts.keys)+diff(cleanShortcuts(p.shortcuts).sw,cur.shortcuts):0};
+  const L={general:"General",advanced:"Advanced",shortcuts:"Keyboard Shortcuts"};
+  sheet("Import Settings","Choose what to bring in. Nothing changes until you tap Import.",`<div style="display:grid;gap:8px">${Object.keys(L).map(k=>`<label class="tgl"><span>${L[k]}<small>${p[k]?(n[k]?`${n[k]} change${n[k]>1?"s":""}`:"Same as now"):"Not in this file"}</small></span><input type="checkbox" data-part="${k}" ${p[k]&&n[k]?"checked":""} ${p[k]?"":"disabled"}></label>`).join("")}
+    <div class="row" style="justify-content:flex-end;gap:8px"><button class="btn" data-x>Cancel</button><button class="btn primary" data-go>Import</button></div></div>`,(h,close)=>{
+    h.querySelector("[data-x]").onclick=close;
+    h.querySelector("[data-go]").onclick=()=>{const parts=[...h.querySelectorAll("[data-part]:checked")].map(x=>x.dataset.part);if(!parts.length){toast("Tick at least one part.",3000);return}
+      const st=S.settings;if(parts.includes("general"))Object.assign(st,JSON.parse(JSON.stringify(p.general)));if(parts.includes("advanced"))Object.assign(st,JSON.parse(JSON.stringify(p.advanced)));
+      if(parts.includes("shortcuts")){const r=cleanShortcuts(p.shortcuts);st.keys={...KEY_DEF,...st.keys,...r.keys};Object.assign(st,r.sw);if(r.dropped.length)toast("Left out (reserved or unknown): "+r.dropped.join(", "),6000)}
+      close();closeModal();ensureSettings();applyPalette();applyAdv();commit();toast(`Imported: ${parts.map(x=>L[x]).join(", ")}`)}})}
 function kbHelp(){
   const k=S.settings.keys,list=KEY_ACTIONS.filter(a=>k[a[0]]);
   modal(`<h2>Keyboard Shortcuts</h2><div class="kb-list">${list.map(([id,l])=>`<div class="kb-row"><span class="kb-l">${l}${KEY_VIEWER.has(id)?" (File Viewer)":""}</span><span class="kb-key">${keyLabel(k[id])}</span></div>`).join("")}
@@ -3458,7 +3554,7 @@ function runAction(id){
     case"timerPause":{const b=document.getElementById("tm-pause");if(b)b.click();return}
     case"timerStop":{const b=document.getElementById("tm-stop");if(b)b.click();return}
     case"undo":return undoLast();case"projects":return libModal();case"settings":return settingsModal();
-    case"theme":{const b=document.getElementById("btn-theme");if(b)b.click();return}
+    case"theme":return toggleTheme();
     case"sync":{if(Sync.connected()){toast("Syncing…");Sync.pull("tap")}else Sync.connectScreen();return}
     case"help":return kbHelp();
     case"weeklyReview":S.ui.view="review";S.ui.rtab="weekly";S.ui.rweek=iso(weekOf(new Date()));return commit();
@@ -3681,7 +3777,7 @@ manual:[
 <h4>Opening Files</h4>
 <ul>
 <li>MP3, M4A and WAV files play in the tracker's own audio player as soon as they open, offline too once saved on the device. If the iPad holds the sound back, tap the big Play button once. Back 10 and Forward 10 sit on either side, and the bar underneath jumps to any point. Keys: <span class="k">Space</span> play or pause, <span class="k">Shift+←</span> <span class="k">Shift+→</span> 10 seconds back or forward, <span class="k">M</span> mute, <span class="k">←</span> <span class="k">→</span> other files, <span class="k">Esc</span> close. Moving to another file or closing stops the sound.</li>
-<li>Text files (TXT, MD, CSV, TSV, JSON, LOG) open in the viewer too, as plain text with tappable links. + and − change the text size, Copy All copies it, and their cards show the first lines. Files over 2 MB show the first 2 MB.</li>
+<li>Text files (TXT, MD, CSV, TSV, JSON, LOG) open in the viewer too, as plain text with tappable links. Markdown (.md) shows formatted: headings, bold, italic, lists, checklists, quotes, code, tables and links. The view button (or Shift+F) switches Formatted, Formatted without the lines under big headings, and Plain; the tracker remembers your choice. Copy All matches the view: formatted text pastes with its formatting into Docs, Word or email; Plain copies the Markdown itself. + and − change the text size, Copy All copies it, and their cards show the first lines. Files over 2 MB show the first 2 MB.</li>
 <li>Edit (in the viewer, or Shift+E) changes a text file: Save or Ctrl+S / Cmd+S writes it back into the same Drive file, so every card that shows it stays linked; Cancel or Esc discards (it asks first if you made changes). Closing or moving to another file with unsaved changes asks Save, Discard or Keep Editing. If the file changed somewhere else after you opened it, you choose Replace It or Save as a Copy. Offline, the edit is kept on the device (the card says Waiting to Save) and goes to Drive when you're back online. Dropbox links and files over 2 MB are view-only. Google Drive keeps earlier versions (Manage versions).</li>
 <li>JPG, PNG and PDF open in the tracker's viewer: pinch or + and − to zoom (double-click on a laptop), swipe sideways or use the arrow keys for the next file, swipe down or Close to go back.</li>
 <li>Dropbox links (shared as "Anyone with the link") come through your Google Sheet's script: JPG, PNG, PDF, audio and text files open in the tracker's viewer, other files download, and they get offline copies like Drive files. On iPad, Open in Dropbox App replaces Open in Browser. A link that needs a login can only be opened in Dropbox.</li>
@@ -3722,6 +3818,7 @@ manual:[
 <li>Pick a phase's color in Edit Phase, or from a Project Work block (it recolors the whole phase).</li>
 <li>Appearance (Settings > Advanced): page, calendar, review and board backgrounds and cards, each for Light and Dark. Text on a light background switches automatically so it stays readable. Default resets one color. Previous Month Review + Weekly Priorities share one color, and Goals + Achievements share another.</li>
 <li>Accent Color (Appearance): filled buttons like + Block, links and switches; in Dark, also today in Week and Month. Today Color (Appearance): the heading of the current day, week, month or review, and in Light also today in Week and Month (#559DD5 Light, #38B2C3 Dark by default).</li>
+<li>Export Settings / Import Settings (Advanced > Data): General, Advanced and Keyboard Shortcuts in one file (no projects, connection key, logo or sound files). Import lets you tick which parts to bring in. Keyboard Shortcuts also has its own Export and Import.</li>
 <li>Budget Meter colors: Hours Used, Hours Left, Warning Bar, Over Budget and Warning Text. Warning Colors and Over Budget Colors can be switched off so everything stays teal.</li>
 <li>Board: Phase Colors on Phase Bars and Phase Colors on Items. Off, they're teal.</li>
 <li>Light/Dark in the top bar switches the theme on this device.</li>
@@ -3833,7 +3930,7 @@ manual:[
 <tr><td><span class="k">N</span></td><td>New block (Week and Day)</td></tr>
 <tr class="g"><td colspan="2">General</td></tr>
 <tr><td><span class="k">Cmd/Ctrl+Z</span></td><td>Undo the last change</td></tr>
-<tr><td><span class="k">Shift+D</span></td><td>Light / Dark theme</td></tr>
+<tr><td><span class="k">Shift+V</span></td><td>Light / Dark theme (also in pop-ups and the file viewer)</td></tr>
 <tr><td><span class="k">Shift+S</span></td><td>Sync now</td></tr>
 <tr><td><span class="k">Shift+N</span></td><td>New text file (Notes pop-up, Day page or Review)</td></tr>
 <tr class="g"><td colspan="2">In Pop-Ups</td></tr>
@@ -3851,6 +3948,7 @@ manual:[
 <tr><td><span class="k">Esc</span> or <span class="k">Cmd/Ctrl+.</span></td><td>Close the viewer</td></tr>
 <tr><td><span class="k">Shift+E</span></td><td>Edit a text file (change it in Keyboard Shortcuts)</td></tr>
 <tr><td><span class="k">Shift+D</span></td><td>Download the file on screen (change it in Keyboard Shortcuts)</td></tr>
+<tr><td><span class="k">Shift+F</span></td><td>Markdown view: Formatted, Formatted without lines, Plain</td></tr>
 <tr><td><span class="k">Cmd/Ctrl+S</span></td><td>Save while editing a text file (Esc cancels)</td></tr>
 <tr class="g"><td colspan="2">Audio Player</td></tr>
 <tr><td><span class="k">Space</span></td><td>Play or pause</td></tr>
@@ -3995,6 +4093,7 @@ function guideModal(tab="quick",back){
 
 /* ===================== modal + toast ===================== */
 const effTheme=()=>S.ui.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
+function toggleTheme(){const b=document.getElementById("btn-theme"),dark=b?b.textContent==="Dark":effTheme()!=="dark";S.ui.theme=dark?"dark":"light";document.documentElement.setAttribute("data-theme",S.ui.theme);save();renderHeader()}
 function restoreTheme(){if(S.ui.theme)document.documentElement.setAttribute("data-theme",S.ui.theme);else document.documentElement.removeAttribute("data-theme")}
 function closeModal(){document.getElementById("modal-root").innerHTML="";document.getElementById("ov2")?.remove();restoreTheme();applyPalette();applyAdv();Sync.afterModal()}
 /* Cmd+. (iPad, Mac) and Ctrl+. (Android, Windows) work like Esc: iPad keyboards often have no Esc key, and Android uses Esc to leave the app. */
@@ -4174,7 +4273,7 @@ document.addEventListener("click",e=>{
   if(d.rw!==undefined){S.ui.rweek=d.rw==="0"?iso(weekOf(new Date())):iso(addDays(parse(S.ui.rweek),+d.rw));commit();return}
   if(d.rvWeek){S.ui.view="review";S.ui.rtab="weekly";S.ui.rweek=d.rvWeek;commit();return}
   if(d.rvMonth){S.ui.view="review";S.ui.rtab="monthly";commit();return}
-  if(el.id==="btn-theme"){const dark=el.textContent==="Dark";S.ui.theme=dark?"dark":"light";document.documentElement.setAttribute("data-theme",S.ui.theme);save();renderHeader();return}
+  if(el.id==="btn-theme")return toggleTheme();
   if(el.id==="btn-lib")return libModal();
   if(el.id==="sync")return Sync.connected()?Sync.pull("tap"):Sync.connectScreen();
   if(el.id==="btn-settings")return settingsModal();
@@ -4185,6 +4284,7 @@ document.addEventListener("keydown",e=>{
   if(document.getElementById("ov2")){if((e.key==="Backspace"||e.key==="Delete")&&!isField(t))e.preventDefault();return}
   if(ov){
     if(e.key==="Escape"||(e.altKey&&e.key==="ArrowLeft")||(e.metaKey&&e.key==="[")){e.preventDefault();return closeModal()}
+    if(!isField(t)&&st.keys&&st.keys.theme&&comboOf(e)===st.keys.theme){e.preventDefault();return toggleTheme()}
     if(!isField(t)&&st.keys&&st.keys.newText&&comboOf(e)===st.keys.newText&&document.querySelector("#modal-root [data-attgrid]")){e.preventDefault();return newTextFor()}
     if(e.key==="Enter"&&st.kbEnter&&!e.defaultPrevented&&!e.shiftKey&&!e.altKey){
       if(t&&(/^(BUTTON|A|SELECT)$/.test(t.tagName)||t.closest("form")))return;
