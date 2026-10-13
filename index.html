@@ -505,6 +505,11 @@ body.timing .toast{bottom:calc(130px + env(safe-area-inset-bottom,0px))}
 .vw-stage.is-text .vw-in{width:100%;justify-content:flex-start;align-items:stretch}
 .vw-text{max-width:860px;width:100%;box-sizing:border-box;margin:0 auto;padding:22px 26px 60px;background:var(--card);color:var(--ink);border-radius:10px;font:400 15px/1.6 var(--sans);white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;text-align:left;user-select:text;-webkit-user-select:text;box-shadow:0 2px 12px rgba(0,0,0,.25)}
 .vw-text a{color:var(--accent);text-decoration:underline}
+.vw-edit{flex:1 1 auto;display:block;width:100%;max-width:860px;min-height:300px;margin:0 auto;box-sizing:border-box;padding:22px 26px;border-radius:10px;border:2px solid var(--accent);background:var(--card);color:var(--ink);font:400 15px/1.6 var(--sans);resize:none;outline:none;white-space:pre-wrap;overflow-wrap:anywhere}
+#vw.editing .vw-nav{display:none}
+.vw-ask{position:absolute;inset:0;background:rgba(0,0,0,.5);display:grid;place-items:center;z-index:20;padding:16px}
+.vw-ask-box{background:var(--card);color:var(--ink);border-radius:12px;padding:18px 20px;max-width:440px;width:100%;box-sizing:border-box;display:grid;gap:10px;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+.vw-ask-box b{font-size:16px}.vw-ask-box p{margin:0;color:var(--muted);font-size:14px;line-height:1.45}.vw-ask-box .row{flex-wrap:wrap;gap:8px}
 .att .th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .att .bdg{position:relative;z-index:1;font-size:10px;font-weight:800;letter-spacing:.04em;color:#fff;background:var(--bc);padding:3px 7px;border-radius:5px;max-width:92%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .att .th img+.bdg,.att .th.has .bdg{position:absolute;left:5px;bottom:5px;font-size:9px;padding:2px 5px}
@@ -678,7 +683,7 @@ const LPAL_DEF={light:["#CEFBD0","#D5ECC2","#FAF6B7","#F2E3B3","#EDE6D8","#F7D9C
 const LIFE_ORDER=[1,7,2,11,10,5,8,6,12,9,4,3]; /* October 2026 reorder: new slot k shows old slot LIFE_ORDER[k-1] */
 const STATUSES=[["Not Started","--faint"],["In Progress","--accent"],["Submitted","--amber"],["Feedback Received","--p7"],["Revising","--act"],["Approved","--p3"],["Done","--ok"]];
 const SC=Object.fromEntries(STATUSES);
-const APP_VERSION="2026.10.12.10";
+const APP_VERSION="2026.10.12.11";
 const isDone=it=>it.status==="Done"||it.status==="Approved";
 const DEF_NAME="Blue Blaze Project Tracker";
 const appName=()=>((typeof S!=="undefined"&&S&&S.settings&&S.settings.brandName)||"").trim()||DEF_NAME;
@@ -1528,17 +1533,25 @@ const exportUrl=a=>{const g=GTYPE[a.mime];if(!g)return null;return g.path==="pre
 async function driveFetch(a){const parts=[];let n=1,mime=a.mime;
   for(let i=0;i<n;i++){const r=await Sync.call("download",{id:a.driveId,part:i});n=r.parts||1;mime=r.mime||mime;parts.push(b64ToBytes(r.data||""))}
   return new Blob(parts,{type:mime||"application/octet-stream"})}
+/* text edits: a saved edit gives the card a new "rev"; devices holding an older offline copy drop it and fetch the new one */
+const K_FREV="bbst-frev",K_EDQ="bbst-edq",FREV=()=>LS.get(K_FREV,{});
+const fresh=a=>!a||!a.driveId||!a.rev||FREV()[a.driveId]===a.rev;
+function markRev(a){if(a&&a.driveId&&a.rev){const m=FREV();m[a.driveId]=a.rev;LS.set(K_FREV,m)}}
+async function dropStale(a){if(!fresh(a)){await cacheDel(a.driveId);if(fileURLs[a.id]){try{URL.revokeObjectURL(fileURLs[a.id])}catch(e){}delete fileURLs[a.id]}}}
+const edQ=()=>LS.get(K_EDQ,[]),edPending=a=>!!(a&&a.driveId&&edQ().some(x=>x.driveId===a.driveId));
 async function getBlob(a){
   if(isDbx(a)){const k=dbxKey(a);let b=await cacheGet(k);if(b)return b;if(!Sync.connected())throw new Error("NOT_CONNECTED");
     b=await(inflight[k]=inflight[k]||dbxFetch(a).finally(()=>delete inflight[k]));await cachePut(k,b);return b}
   if(a.kind==="link")return null;
   if(a.pending){const u=memUp[a.id]||await IDB.get("up:"+a.id);if(u&&u.blob)return u.blob;throw new Error("ELSEWHERE")}
   if(isGdoc(a)){if(!Sync.connected())throw new Error("NOT_CONNECTED");return driveFetch(a)}
+  if(edPending(a)){const t=await IDB.get("ed:"+a.driveId);if(t!=null)return new Blob([t],{type:a.mime||"text/plain"})}
+  await dropStale(a);
   let b=await cacheGet(a.driveId);if(b)return b;
   if(!Sync.connected())throw new Error("NOT_CONNECTED");
   b=await(inflight[a.driveId]=inflight[a.driveId]||driveFetch(a).finally(()=>delete inflight[a.driveId]));
-  await cachePut(a.driveId,b);return b}
-async function localURL(a){if(fileURLs[a.id])return fileURLs[a.id];let b=null;
+  await cachePut(a.driveId,b);markRev(a);return b}
+async function localURL(a){if(!fresh(a)){await dropStale(a);return null}if(fileURLs[a.id])return fileURLs[a.id];let b=null;
   if(a.pending){const u=memUp[a.id]||await IDB.get("up:"+a.id);b=u&&u.blob}else if(a.driveId)b=await cacheGet(a.driveId);else if(isDbx(a))b=await cacheGet(dbxKey(a));
   return b?(fileURLs[a.id]=URL.createObjectURL(b)):null}
 /* a thumbnail that won't show (a fresh photo on iPad can be unreadable for a moment) is fetched again from the Drive copy, once */
@@ -1552,10 +1565,45 @@ async function blobText(b,max){const buf=new Uint8Array(await b.slice(0,max||TEX
   try{t=new TextDecoder("utf-8",{fatal:true}).decode(buf)}catch(e){try{t=new TextDecoder("utf-8",{fatal:true}).decode(buf.subarray(0,Math.max(0,buf.length-3)))}catch(e2){t=new TextDecoder("windows-1252").decode(buf)}}
   return t.replace(/^\uFEFF/,"").replace(/\r\n?/g,"\n")}
 const peekCache={};
-async function textPeek(a){if(peekCache[a.id]!=null)return peekCache[a.id];let b=null;
-  if(a.pending){const u=memUp[a.id]||await IDB.get("up:"+a.id);b=u&&u.blob}else if(a.driveId)b=await cacheGet(a.driveId);else if(isDbx(a))b=await cacheGet(dbxKey(a));
-  if(!b)return null;const t=(await blobText(b,1200)).trim().split("\n").slice(0,8).join("\n").slice(0,320);return peekCache[a.id]=t}
+async function textPeek(a){const pk=a.id+"|"+(a.rev||"")+(edPending(a)?"|ed":"");if(peekCache[pk]!=null)return peekCache[pk];let b=null;
+  if(edPending(a)){const t=await IDB.get("ed:"+a.driveId);if(t!=null)b=new Blob([t])}else if(!fresh(a))return null;
+  if(!b){if(a.pending){const u=memUp[a.id]||await IDB.get("up:"+a.id);b=u&&u.blob}else if(a.driveId)b=await cacheGet(a.driveId);else if(isDbx(a))b=await cacheGet(dbxKey(a))}
+  if(!b)return null;const t=(await blobText(b,1200)).trim().split("\n").slice(0,8).join("\n").slice(0,320);return peekCache[pk]=t}
 const linkText=t=>{let out="",i=0;String(t).replace(LINK_RE,(m,at)=>{const u=m.replace(/[.,;:!?]+$/,"");out+=esc(t.slice(i,at))+(u.length<5?esc(u):`<a href="${esc(/^https?:\/\//i.test(u)?u:"https://"+u)}" target="_blank" rel="noopener">${esc(u)}</a>`);i=at+u.length;return m});return out+esc(t.slice(i))};
+/* ---- editing text files: Save writes into the same Drive file (same ID, same cards) ---- */
+async function sha256hex(b){try{if(!(crypto&&crypto.subtle))return "";const h=await crypto.subtle.digest("SHA-256",await b.arrayBuffer());return [...new Uint8Array(h)].map(x=>x.toString(16).padStart(2,"0")).join("")}catch(e){return ""}}
+const sameFile=id=>{const out=[];attOwners().forEach(o=>(o.files||[]).forEach(a=>{if(a.driveId===id)out.push(a)}));return out};
+async function applySaved(driveId,text,size){const all=sameFile(driveId);if(!all.length)return;const rev=String(Date.now()),mime=all[0].mime||"text/plain";
+  all.forEach(a=>{a.rev=rev;if(size)a.size=size;if(fileURLs[a.id]){try{URL.revokeObjectURL(fileURLs[a.id])}catch(e){}delete fileURLs[a.id]}});
+  await cachePut(driveId,new Blob([text],{type:mime}));markRev(all[0]);commit()}
+function copyName(n){const m=String(n||"Notes.txt").match(/^(.*?)(\.[^.]+)?$/);return `${m[1]}_Copy_${d8()}${m[2]||".txt"}`}
+function placeOfDrive(driveId){for(const pl of attPlaces())if((pl.o.files||[]).some(a=>a.driveId===driveId))return pl.ref;return null}
+async function saveTextCopy(a,text,ref){ref=ref||placeOfDrive(a.driveId);if(!ref)return "";const n=copyName(a.name);await addFiles(ref,[new File([text],n,{type:a.mime||"text/plain"})]);return n}
+/* returns ok | changed | queued | noedit | error */
+async function saveText(a,text,hash,force){
+  let r;try{r=await Sync.call("textSave",{id:a.driveId,text,hash,force:!!force})}
+  catch(x){const m=String(x&&x.message||x);
+    if(m==="CHANGED")return "changed";
+    if(m==="NO_EDIT"){toast("Google Drive won't let this account edit that file (it's view-only for you). Nothing changed.",7000);return "noedit"}
+    if(m==="NO_FILE"){toast("Google Drive can't find that file anymore. Use Save as a Copy.",6000);return "error"}
+    if(/Unknown action/i.test(m)){toast("Update your Google Sheet script first: paste the new Code.gs, then deploy a new version.",7000);return "error"}
+    if(/NOT_TEXT|TOO_BIG|SAVE_FAIL/.test(m)){toast("This file can't be saved here ("+m.replace(/^SAVE_FAIL:\s*/,"")+").",6000);return "error"}
+    await IDB.set("ed:"+a.driveId,text);LS.set(K_EDQ,[...edQ().filter(e=>e.driveId!==a.driveId),{driveId:a.driveId,id:a.id,hash,force:!!force,at:Date.now()}]);
+    slog("FILES","Text edit saved on this device, waiting to send: "+m);refreshAttViews();return "queued"}
+  await applySaved(a.driveId,text,r&&r.size);slog("FILES","Text file saved to Drive");return "ok"}
+/* edits saved while offline go out on the next sync; if the file changed elsewhere meanwhile, the edit becomes a copy next to it */
+let edRun=false,edRetry=null;
+async function runEdits(){if(edRun||!Sync.connected())return;edRun=true;clearTimeout(edRetry);let failed=false;
+  try{for(const e of edQ()){const t=await IDB.get("ed:"+e.driveId),drop=async()=>{LS.set(K_EDQ,edQ().filter(x=>x.driveId!==e.driveId));await IDB.del("ed:"+e.driveId)};
+      if(t==null){await drop();continue}const a=sameFile(e.driveId)[0];if(!a){await drop();continue}
+      let r;try{r=await Sync.call("textSave",{id:e.driveId,text:t,hash:e.hash,force:e.force})}
+      catch(x){const m=String(x&&x.message||x);if(/^(CHANGED|NO_EDIT|NO_FILE|NOT_TEXT|TOO_BIG)$/.test(m)){const ref=placeOfDrive(e.driveId);await drop();const n=await saveTextCopy(a,t,ref);
+          toast(`"${a.name}" ${m==="CHANGED"?"changed somewhere else":"couldn't be saved"}, so your edit was saved as a copy: ${n}`,8000);slog("FILES","Queued text edit saved as a copy ("+m+")");continue}
+        failed=true;slog("FILES","Text edit still waiting: "+m);break}
+      await drop();await applySaved(e.driveId,t,r&&r.size);slog("FILES","Queued text edit saved to Drive");toast(`"${a.name}" saved to Google Drive`)}}
+  finally{edRun=false}
+  if(failed&&edQ().length)edRetry=setTimeout(()=>{if(navigator.onLine)runEdits()},30000);
+  refreshAttViews()}
 function refreshAttViews(){document.querySelectorAll("[data-attgrid]").forEach(e=>{if(e._draw)e._draw()})}
 /* add files: they wait on this device until they reach Drive, so attaching works offline too */
 async function addFiles(ref,list){
@@ -1605,13 +1653,13 @@ async function syncOffline(){
   try{const live=allDriveIds(),idx=FIDX();attOwners().forEach(o=>(o.files||[]).forEach(a=>{if(isDbx(a))live.add(dbxKey(a))}));
     for(const id of Object.keys(idx))if(!live.has(id)&&!LS.get(K_TRASH,[]).some(x=>x.id===id))await cacheDel(id);
     for(const o of attOwners())for(const a of (o.files||[]).slice()){
-      if(a.kind!=="drive"||!a.driveId||isGdoc(a)||FIDX()[a.driveId])continue;
-      try{const b=await driveFetch(a);await cachePut(a.driveId,b);got++;refreshAttViews()}catch(x){if(x.message==="NO_FILE")continue;fail=x.message;return}}
+      if(a.kind!=="drive"||!a.driveId||isGdoc(a)||(FIDX()[a.driveId]&&fresh(a)))continue;
+      try{await dropStale(a);const b=await driveFetch(a);await cachePut(a.driveId,b);markRev(a);got++;refreshAttViews()}catch(x){if(x.message==="NO_FILE")continue;fail=x.message;return}}
     for(const o of attOwners())for(const a of (o.files||[]).slice()){const k=isDbx(a)&&dbxKey(a);if(!k||FIDX()[k]||dbxBad.has(k))continue;
       try{const b=await dbxFetch(a);await cachePut(k,b);got++;refreshAttViews()}catch(x){if(/Unknown action/i.test(x.message)||!navigator.onLine){fail=x.message;return}dbxBad.add(k)}}}
   finally{offRun=false;if(got||fail)slog("FILES",(got?`Downloaded ${got} file${got>1?"s":""} for offline use`:"")+(fail?(got?"; ":"")+"stopped: "+fail:""))}
 }
-function afterSync(){migrateColors();migrateFiles();migrateKeys();gScan();gFlush();gFetch();gDates();runUploads().then(()=>{runTrash();return convertDriveLinks()}).then(()=>{runRelocate();return syncOffline()}).catch(e=>slog("ERROR","After sync: "+(e&&e.message)))
+function afterSync(){migrateColors();migrateFiles();migrateKeys();gScan();gFlush();gFetch();gDates();runUploads().then(()=>runEdits()).then(()=>{runTrash();return convertDriveLinks()}).then(()=>{runRelocate();return syncOffline()}).catch(e=>slog("ERROR","After sync: "+(e&&e.message)))
   .then(()=>redraw("after sync"))}
 addEventListener("online",()=>setTimeout(()=>{runUploads();runTrash()},1500));
 /* One-time update (Oct 2026): item "Links to Files" move into the item's notes. */
@@ -1645,7 +1693,7 @@ function shareCounts(){const m={};attOwners().forEach(o=>(o.files||[]).forEach(a
 function placeList(p){const out=[{ref:{kind:"project",id:p.id},label:"Project Notes",lvl:0}];p.phases.forEach(ph=>{out.push({ref:{kind:"phase",id:ph.id},label:`${ph.name} Notes`,lvl:0,color:ph.color});ph.items.forEach(it=>out.push({ref:{kind:"item",id:it.id},label:it.name,sub:it.group||"",lvl:1,color:ph.color}))});return out}
 function placesOf(a,except){const k=shareKey(a),out=[];S.projects.forEach(p=>placeList(p).forEach(x=>{const o=ownerOf(x.ref);if(o&&o!==except&&(o.files||[]).some(y=>shareKey(y)===k))out.push(x.lvl?`${x.label} (${(IX.idx.item[x.ref.id]||{}).ph?.name||""})`:x.label)}));RVK&&attPlaces().forEach(pl=>{if(RVK.has(pl.ref.kind)&&pl.o!==except&&(pl.o.files||[]).some(y=>shareKey(y)===k))out.push(placeLabel(pl.ref))});return out}
 function attCard(a,cnt){
-  const k=kindOf(a),bd=badgeOf(a),st=a.pending?"Waiting to Upload":a.kind==="link"?"Link":isGdoc(a)?((GTYPE[a.mime]||{}).l||"Google File"):fsize(a.size);
+  const k=kindOf(a),bd=badgeOf(a),st=a.pending?"Waiting to Upload":edPending(a)?"Waiting to Save":a.kind==="link"?"Link":isGdoc(a)?((GTYPE[a.mime]||{}).l||"Google File"):fsize(a.size);
   return `<div class="att ${a.pending?"pending":""}" data-att="${a.id}"><button class="att-open" data-att-open="${a.id}" title="${esc(a.name)}"><span class="th" ${k==="img"&&(a.kind==="drive"||isDbx(a))?`data-th="${a.id}"`:k==="text"&&(a.kind==="drive"||isDbx(a))?`data-tt="${a.id}"`:""}><span class="bdg" style="--bc:${bd.c};${bd.ink?`color:${bd.ink}`:""}">${esc(bd.t)}</span></span><span class="nm">${esc(a.name)}</span><span class="sz"><span>${st}</span>${cnt>1?`<b class="cnt" title="In ${cnt} Places">${cnt}x</b>`:""}</span></button><button class="att-x" data-att-menu="${a.id}" aria-label="Options for ${esc(a.name)}">⋯</button></div>`}
 /* a small pop-up on top of the notes pop-up */
 function sheet(title,sub,body,onMount){
@@ -2017,7 +2065,7 @@ function openViewer(ref,id){
   const o=ownerOf(ref);if(!o)return;const list=(o.files||[]).filter(a=>kindOf(a)!=="other");let i=Math.max(0,list.findIndex(a=>a.id===id));
   const root=document.getElementById("viewer-root");
   root.innerHTML=`<div class="vw" id="vw" tabindex="-1" role="dialog" aria-modal="true" aria-label="File viewer"><div class="vw-top"><span class="vw-t"><b id="vw-n"></b><span id="vw-c"></span></span>
-    <span class="row" style="gap:6px"><button class="btn sm" id="vw-out" aria-label="Zoom out">−</button><button class="btn sm" id="vw-fit">Fit</button><button class="btn sm" id="vw-zin" aria-label="Zoom in">+</button><button class="btn sm" id="vw-copy" hidden>Copy All</button><button class="btn sm" id="vw-dl">Download</button><button class="btn sm" id="vw-drive">Open in Drive</button><button class="btn sm" id="vw-x">Close</button></span></div>
+    <span class="row" style="gap:6px"><button class="btn sm" id="vw-out" aria-label="Zoom out">−</button><button class="btn sm" id="vw-fit">Fit</button><button class="btn sm" id="vw-zin" aria-label="Zoom in">+</button><button class="btn sm" id="vw-edit" hidden>Edit</button><button class="btn sm" id="vw-cancel" hidden>Cancel</button><button class="btn sm primary" id="vw-save" hidden>Save</button><button class="btn sm" id="vw-copy" hidden>Copy All</button><button class="btn sm" id="vw-dl">Download</button><button class="btn sm" id="vw-drive">Open in Drive</button><button class="btn sm" id="vw-x">Close</button></span></div>
     <div class="vw-stage" id="vw-stage"><div class="vw-in" id="vw-box"></div></div>
     ${list.length>1?`<button class="vw-nav prev" id="vw-prev" aria-label="Previous">‹</button><button class="vw-nav next" id="vw-next" aria-label="Next">›</button>`:""}</div>`;
   const st=root.querySelector("#vw-stage"),box=root.querySelector("#vw-box");
@@ -2025,7 +2073,7 @@ function openViewer(ref,id){
   if(IS_IOS&&list.some(a=>kindOf(a)==="audio")){try{const AC=window.AudioContext||window.webkitAudioContext;if(AC){VW.ac=new AC();VW.ac.resume().catch(()=>{})}}catch(x){}}
   const q=x=>root.querySelector(x);
   const setW=(keepX,keepY)=>{if(!VW.base)return;const r=st.getBoundingClientRect(),fx=keepX??r.width/2,fy=keepY??r.height/2,ox=(st.scrollLeft+fx)/Math.max(box.scrollWidth,1),oy=(st.scrollTop+fy)/Math.max(box.scrollHeight,1);
-    if(VW.kind==="text"){const tx=box.querySelector(".vw-text");if(tx)tx.style.fontSize=(15*VW.zoom).toFixed(1)+"px";return}
+    if(VW.kind==="text"){const tx=box.querySelector(".vw-text,#vw-ed");if(tx)tx.style.fontSize=(15*VW.zoom).toFixed(1)+"px";return}
     box.querySelectorAll("img,canvas").forEach(c=>{c.style.width=Math.round(VW.base.w*VW.zoom*(c.dataset.k?+c.dataset.k:1))+"px"});
     st.scrollLeft=ox*box.scrollWidth-fx;st.scrollTop=oy*box.scrollHeight-fy;
     if(VW.kind==="pdf"){clearTimeout(VW.rT);VW.rT=setTimeout(renderPDF,250)}};
@@ -2035,14 +2083,14 @@ function openViewer(ref,id){
       if(Math.abs(cs[n].width-vp.width)<2&&cs[n].dataset.r)continue;const c=document.createElement("canvas");c.width=vp.width;c.height=vp.height;await pg.render({canvasContext:c.getContext("2d"),viewport:vp}).promise;
       if(tok!==VW.tok)return;const t=cs[n].getContext("2d");cs[n].width=vp.width;cs[n].height=vp.height;t.drawImage(c,0,0);cs[n].dataset.r=1}}
   async function show(){
-    const a=VW.list[VW.i];VW.tok++;VW.pdf=null;VW.au=null;VW.zoom=1;VW.base=null;VW.kind=kindOf(a);const tok=VW.tok;
+    const a=VW.list[VW.i];VW.tok++;VW.pdf=null;VW.au=null;VW.zoom=VW.edit===false&&VW.keepZoom?VW.zoom:1;VW.keepZoom=false;VW.base=null;VW.kind=kindOf(a);VW.edit=false;VW.blob=null;const tok=VW.tok;edButtons();
     q("#vw-n").textContent=a.name;q("#vw-c").textContent=`${VW.list.length>1?`${VW.i+1} of ${VW.list.length} · `:""}${a.pending?"Waiting to Upload":isDbx(a)?"Dropbox Link":fsize(a.size)}`;
     q("#vw-drive").hidden=!a.driveId&&!isDbx(a);q("#vw-drive").textContent=isDbx(a)?"Open in Dropbox":"Open in Drive";q("#vw-dl").hidden=!canDownload(a)&&!a.pending;box.innerHTML=`<div class="vw-msg">Opening…</div>`;
     let b;try{b=await getBlob(a)}catch(x){if(tok===VW.tok)box.innerHTML=`<div class="vw-msg">${isDbx(a)&&x.message!=="NOT_CONNECTED"&&navigator.onLine?esc(dbxErr(x)):x.message==="ELSEWHERE"?"This file was added on another device and hasn't reached Google Drive yet. It opens once that device is back online.":x.message==="NOT_CONNECTED"||!navigator.onLine?"This file isn't saved on this device yet. Open it once while online (VPN if needed), or turn on Keep All Attachments Offline in Settings > Advanced.":esc(driveErr(x))}</div>`;return}
     if(tok!==VW.tok)return;const r=st.getBoundingClientRect(),aw=r.width-24,ah=r.height-24;
     ["#vw-out","#vw-fit","#vw-zin"].forEach(x=>{const e=q(x);if(e)e.hidden=VW.kind==="audio"});q("#vw-copy").hidden=VW.kind!=="text";st.classList.toggle("is-text",VW.kind==="text");
     if(VW.kind==="text"){let t;try{t=await blobText(b)}catch(x){if(tok===VW.tok)box.innerHTML=`<div class="vw-msg">This file couldn't be read as text.</div>`;return}if(tok!==VW.tok)return;
-      VW.text=t;VW.base={w:1};box.innerHTML=`<div class="vw-text">${t.trim()?linkText(t):`<span class="sub">This file is empty.</span>`}</div>${b.size>TEXT_MAX?`<div class="vw-msg">Showing the first 2 MB of ${fsize(b.size)}. Download for the rest.</div>`:""}`;
+      VW.text=t;VW.blob=b;VW.base={w:1};q("#vw-edit").hidden=!(a.kind==="drive"&&a.driveId&&!a.pending&&!isGdoc(a)&&b.size<=TEXT_MAX);box.innerHTML=`<div class="vw-text">${t.trim()?linkText(t):`<span class="sub">This file is empty.</span>`}</div>${b.size>TEXT_MAX?`<div class="vw-msg">Showing the first 2 MB of ${fsize(b.size)}. Download for the rest.</div>`:""}`;
       st.scrollTop=0;setW();vwFocus();return}
     if(VW.kind==="audio"){const u=fileURLs[a.id]||(fileURLs[a.id]=URL.createObjectURL(b));if(tok!==VW.tok)return;
       box.innerHTML=`<div class="vw-audio ap"><span class="bdg" style="--bc:#000">${esc(badgeOf(a).t)}</span><b>${esc(a.name)}</b><audio preload="auto" src="${u}"></audio>
@@ -2076,7 +2124,35 @@ function openViewer(ref,id){
     sk.addEventListener("pointerdown",()=>drag=true);sk.addEventListener("input",()=>{if(au.duration){au.currentTime=sk.value/1000*au.duration;cu.textContent=mmss(au.currentTime);sk.style.setProperty("--p",(sk.value/10)+"%")}});
     sk.addEventListener("change",()=>{drag=false;vwFocus()});
     VW.au=au;const p=au.play();if(p&&p.catch)p.catch(()=>{if(tok===VW.tok)paint()});vwFocus()}
-  const go=d=>{if(VW.list.length<2)return;document.querySelectorAll("#viewer-root audio").forEach(x=>{try{x.pause()}catch(e){}});VW.i=(VW.i+d+VW.list.length)%VW.list.length;show();vwFocus()};
+  /* ---- edit mode ---- */
+  function edButtons(){const ed=!!(VW&&VW.edit);["#vw-out","#vw-fit","#vw-zin"].forEach(x=>{const e=q(x);if(e&&ed)e.hidden=false});
+    ["#vw-copy","#vw-dl","#vw-drive","#vw-edit"].forEach(x=>{const e=q(x);if(e&&ed)e.hidden=true});q("#vw-save").hidden=!ed;q("#vw-cancel").hidden=!ed;q("#vw").classList.toggle("editing",ed);if(!ed)q("#vw-edit").hidden=true}
+  const dirty=()=>!!(VW&&VW.edit&&q("#vw-ed")&&q("#vw-ed").value!==VW.orig);
+  async function startEdit(){const a=VW.list[VW.i];if(VW.kind!=="text"||!VW.blob)return;
+    const qe=edQ().find(e=>e.driveId===a.driveId);VW.origHash=qe?qe.hash:await sha256hex(VW.blob);VW.origForce=qe?!!qe.force:false;VW.orig=VW.text;VW.edit=true;edButtons();
+    box.innerHTML=`<textarea id="vw-ed" class="vw-edit" spellcheck="true" aria-label="Edit ${esc(a.name)}"></textarea>`;const ed=q("#vw-ed");ed.value=VW.text;setW();st.scrollTop=0;
+    ed.focus({preventScroll:true});ed.setSelectionRange(0,0);ed.scrollTop=0}
+  async function leaveEdit(){VW.edit=false;VW.keepZoom=true;VW.edit=false;await show();vwFocus()}
+  async function doSave(){const a=VW.list[VW.i],ed=q("#vw-ed");if(!ed)return "error";const text=ed.value;
+    if(text===VW.orig&&!edPending(a)){await leaveEdit();return "ok"}
+    const sv=q("#vw-save");sv.disabled=true;sv.textContent="Saving…";let r;
+    try{r=await saveText(a,text,VW.origHash,VW.origForce);
+      if(r==="changed"){const c=await vwAsk("Changed Somewhere Else",`"${a.name}" was changed after you opened it (maybe on another device). What should happen to your edit?`,[["replace","Replace It"],["copy","Save as a Copy"],["keep","Keep Editing"]]);
+        if(c==="replace")r=await saveText(a,text,VW.origHash,true);
+        else if(c==="copy"){const n=await saveTextCopy(a,text,VW.ref);toast("Saved as a copy: "+n,6000);r="copy"}else r="keep"}}
+    finally{if(sv.isConnected){sv.disabled=false;sv.textContent="Save"}}
+    if(r==="ok"){toast("Saved");await leaveEdit()}else if(r==="queued"){toast("Saved on this device. It goes to Google Drive when you're back online.",6000);await leaveEdit()}
+    else if(r==="copy"){VW.edit=false;closeViewer()}else{const e=q("#vw-ed");if(e)e.focus()}
+    return r}
+  async function cancelEdit(){if(dirty()){const c=await vwAsk("Discard Changes?","Your changes to this file haven't been saved.",[["discard","Discard"],["keep","Keep Editing"]]);if(c!=="discard")return}await leaveEdit()}
+  /* asks before leaving a file with unsaved changes; resolves true when it's fine to go on */
+  VW.guard=async()=>{if(!dirty())return true;const c=await vwAsk("Unsaved Changes",`Save your changes to "${VW.list[VW.i].name}"?`,[["save","Save"],["discard","Discard"],["keep","Keep Editing"]]);
+    if(c==="save"){const r=await doSave();return r==="ok"||r==="queued"||r==="copy"}if(c==="discard"){VW.edit=false;return true}return false};
+  function vwAsk(title,msg,btns){return new Promise(res=>{const w=document.createElement("div");w.className="vw-ask";w.innerHTML=`<div class="vw-ask-box" role="alertdialog" aria-label="${esc(title)}"><b>${esc(title)}</b><p>${esc(msg)}</p><div class="row">${btns.map(([k,l],i)=>`<button class="btn sm ${i===0?"primary":""}" data-k="${k}">${esc(l)}</button>`).join("")}</div></div>`;
+    q("#vw").appendChild(w);VW.ask=k=>{w.remove();VW.ask=null;res(k)};w.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>VW.ask(b.dataset.k));setTimeout(()=>w.querySelector("[data-k]").focus(),0)})}
+  q("#vw-edit").onclick=()=>startEdit();q("#vw-save").onclick=()=>doSave();q("#vw-cancel").onclick=()=>cancelEdit();
+  VW.saveKey=()=>doSave();VW.cancelKey=()=>cancelEdit();
+  const go=async d=>{if(VW.list.length<2)return;if(!(await VW.guard()))return;document.querySelectorAll("#viewer-root audio").forEach(x=>{try{x.pause()}catch(e){}});VW.i=(VW.i+d+VW.list.length)%VW.list.length;show();vwFocus()};
   q("#vw-x").onclick=()=>closeViewer();q("#vw-zin").onclick=()=>zoomTo(VW.zoom*1.4);q("#vw-out").onclick=()=>zoomTo(VW.zoom/1.4);q("#vw-fit").onclick=()=>zoomTo(1);
   q("#vw-copy").onclick=()=>{const t=VW.text||"";(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("Text copied"),()=>{const r=document.createRange(),tx=box.querySelector(".vw-text");if(tx){r.selectNodeContents(tx);const sl=getSelection();sl.removeAllRanges();sl.addRange(r);toast("Selected. Copy with your device's Copy.")}});vwFocus()};
   q("#vw-dl").onclick=()=>{const a=VW.list[VW.i];if(a.pending){getBlob(a).then(b=>deliverFile(a.name,b)).catch(()=>{})}else downloadAtt(a)};
@@ -2087,16 +2163,19 @@ function openViewer(ref,id){
   let pz=null,pan=null;
   const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
   st.addEventListener("touchstart",e=>{if(e.touches.length===2){const r=st.getBoundingClientRect();pz={d0:Math.max(dist(e.touches),20),z0:VW.zoom,fx:(e.touches[0].clientX+e.touches[1].clientX)/2-r.left,fy:(e.touches[0].clientY+e.touches[1].clientY)/2-r.top}}},{passive:true});
-  st.addEventListener("touchmove",e=>{if(pz&&e.touches.length===2){e.preventDefault();zoomTo(pz.z0*dist(e.touches)/pz.d0,pz.fx,pz.fy)}},{passive:false});
+  st.addEventListener("touchmove",e=>{if(pz&&e.touches.length===2&&!VW.edit){e.preventDefault();zoomTo(pz.z0*dist(e.touches)/pz.d0,pz.fx,pz.fy)}},{passive:false});
   st.addEventListener("touchend",e=>{if(e.touches.length<2)pz=null},{passive:true});
   let sx=0,sy=0,st0=0,inAp=false;st.addEventListener("touchstart",e=>{inAp=!!(e.target.closest&&e.target.closest(".ap-ctl,.ap-seek,.ap-time"));if(e.touches.length===1){sx=e.touches[0].clientX;sy=e.touches[0].clientY;st0=st.scrollTop}},{passive:true});
-  st.addEventListener("touchend",e=>{if(!inAp&&VW.zoom<=1.02&&e.changedTouches.length===1&&!pz){const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
+  st.addEventListener("touchend",e=>{if(!inAp&&!VW.edit&&VW.zoom<=1.02&&e.changedTouches.length===1&&!pz){const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
     if(dy>110&&Math.abs(dx)<70&&st0<=2)return closeViewer();
     if(Math.abs(dx)>70&&Math.abs(dy)<80&&st.scrollWidth<=st.clientWidth+2)go(dx<0?1:-1)}},{passive:true});
   st.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"||e.button!==0||VW.kind==="text"||(e.target.closest&&e.target.closest(".ap")))return;pan={x:e.clientX,y:e.clientY,l:st.scrollLeft,t:st.scrollTop};st.classList.add("dragging")});
   addEventListener("pointermove",e=>{if(pan){st.scrollLeft=pan.l-(e.clientX-pan.x);st.scrollTop=pan.t-(e.clientY-pan.y)}});
   addEventListener("pointerup",()=>{pan=null;st.classList.remove("dragging")});
   VW.key=e=>{if(!VW)return;
+    if(VW.ask){if(e.key==="Escape"){e.preventDefault();VW.ask("keep")}e.stopImmediatePropagation();return}
+    if(VW.edit){const k=e.key;if((e.metaKey||e.ctrlKey)&&(k==="s"||k==="S")){e.preventDefault();e.stopImmediatePropagation();VW.saveKey();return}
+      if(k==="Escape"){e.preventDefault();e.stopImmediatePropagation();VW.cancelKey();return}e.stopImmediatePropagation();return}
     if(VW.kind==="audio"&&VW.au&&!e.metaKey&&!e.ctrlKey&&!e.altKey){const k=e.key;
       if(k===" "||k==="Spacebar"||k==="m"||k==="M"||(e.shiftKey&&(k==="ArrowLeft"||k==="ArrowRight"))){e.preventDefault();e.stopImmediatePropagation();vwFocus();
         if(k==="m"||k==="M")apMute();else if(k==="ArrowLeft")apSeek(-10);else if(k==="ArrowRight")apSeek(10);else apToggle();return}}
@@ -2108,7 +2187,7 @@ function openViewer(ref,id){
     if(e.key==="Escape"){e.preventDefault();e.stopImmediatePropagation();closeViewer()}else if(e.key==="ArrowRight"){e.preventDefault();e.stopImmediatePropagation();go(1)}else if(e.key==="ArrowLeft"){e.preventDefault();e.stopImmediatePropagation();go(-1)}
     else if(e.key==="+"||e.key==="="){e.preventDefault();e.stopImmediatePropagation();zoomTo(VW.zoom*1.4)}else if(e.key==="-"){e.preventDefault();e.stopImmediatePropagation();zoomTo(VW.zoom/1.4)}else if(e.key==="0"){e.preventDefault();e.stopImmediatePropagation();zoomTo(1)}else e.stopImmediatePropagation()};
   document.addEventListener("keydown",VW.key,true);
-  root.querySelector("#vw").addEventListener("click",e=>{if(!(e.target.closest&&e.target.closest("input")))setTimeout(vwFocus,0)});vwFocus();
+  root.querySelector("#vw").addEventListener("click",e=>{if(!(e.target.closest&&e.target.closest("input,textarea,.vw-ask")))setTimeout(vwFocus,0)});vwFocus();
   try{history.pushState({bbv:1},"")}catch(x){}
   show();
 }
@@ -2126,8 +2205,9 @@ function apMute(){const au=VW&&VW.au;if(!au)return;
   if(IS_IOS){const g=apGain(au);if(g){VW.muted=!VW.muted;g.gain.value=VW.muted?0:1;const b=document.getElementById("ap-mute");if(b)b.textContent=VW.muted?"Unmute":"Mute";return}}
   VW.muted=au.muted=!au.muted;const b=document.getElementById("ap-mute");if(b)b.textContent=au.muted?"Unmute":"Mute";}
 /* the viewer keeps keyboard focus while it's open: on iPad, Safari stops sending keys to the page when nothing has focus */
-function vwFocus(){const v=(VW&&VW.kind==="audio"&&document.getElementById("ap-play"))||document.getElementById("vw");if(v&&document.activeElement!==v){try{v.focus({preventScroll:true})}catch(x){}}}
-function closeViewer(fromPop){if(!VW)return;if(VW.ac){try{VW.ac.close()}catch(x){}}document.querySelectorAll("#viewer-root audio").forEach(x=>{try{x.pause()}catch(e){}});document.removeEventListener("keydown",VW.key,true);VW.tok++;VW=null;document.getElementById("viewer-root").innerHTML="";if(!fromPop){vwPop=true;try{history.back()}catch(x){vwPop=false}}}
+function vwFocus(){if(VW&&VW.ask)return;if(VW&&VW.edit){const ed=document.getElementById("vw-ed");if(ed&&document.activeElement!==ed)try{ed.focus({preventScroll:true})}catch(x){}return}const v=(VW&&VW.kind==="audio"&&document.getElementById("ap-play"))||document.getElementById("vw");if(v&&document.activeElement!==v){try{v.focus({preventScroll:true})}catch(x){}}}
+async function closeViewer(fromPop){if(!VW)return;
+  if(VW.guard&&VW.edit){const okGo=await VW.guard();if(!VW)return;if(!okGo){if(fromPop){try{history.pushState({bbv:1},"")}catch(x){}}return}}if(VW.ac){try{VW.ac.close()}catch(x){}}document.querySelectorAll("#viewer-root audio").forEach(x=>{try{x.pause()}catch(e){}});document.removeEventListener("keydown",VW.key,true);VW.tok++;VW=null;document.getElementById("viewer-root").innerHTML="";if(!fromPop){vwPop=true;try{history.back()}catch(x){vwPop=false}}}
 
 /* date boxes with a ✕ to empty them (Android's picker has no Clear, and iPad's Reset puts the saved date back) */
 const dateBox=(attrs,val,cls="")=>`<span class="dbox ${cls}"><input class="inp" type="date" ${attrs} value="${esc(val||"")}"><button type="button" class="dclr" data-dclr aria-label="Clear date" title="Clear Date" ${val?"":"data-empty"}>✕</button></span>`;
@@ -3518,7 +3598,7 @@ manual:[
 <h4>Notes</h4>
 <ul>
 <li>Projects and phases have a Notes button; items have a Notes box inside the item pop-up. Notes save as you type, and links you type show up as tappable links underneath.</li>
-<li>Notes boxes grow with your text up to 60% of the screen (Project, Phase and Item Notes, the Diary, and the Weekly and Monthly Review NOTES), then scroll inside so the Attachments stay in view. Expand at the box's bottom corner shows the whole note; Collapse brings the limit back. Other review boxes keep growing.</li>
+<li>Notes boxes grow with your text up to 55% of the screen (Project, Phase and Item Notes, the Diary, and the Weekly and Monthly Review NOTES), then scroll inside so the Attachments stay in view. Expand at the box's bottom corner shows the whole note; Collapse brings the limit back. Other review boxes keep growing.</li>
 </ul>
 <h4>Adding Files</h4>
 <ul>
@@ -3533,6 +3613,7 @@ manual:[
 <ul>
 <li>MP3, M4A and WAV files play in the tracker's own audio player as soon as they open, offline too once saved on the device. If the iPad holds the sound back, tap the big Play button once. Back 10 and Forward 10 sit on either side, and the bar underneath jumps to any point. Keys: <span class="k">Space</span> play or pause, <span class="k">Shift+←</span> <span class="k">Shift+→</span> 10 seconds back or forward, <span class="k">M</span> mute, <span class="k">←</span> <span class="k">→</span> other files, <span class="k">Esc</span> close. Moving to another file or closing stops the sound.</li>
 <li>Text files (TXT, MD, CSV, TSV, JSON, LOG) open in the viewer too, as plain text with tappable links. + and − change the text size, Copy All copies it, and their cards show the first lines. Files over 2 MB show the first 2 MB.</li>
+<li>Edit (in the viewer) changes a text file: Save or Ctrl+S / Cmd+S writes it back into the same Drive file, so every card that shows it stays linked; Cancel or Esc discards (it asks first if you made changes). Closing or moving to another file with unsaved changes asks Save, Discard or Keep Editing. If the file changed somewhere else after you opened it, you choose Replace It or Save as a Copy. Offline, the edit is kept on the device (the card says Waiting to Save) and goes to Drive when you're back online. Dropbox links and files over 2 MB are view-only. Google Drive keeps earlier versions (Manage versions).</li>
 <li>JPG, PNG and PDF open in the tracker's viewer: pinch or + and − to zoom (double-click on a laptop), swipe sideways or use the arrow keys for the next file, swipe down or Close to go back.</li>
 <li>Dropbox links (shared as "Anyone with the link") come through your Google Sheet's script: JPG, PNG, PDF, audio and text files open in the tracker's viewer, other files download, and they get offline copies like Drive files. On iPad, Open in Dropbox App replaces Open in Browser. A link that needs a login can only be opened in Dropbox.</li>
 <li>Other files (PSD, Procreate, AI and so on), Google Docs, Sheets and Slides, and Dropbox or Proton links: the tracker asks how to open that type on this device: Open in App, Open in Browser, Download or Copy Link. Tick Remember for that type and it opens straight away next time. Change it in Settings > Advanced > Data > Link and File Actions.</li>
@@ -3765,7 +3846,8 @@ manual:[
 <dt>Due Date</dt><dd>The date a whole project is due. It shows in the project&#x27;s color on Month, Week and Day, and drives the deadline forecast.</dd>
 <dt>Effective Rate</dt><dd>What you actually earn per hour logged on a project or phase.</dd>
 <dt>Estimate</dt><dd>The time you expect a step to take. Item and phase estimates add up from their steps; the thin line on a bar marks it.</dd>
-<dt>Expand / Collapse</dt><dd>The small button at the bottom corner of a long Notes box: Expand shows the whole note, Collapse returns it to 60% of the screen.</dd>
+<dt>Edit (Text Files)</dt><dd>The viewer button that turns a TXT, MD, CSV, TSV, JSON or LOG file into a text box. Save writes it back into the same Drive file.</dd>
+<dt>Expand / Collapse</dt><dd>The small button at the bottom corner of a long Notes box: Expand shows the whole note, Collapse returns it to 55% of the screen.</dd>
 <dt>Feedback Round</dt><dd>One round of client feedback on a phase. Past the rounds included, the phase shows Over Scope.</dd>
 <dt>File Viewer</dt><dd>The full-screen view that opens images, PDFs, audio and text files inside the tracker, with arrows to move between files.</dd>
 <dt>Files Follow Their Card</dt><dd>A file you uploaded moves in Google Drive to the folder of the one place it's shown in, after Move To or Remove. Files added From Drive never move.</dd>
@@ -3851,7 +3933,7 @@ let histArmed=false;
 addEventListener("popstate",()=>{if(vwPop){vwPop=false;return}if(VW){closeViewer(true);return}document.getElementById("ov2")?.remove();histArmed=false;if(document.getElementById("ov"))closeModal()});
 /* text boxes grow with their text. They're measured on a hidden copy, so the box never shrinks for a moment and the page doesn't jump.
    Boxes with Attachments under them stop at 60% of the screen and scroll inside; Expand shows the whole note. */
-const CAP_IDS=new Set(["nt","it-nt","diary","wr-notes","mr-notes"]),CAP_PCT=.6,capExp=new Set();let meas=null;
+const CAP_IDS=new Set(["nt","it-nt","diary","wr-notes","mr-notes"]),CAP_PCT=.55,capExp=new Set();let meas=null;
 function measure(t){if(!meas){meas=document.createElement("textarea");meas.setAttribute("aria-hidden","true");meas.tabIndex=-1;meas.style.cssText="position:fixed;left:-10000px;top:0;visibility:hidden;overflow:hidden;pointer-events:none";document.body.appendChild(meas)}
   const cs=getComputedStyle(t);["fontFamily","fontSize","fontWeight","fontStyle","lineHeight","letterSpacing","wordSpacing","textTransform","textIndent","paddingTop","paddingBottom","paddingLeft","paddingRight","borderTopWidth","borderBottomWidth","borderLeftWidth","borderRightWidth","borderStyle","boxSizing","whiteSpace","wordBreak","overflowWrap","tabSize"].forEach(k=>meas.style[k]=cs[k]);
   meas.style.width=t.getBoundingClientRect().width+"px";meas.rows=t.rows||2;meas.style.height="auto";meas.value=t.value;return meas.scrollHeight}
