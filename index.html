@@ -20,7 +20,7 @@
 :root{
   --bg:#D7D7DB; --surface:#FFFFFF; --stat:#EEF0F4; --btn:#FFFFFF; --tabbar:#EEF0F4; --tabsel:#FFFFFF; --field:#FFFFFF;
   --line:#DCDFE6; --line2:#C9CED8; --ink:#1A1F2B; --muted:#3F4657; --faint:#7D8496; --label:#3F4657;
-  --accent:#006BC2; --accent-ink:#FFFFFF;
+  --accent:#006BC2; --accent-ink:#FFFFFF; --today:#559DD5; --today-d:var(--today);
   --act:#38B2C3; --act-hi:#13707D; --left:#CFE1EC; --over:#FF52A6; --dis-fg:#FF1D76; --warn-bg:#FFDF00; --warn-fg:#FF52A6; --ok:#1E9C74; --amber:#C98200;
   --act-empty:#E2E6ED;
   --cal:#FFFFFF; --rvp:#FFFFFF; --bbg:#D7D7DB; --card:#FFFFFF; --warn:#EFD22F; --warn-tx:#E7C400; --tz:1;
@@ -37,7 +37,7 @@
   color-scheme:dark;
   --bg:#19212F; --surface:#0B1324; --stat:#3E4D6F; --btn:#2E394E; --tabbar:#2E394E; --tabsel:#445170; --field:#333B4B;
   --line:#243049; --line2:#3A4763; --ink:#E9ECF2; --muted:#A5ADC0; --faint:#6E7891; --label:#A5ADC0;
-  --accent:#4DA6F0; --accent-ink:#0B1324;
+  --accent:#4DA6F0; --accent-ink:#0B1324; --today:#38B2C3; --today-d:var(--accent);
   --act:#38B2C3; --act-hi:#22F8FF; --left:#494E72; --over:#FF2E90; --dis-fg:#FF3A87; --dis-bg:#282E3B; --faint-line:#3A4763; --ok:#3CC79A; --amber:#E6A93C;
   --act-empty:#23304F;
   --cal:#0B1324; --rvp:#0B1324; --bbg:#2B364A; --card:#1B1E25; --warn:#EFD22F; --warn-tx:#EFD22F;
@@ -51,7 +51,7 @@
   color-scheme:dark;
   --bg:#19212F; --surface:#0B1324; --stat:#3E4D6F; --btn:#2E394E; --tabbar:#2E394E; --tabsel:#445170; --field:#333B4B;
   --line:#243049; --line2:#3A4763; --ink:#E9ECF2; --muted:#A5ADC0; --faint:#6E7891; --label:#A5ADC0;
-  --accent:#4DA6F0; --accent-ink:#0B1324;
+  --accent:#4DA6F0; --accent-ink:#0B1324; --today:#38B2C3; --today-d:var(--accent);
   --act:#38B2C3; --act-hi:#22F8FF; --left:#494E72; --over:#FF2E90; --dis-fg:#FF3A87; --dis-bg:#282E3B; --faint-line:#3A4763; --ok:#3CC79A; --amber:#E6A93C;
   --act-empty:#23304F;
   --cal:#0B1324; --rvp:#0B1324; --bbg:#2B364A; --card:#1B1E25; --warn:#EFD22F; --warn-tx:#EFD22F;
@@ -82,6 +82,8 @@ button{cursor:pointer}
 .v-week .num,.v-week .num .e,.v-week .tot b,.v-month .tot b{font-weight:700;color:var(--ink)}
 .v-week .num .a,.v-week .tot .a{color:var(--act)}
 .v-week .task .chip .num .a{color:var(--act-hi)}
+/* the heading of the current day, week or month */
+h2.is-now{color:var(--today)}
 h2{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0;text-wrap:balance}
 h3{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0}
 .sub{font-size:12.5px;color:var(--muted)}
@@ -222,7 +224,7 @@ button.slab:hover b{color:var(--accent)}
 .slab b{font-size:13.5px;font-weight:800;letter-spacing:.02em}
 .slab b span{font-weight:500;color:var(--muted)}
 .slab .h{font-size:11.5px;color:var(--muted)}
-.srow.is-today .slab b{color:var(--accent)}
+.srow.is-today .slab b{color:var(--today-d)}
 .hours-h{position:relative;height:26px}
 .hours-h span{position:absolute;top:5px;transform:translateX(-50%);font-size:11.5px;color:var(--muted);font-weight:600}
 .lane{position:relative;height:calc(6px + var(--ph,38px) + 3px + var(--ah,7px));cursor:copy}
@@ -295,7 +297,7 @@ body.timing .dcol{height:clamp(440px,calc(100dvh - 390px),980px)}
 .mcell .dn{font-weight:700;font-size:13px}
 .mtop{display:flex;align-items:flex-start;justify-content:space-between;gap:4px}
 .mcell.ph .hrs{color:var(--ink)}
-.mcell.is-today .dn{display:inline-grid;place-items:center;min-width:24px;height:24px;border-radius:12px;background:var(--accent);color:var(--accent-ink)}
+.mcell.is-today .dn{display:inline-grid;place-items:center;min-width:24px;height:24px;border-radius:12px;background:var(--today-d);color:var(--accent-ink)}
 .mcell .hrs{font-size:13px;font-weight:700;color:var(--act);line-height:24px}
 .mk{display:flex;flex-wrap:wrap;gap:3px}
 .mk span{font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:4px;background:var(--btn);border:1px solid var(--line2);color:var(--muted)}
@@ -686,7 +688,7 @@ const LPAL_DEF={light:["#CEFBD0","#D5ECC2","#FAF6B7","#F2E3B3","#EDE6D8","#F7D9C
 const LIFE_ORDER=[1,7,2,11,10,5,8,6,12,9,4,3]; /* October 2026 reorder: new slot k shows old slot LIFE_ORDER[k-1] */
 const STATUSES=[["Not Started","--faint"],["In Progress","--accent"],["Submitted","--amber"],["Feedback Received","--p7"],["Revising","--act"],["Approved","--p3"],["Done","--ok"]];
 const SC=Object.fromEntries(STATUSES);
-const APP_VERSION="2026.10.13.03";
+const APP_VERSION="2026.10.13.04";
 const isDone=it=>it.status==="Done"||it.status==="Approved";
 const DEF_NAME="Blue Blaze Project Tracker";
 const appName=()=>((typeof S!=="undefined"&&S&&S.settings&&S.settings.brandName)||"").trim()||DEF_NAME;
@@ -735,6 +737,8 @@ const CKEYS=[
   {k:"rvGoals",l:"Goals + Achievements",sub:"Monthly Review Goals, and Achievements on Week and the Weekly Review",v:"--rv-goals",d:["#E0BAD0","#6B496B"],bg:1,grp:"ap"},
   {k:"bbg",l:"Board Background",v:"--bbg",d:["#D7D7DB","#2B364A"],bg:1,grp:"ap"},
   {k:"card",l:"Board Cards",sub:"Project and Phase cards",v:"--card",d:["#FFFFFF","#1B1E25"],bg:1,grp:"ap"},
+  {k:"accent",l:"Accent Color",sub:"Filled buttons like + Block, links, switches. In Dark, also today in Week and Month.",v:"--accent",d:["#006BC2","#4DA6F0"],grp:"ap"},
+  {k:"today",l:"Today Color",sub:"Heading of the current day, week or month. In Light, also today in Week and Month.",v:"--today",d:["#559DD5","#38B2C3"],grp:"ap"},
   {k:"act",l:"Hours Used",sub:"Used everywhere teal shows time",v:"--act",d:["#38B2C3","#38B2C3"],m:1,grp:"bm"},
   {k:"left",l:"Hours Left",v:"--left",d:["#CFE1EC","#494E72"],m:1,grp:"bm"},
   {k:"warn",l:"Warning Bar",v:"--warn",d:["#EFD22F","#EFD22F"],grp:"bm"},
@@ -2596,7 +2600,7 @@ function viewWeek(){
   const tasks=[];S.projects.filter(p=>!p.archived).forEach(p=>p.phases.forEach(ph=>ph.items.forEach(it=>{if(it.week===ws)tasks.push({ph,it})})));
   const meta=S.weekMeta[ws]=S.weekMeta[ws]||{priorities:[],achievements:[]};
   const total=days.reduce((a,d)=>a+loggedOn(d),0),target=S.settings.target*S.settings.days*60,z=S.ui.zoom||1;
-  return `<div class="row"><h2 class="grow">Week of ${short(ws)}</h2><span class="sub tot"><span class="a">${fmtH(total)}</span> of <b>${fmtH(target)}</b> Logged</span>
+  return `<div class="row"><h2 class="grow${ws===iso(weekOf(new Date()))?" is-now":""}">Week of ${short(ws)}</h2><span class="sub tot"><span class="a">${fmtH(total)}</span> of <b>${fmtH(target)}</b> Logged</span>
     <span class="navg"><button class="btn" data-wk="-7" aria-label="Previous week">←</button><button class="btn" data-wk="0">This Week</button><button class="btn" data-wk="7" aria-label="Next week">→</button>
     <button class="btn" data-rv-week="${ws}">Weekly Review</button></span></div>
   <div class="row"><span class="sub grow">Pinch the Chart to Zoom the Hours. Tap a Day to Plan It in Detail.</span>
@@ -2629,7 +2633,7 @@ function viewDay(){
   const gday=gEventsOn(d),gev=gday.filter(e=>!e.allDay).map(e=>{let[s,en]=gMins(e,d);s=Math.max(s,a);en=Math.min(en,b);if(en<=s)return"";
     return `<div class="vgev" data-gev="${esc(gKey(e))}" style="top:${pct(s)}%;height:calc(${pct(en)-pct(s)}% - 2px);--gc:${gevColor(e)}" title="${esc(e.title)} · Google Calendar"><span>${esc(e.title)}</span></div>`}).join("");
   const items=[...new Set(S.plans.filter(p=>p.date===d&&p.step).map(p=>IX.idx.step[p.step]?.it.id).filter(Boolean))].map(id=>IX.idx.item[id]);
-  return `<div class="row"><h2 class="grow">${dt.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}</h2>
+  return `<div class="row"><h2 class="grow${d===TODAY()?" is-now":""}">${dt.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}</h2>
     <span class="navg"><button class="btn" data-dd="-1" aria-label="Previous day">←</button><button class="btn" data-dd="0">Today</button><button class="btn" data-dd="1" aria-label="Next day">→</button>
     <button class="btn primary" data-addblock="${d}">+ Block</button></span></div>
   <div class="day-grid">
@@ -2794,7 +2798,7 @@ function viewMonth(){
     return `<button class="mcell ${out?"out":""} ${ds===TODAY()?"is-today":""} ${mode==="phase"&&l?"ph":""}" style="${bg}" data-goday="${ds}"><span class="mtop"><span class="dn">${d.getDate()}</span><span class="hrs">${l?fmtH(l):""}</span></span>
       <span class="mk">${mk.map(x=>`<span style="--c:${x.hex||`var(--${x.c})`}" class="${x.due?"due":""} ${x.g?"g":""}">${esc(x.t)}</span>`).join("")}</span></button>`}).join("");
   const rec=monthRec(S.ui.month);
-  return `<div class="row"><h2 class="grow">${first.toLocaleDateString(undefined,{month:"long",year:"numeric"})}</h2><span class="sub tot"><span class="a">${fmtH(total)}</span> of <b>${fmtH(daysW*t)}</b> Logged</span>
+  return `<div class="row"><h2 class="grow${S.ui.month===TODAY().slice(0,7)?" is-now":""}">${first.toLocaleDateString(undefined,{month:"long",year:"numeric"})}</h2><span class="sub tot"><span class="a">${fmtH(total)}</span> of <b>${fmtH(daysW*t)}</b> Logged</span>
     <span class="navg"><button class="btn" data-mo="-1" aria-label="Previous month">←</button><button class="btn" data-mo="0">This Month</button><button class="btn" data-mo="1" aria-label="Next month">→</button>
     <button class="btn" data-rv-month="1">Monthly Review</button></span></div>
   <div class="row" style="justify-content:${gOn()?"space-between":"flex-end"}">${gOn()?`<label class="check"><input type="checkbox" id="m-gev" ${S.settings.gcalMonth!==false?"checked":""}><span>Show Google Events</span></label>`:""}<span class="row" style="gap:8px"><span class="sub">Shade Days By</span><div class="seg-ctl"><button data-mshade="target" aria-pressed="${mode==="target"}">Hours vs Target</button><button data-mshade="phase" aria-pressed="${mode==="phase"}">Main Phase</button></div></span></div>
@@ -2824,7 +2828,7 @@ function weeklyReview(){
   let ba=0,bb=0;proj().phases.forEach(ph=>{if(!ph.bonus){const s=phaseStats(ph);ba+=s.act;bb+=s.budget}});
   const f=(k,l,ph,rows=5)=>`<section class="panel field"><label for="wr-${k}">${l}</label><textarea class="inp" id="wr-${k}" data-wr="${k}" rows="${rows}" placeholder="${esc(ph)}">${esc(r[k]||"")}</textarea>${linkBox("wr-"+k,r[k])}</section>`;
   const meta=S.weekMeta[ws]=S.weekMeta[ws]||{priorities:[],achievements:[]},prevFocus=((S.weekly[iso(addDays(parse(ws),-7))]||{}).focus||"").trim();
-  return `<div class="row"><h2 class="grow">Week of ${short(ws)} – ${short(we)}</h2>
+  return `<div class="row"><h2 class="grow${ws===iso(weekOf(new Date()))?" is-now":""}">Week of ${short(ws)} – ${short(we)}</h2>
     <span class="navg"><button class="btn" data-rw="-7" aria-label="Previous week">←</button><button class="btn" data-rw="0">This Week</button><button class="btn" data-rw="7" aria-label="Next week">→</button>
     <button class="btn" data-rv-export="weekly">Export</button></span></div>
   <div class="stat-row rv-stats"><div class="stat"><span class="k">Logged vs Target</span><span class="v">${AE(l,S.settings.target*S.settings.days*60,fmtH)}</span></div>
@@ -2843,7 +2847,7 @@ function monthlyReview(){
   const ses=S.sessions.filter(s=>s.date>=from&&s.date<=to),l=ses.reduce((a,s)=>a+s.dur,0);
   const per={};ses.forEach(s=>{const x=IX.idx.step[s.step];if(x)per[x.p.name]=(per[x.p.name]||0)+s.dur});
   const lst=(k,arr)=>`<div class="list-ed" data-mlist="${k}">${arr.map((v,i)=>`<div class="li"><span class="n${arr.length>1?" grip":""}" ${arr.length>1?`title="Drag to Reorder"`:""}>${arr.length>1?"⋮⋮ ":""}${i+1}</span><input class="inp" data-mi="${i}" value="${esc(v)}" aria-label="${k} ${i+1}"><button class="btn sm ghost" data-mx="${i}" aria-label="Remove">✕</button></div>`).join("")}<button class="btn sm ghost" style="justify-self:start" data-madd>+ Add</button></div>`;
-  return `<div class="row"><h2 class="grow">${new Date(y,m-1,1).toLocaleDateString(undefined,{month:"long",year:"numeric"})}</h2>
+  return `<div class="row"><h2 class="grow${mk===TODAY().slice(0,7)?" is-now":""}">${new Date(y,m-1,1).toLocaleDateString(undefined,{month:"long",year:"numeric"})}</h2>
     <span class="navg"><button class="btn" data-mr="-1" aria-label="Previous month">←</button><button class="btn" data-mr="0">This Month</button><button class="btn" data-mr="1" aria-label="Next month">→</button>
     <button class="btn" data-rv-export="monthly">Export</button></span></div>
   <section class="panel field"><label for="mr-focus">FOCUS</label><input class="inp" id="mr-focus" value="${esc(r.focus)}" placeholder="One line for the month, e.g. Broad Exploration + Pitch Pages">${linkBox("mr-focus",r.focus)}</section>
@@ -3717,6 +3721,7 @@ manual:[
 <li>Life Block Colors work the same way for life blocks and your Daily Routine.</li>
 <li>Pick a phase's color in Edit Phase, or from a Project Work block (it recolors the whole phase).</li>
 <li>Appearance (Settings > Advanced): page, calendar, review and board backgrounds and cards, each for Light and Dark. Text on a light background switches automatically so it stays readable. Default resets one color. Previous Month Review + Weekly Priorities share one color, and Goals + Achievements share another.</li>
+<li>Accent Color (Appearance): filled buttons like + Block, links and switches; in Dark, also today in Week and Month. Today Color (Appearance): the heading of the current day, week, month or review, and in Light also today in Week and Month (#559DD5 Light, #38B2C3 Dark by default).</li>
 <li>Budget Meter colors: Hours Used, Hours Left, Warning Bar, Over Budget and Warning Text. Warning Colors and Over Budget Colors can be switched off so everything stays teal.</li>
 <li>Board: Phase Colors on Phase Bars and Phase Colors on Items. Off, they're teal.</li>
 <li>Light/Dark in the top bar switches the theme on this device.</li>
@@ -3959,6 +3964,7 @@ manual:[
 <dt>Target Week</dt><dd>The week an item should be done. It lists the item under This Week&#x27;s Items on Week.</dd>
 <dt>Template</dt><dd>A saved starting point: an item template (steps and checklist), a phase template or a pipeline template (a whole project).</dd>
 <dt>This Week&#x27;s Focus</dt><dd>The one thing a week is about, at the top of the Weekly Review.</dd>
+<dt>Today Color</dt><dd>The color of the heading when you're on the current day, week, month or review (and of today in Week and Month in Light). Set it in Settings > Advanced > Appearance.</dd>
 <dt>Time Log</dt><dd>The list of sessions logged on a step, where you can fix or delete them.</dd>
 <dt>To-Do</dt><dd>The checklist for one day on the Day page. Unfinished ones are offered on the next day you open, with Move to Today or Leave Them.</dd>
 <dt>.TRACKER-TEMP</dt><dd>A folder in Project Tracker Files where big Dropbox files wait briefly while they come to your device. Cleaned up automatically, and hidden from + From Drive.</dd>
