@@ -501,6 +501,7 @@ body.timing .toast{bottom:calc(130px + env(safe-area-inset-bottom,0px))}
 .capwrap{position:relative;display:grid;min-width:0}
 .capbtn{position:absolute;right:18px;bottom:8px;border:1px solid var(--line2);background:var(--card);color:var(--muted);border-radius:999px;padding:3px 11px;font:700 11.5px var(--sans);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.15);opacity:.92}
 .capbtn:hover{opacity:1;color:var(--ink)}
+.nt-tx{display:flex;justify-content:flex-end;margin-top:-2px}.nt-tx[hidden]{display:none}
 .vw-stage.is-text{cursor:auto;user-select:text;-webkit-user-select:text}
 .vw-stage.is-text .vw-in{width:100%;justify-content:flex-start;align-items:stretch}
 .vw-text{max-width:860px;width:100%;box-sizing:border-box;margin:0 auto;padding:22px 26px 60px;background:var(--card);color:var(--ink);border-radius:10px;font:400 15px/1.6 var(--sans);white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;text-align:left;user-select:text;-webkit-user-select:text;box-shadow:0 2px 12px rgba(0,0,0,.25)}
@@ -683,7 +684,7 @@ const LPAL_DEF={light:["#CEFBD0","#D5ECC2","#FAF6B7","#F2E3B3","#EDE6D8","#F7D9C
 const LIFE_ORDER=[1,7,2,11,10,5,8,6,12,9,4,3]; /* October 2026 reorder: new slot k shows old slot LIFE_ORDER[k-1] */
 const STATUSES=[["Not Started","--faint"],["In Progress","--accent"],["Submitted","--amber"],["Feedback Received","--p7"],["Revising","--act"],["Approved","--p3"],["Done","--ok"]];
 const SC=Object.fromEntries(STATUSES);
-const APP_VERSION="2026.10.12.12";
+const APP_VERSION="2026.10.12.13";
 const isDone=it=>it.status==="Done"||it.status==="Approved";
 const DEF_NAME="Blue Blaze Project Tracker";
 const appName=()=>((typeof S!=="undefined"&&S&&S.settings&&S.settings.brandName)||"").trim()||DEF_NAME;
@@ -700,13 +701,13 @@ const KEY_ACTIONS=[
   ["prev","Previous Week, Month or Day"],["next","Next Week, Month or Day"],["today","This Week, This Month or Today"],["newBlock","New Block (Day and Week)"],
   ["timerPause","Pause / Resume the Timer"],["timerStop","Stop the Timer"],["undo","Undo the Last Change"],["projects","Projects & Templates"],["settings","Settings"],
   ["theme","Light / Dark Theme"],["sync","Sync Now"],["help","Show Keyboard Shortcuts"],
-  ["weeklyReview","Open This Week's Review"],["monthlyReview","Open This Month's Review"],["editProject","Edit Project"],["projectNotes","Project Notes"],["backup","Export Everything (Backup)"],["guide","Open the Guide"],
+  ["weeklyReview","Open This Week's Review"],["monthlyReview","Open This Month's Review"],["editProject","Edit Project"],["projectNotes","Project Notes"],["backup","Export Everything (Backup)"],["guide","Open the Guide"],["newText","New Text File"],
   ["vwEdit","Edit Text File"],["vwDownload","Download File"]];
 /* File Viewer shortcuts only count while the viewer is open; the viewer's own fixed keys can't be used for them */
 const KEY_VIEWER=new Set(["vwEdit","vwDownload"]);
 const VIEWER_FIXED=["ArrowLeft","ArrowRight","ArrowUp","ArrowDown","Shift+ArrowLeft","Shift+ArrowRight","+","=","-","0","Space","Shift+Space","M","Shift+M","Mod+S","Mod+A","Mod+C","PageUp","PageDown","Home","End"];
-const KEY_EXTRA=new Set(["weeklyReview","monthlyReview","editProject","projectNotes","backup","guide"]);
-const KEY_DEF={viewBoard:"1",viewMonth:"2",viewWeek:"3",viewDay:"4",viewReview:"5",prev:"ArrowLeft",next:"ArrowRight",today:"T",newBlock:"N",timerPause:"Space",timerStop:"Shift+T",undo:"Mod+Z",projects:"P",settings:"<",theme:"Shift+D",sync:"Shift+S",help:"?",weeklyReview:"",monthlyReview:"",editProject:"",projectNotes:"",backup:"",guide:"",vwEdit:"Shift+E",vwDownload:"Shift+D"};
+const KEY_EXTRA=new Set(["weeklyReview","monthlyReview","editProject","projectNotes","backup","guide","newText"]);
+const KEY_DEF={viewBoard:"1",viewMonth:"2",viewWeek:"3",viewDay:"4",viewReview:"5",prev:"ArrowLeft",next:"ArrowRight",today:"T",newBlock:"N",timerPause:"Space",timerStop:"Shift+T",undo:"Mod+Z",projects:"P",settings:"<",theme:"Shift+D",sync:"Shift+S",help:"?",weeklyReview:"",monthlyReview:"",editProject:"",projectNotes:"",backup:"",guide:"",newText:"Shift+N",vwEdit:"Shift+E",vwDownload:"Shift+D"};
 const KEY_RESERVED=["Mod+T","Mod+W","Mod+N","Mod+Q","Mod+R","Mod+L","Mod+Tab","Mod+Shift+T","Mod+Shift+N","Mod+Shift+W","Alt+F4","Alt+ArrowLeft","Alt+ArrowRight","Mod+[","Mod+]","Tab","Shift+Tab","Enter","Escape","Backspace","Delete","Mod+C","Mod+V","Mod+X","Mod+A","Mod+P","Mod+F"];
 function comboOf(e){
   if(["Shift","Control","Alt","Meta","CapsLock","Dead","Unidentified"].includes(e.key))return null;
@@ -1710,11 +1711,64 @@ function sheet(title,sub,body,onMount){
   document.addEventListener("keydown",esc2,true);
   host.addEventListener("mousedown",e=>{if(e.target===host)close()});host.querySelector("[data-sx]").onclick=close;
   onMount&&onMount(host,close);return close}
+/* ---- new text files: name it yourself (TXT by default), write it, Save adds it like any upload ---- */
+const NOTE_BOX={project:"#nt",phase:"#nt",item:"#it-nt",day:"#diary",week:"#wr-notes",month:"#mr-notes"};
+function newTextFor(){const g=[...document.querySelectorAll("#modal-root [data-attgrid]")].pop()||((S.ui.view==="day"||S.ui.view==="review")&&!document.querySelector("#modal-root .ov")?document.querySelector("#view [data-attgrid]"):null);
+  if(!g||!g._ref)return toast("Open a Notes pop-up, the Day page or a Review first.",4000);newTextFlow(g._ref)}
+function nameSheet(title,ref,cb){let ext="txt";const o=ownerOf(ref)||peekOwner(ref)||{};
+  sheet(title,"Name it yourself. It's saved as a file on this card and in Google Drive.",`<div style="display:grid;gap:10px">
+    <input class="inp" id="nf-name" placeholder="e.g. Mentor-Feedback" autocomplete="off" spellcheck="false" aria-label="File name">
+    <div class="row" style="gap:10px"><div class="seg-ctl" style="width:auto"><button data-nfx="txt" aria-pressed="true">TXT</button><button data-nfx="md" aria-pressed="false">MD</button></div>
+      <label class="row" style="gap:6px;font-size:13px"><input type="checkbox" id="nf-date"> Add Today's Date</label></div>
+    <span class="sub" id="nf-note"></span>
+    <div class="row" style="justify-content:flex-end;gap:8px"><button class="btn" data-nf-cancel>Cancel</button><button class="btn primary" data-nf-ok disabled>Create</button></div></div>`,(h,close)=>{
+    const i=h.querySelector("#nf-name"),okb=h.querySelector("[data-nf-ok]"),note=h.querySelector("#nf-note"),dt=h.querySelector("#nf-date");
+    const segs=()=>h.querySelectorAll("[data-nfx]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.nfx===ext)));
+    const final=()=>{let raw=i.value.trim();const bad=/[\\/:*?"<>|]/.test(raw);raw=raw.replace(/[\\/:*?"<>|]+/g,"").trim();
+      const m=raw.match(/\.(txt|md)$/i);if(m){ext=m[1].toLowerCase();raw=raw.slice(0,-m[0].length).trim();segs()}
+      return{name:raw?`${raw}${dt.checked?"_"+d8():""}.${ext}`:"",bad}};
+    const check=()=>{const f=final(),dup=f.name&&(o.files||[]).some(a=>String(a.name).toLowerCase()===f.name.toLowerCase());
+      okb.disabled=!f.name||dup;note.textContent=dup?`"${f.name}" is already on this card. Use another name.`:f.bad?`/ \\ : * ? " < > | can't be in a file name, so they're left out: ${f.name}`:f.name?`Saves as ${f.name}`:"";note.style.color=dup||f.bad?"var(--amber)":""};
+    i.oninput=check;dt.onchange=check;h.querySelectorAll("[data-nfx]").forEach(b=>b.onclick=()=>{ext=b.dataset.nfx;i.value=i.value.replace(/\.(txt|md)$/i,"");segs();check();i.focus()});
+    h.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.isComposing&&e.target.tagName!=="BUTTON"){e.preventDefault();e.stopPropagation();if(!okb.disabled)okb.click()}});
+    h.querySelector("[data-nf-cancel]").onclick=close;okb.onclick=()=>{const f=final();if(!f.name)return;close();cb(f.name,ext)};
+    i.focus();setTimeout(()=>{if(document.activeElement!==i&&h.isConnected&&!h.contains(document.activeElement))i.focus()},30)})}
+function newTextFlow(ref){nameSheet("New Text File",ref,(name,ext)=>ntEditor(ref,name,ext))}
+let NTE=null;
+function ntEditor(ref,name,ext){const root=document.getElementById("viewer-root"),mime=ext==="md"?"text/markdown":"text/plain";
+  root.innerHTML=`<div class="vw editing" id="nte" tabindex="-1" role="dialog" aria-modal="true" aria-label="New text file"><div class="vw-top"><span class="vw-t"><b>${esc(name)}</b><span>New File · Not Saved Yet</span></span>
+    <span class="row" style="gap:6px"><button class="btn sm" id="nte-cancel">Cancel</button><button class="btn sm primary" id="nte-save">Save</button></span></div>
+    <div class="vw-stage is-text"><div class="vw-in"><textarea id="nte-ed" class="vw-edit" spellcheck="true" aria-label="${esc(name)}"></textarea></div></div></div>`;
+  const ed=root.querySelector("#nte-ed"),box=root.querySelector("#nte");
+  const ask=(title,msg,btns)=>new Promise(res=>{const w=document.createElement("div");w.className="vw-ask";w.innerHTML=`<div class="vw-ask-box" role="alertdialog"><b>${esc(title)}</b><p>${esc(msg)}</p><div class="row">${btns.map(([k,l],i)=>`<button class="btn sm ${i===0?"primary":""}" data-k="${k}">${esc(l)}</button>`).join("")}</div></div>`;
+    box.appendChild(w);NTE.ask=k=>{w.remove();NTE.ask=null;res(k)};w.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>NTE.ask(b.dataset.k));setTimeout(()=>w.querySelector("[data-k]").focus(),0)});
+  const shut=()=>{document.removeEventListener("keydown",key,true);NTE=null;root.innerHTML=""};
+  const save=async()=>{const text=ed.value;if(!text.trim()){toast("Type something first, or Cancel.",3500);ed.focus();return false}
+    shut();vwPop=true;try{history.back()}catch(x){vwPop=false}await addFiles(ref,[new File([text],name,{type:mime})]);toast(`Created ${name}`);return true};
+  const cancel=async fromPop=>{if(ed.value.trim()){const c=await ask("Discard This File?",`"${name}" hasn't been saved yet.`,[["discard","Discard"],["keep","Keep Writing"]]);
+      if(c!=="discard"){if(fromPop){try{history.pushState({bbv:1},"")}catch(x){}}ed.focus();return}}
+    shut();if(!fromPop){vwPop=true;try{history.back()}catch(x){vwPop=false}}};
+  const key=e=>{if(!NTE)return;if(NTE.ask){if(e.key==="Escape"){e.preventDefault();NTE.ask("keep")}e.stopImmediatePropagation();return}
+    if((e.metaKey||e.ctrlKey)&&(e.key==="s"||e.key==="S")){e.preventDefault();e.stopImmediatePropagation();save();return}
+    if(e.key==="Escape"){e.preventDefault();e.stopImmediatePropagation();cancel(false);return}e.stopImmediatePropagation()};
+  document.addEventListener("keydown",key,true);
+  NTE={back:()=>cancel(true),ask:null};try{history.pushState({bbv:1},"")}catch(x){}
+  root.querySelector("#nte-save").onclick=()=>save();root.querySelector("#nte-cancel").onclick=()=>cancel(false);
+  ed.focus();setTimeout(()=>{if(NTE&&document.activeElement!==ed)ed.focus()},30)}
+/* "Save as Text File" under a Notes box: the text becomes a file on the same card; then keep or clear the box */
+function notesToText(el,ref){const sel=NOTE_BOX[ref.kind];if(!sel)return;const scope=el.closest(".modal")||document.getElementById("view");const t=scope&&scope.querySelector(sel);if(!t||t._txb)return;
+  const w=document.createElement("div");w.className="nt-tx";w.innerHTML=`<button type="button" class="btn sm ghost" data-nt-tx>Save as Text File</button>`;
+  const anchor=t.parentNode&&t.parentNode.classList&&t.parentNode.classList.contains("capwrap")?t.parentNode:t;anchor.after(w);t._txb=w;
+  const upd=()=>{w.hidden=!t.value.trim()};upd();t.addEventListener("input",upd);
+  w.querySelector("button").onclick=()=>{if(!t.value.trim())return;nameSheet("Save Notes as a Text File",ref,async(name,ext)=>{
+    await addFiles(ref,[new File([t.value],name,{type:ext==="md"?"text/markdown":"text/plain"})]);toast(`Created ${name}`);
+    sheet("Keep the Notes Text?",`"${name}" now holds a copy of these notes.`,`<div class="row" style="justify-content:flex-end;gap:8px;margin-top:6px"><button class="btn" data-kp>Keep Text</button><button class="btn primary" data-cl>Clear Notes</button></div>`,(h,close)=>{
+      h.querySelector("[data-kp]").onclick=close;h.querySelector("[data-cl]").onclick=()=>{close();const box=document.querySelector(sel)||t;box.value="";box.dispatchEvent(new Event("input",{bubbles:true}));grow(box)}})})}}
 function mountAtt(el,ref){
-  el.setAttribute("data-attgrid","1");
+  el.setAttribute("data-attgrid","1");el._ref=ref;notesToText(el,ref);
   const draw=()=>{const o=RVK.has(ref.kind)?(peekOwner(ref)||{}):ownerOf(ref);if(!o){el.innerHTML="";return}const L=o.files||[],cn=shareCounts();
     el.innerHTML=`${L.length?`<div class="att-grid">${L.map(a=>attCard(a,cn[shareKey(a)])).join("")}</div>`:""}
-      <div class="row"><button class="btn sm" data-att-add>+ Add Files</button><button class="btn sm ghost" data-att-drive>+ From Drive</button><button class="btn sm ghost" data-att-link>+ Add Link</button>${L.length>1?`<button class="btn sm ghost" data-att-sort>Sort</button>`:""}<span class="sub grow">${L.length?(L.length>1?"Hold and Drag a Card to Reorder":""):"Images, PDFs, Audio and Text Files Open Here. Other Files Open in Google Drive. Up to 15 MB Each."}</span></div>
+      <div class="row"><button class="btn sm" data-att-add>+ Add Files</button><button class="btn sm ghost" data-att-drive>+ From Drive</button><button class="btn sm ghost" data-att-link>+ Add Link</button><button class="btn sm ghost" data-att-new>+ New Text</button>${L.length>1?`<button class="btn sm ghost" data-att-sort>Sort</button>`:""}<span class="sub grow">${L.length?(L.length>1?"Hold and Drag a Card to Reorder":""):"Images, PDFs, Audio and Text Files Open Here. Other Files Open in Google Drive. Up to 15 MB Each."}</span></div>
       <input type="file" multiple hidden data-att-file>`;
     el.querySelectorAll("[data-th]").forEach(t=>{const a=L.find(x=>x.id===t.dataset.th);if(a)localURL(a).then(u=>{if(u&&t.isConnected){t.insertAdjacentHTML("afterbegin",`<img src="${u}" alt="" draggable="false">`);t.classList.add("has");
       const im=t.querySelector("img");im.onerror=()=>{im.remove();t.classList.remove("has");thumbRetry(a)}}}).catch(()=>{})});
@@ -1723,6 +1777,7 @@ function mountAtt(el,ref){
     el.querySelector("[data-att-add]").onclick=()=>fi.click();
     fi.onchange=()=>{const fl=[...fi.files];fi.value="";if(fl.length)addFiles(ref,fl)};
     el.querySelector("[data-att-link]").onclick=()=>linkModal(ref);
+    el.querySelector("[data-att-new]").onclick=()=>newTextFlow(ref);
     el.querySelector("[data-att-drive]").onclick=()=>fromDriveSheet(ref);
     const so=el.querySelector("[data-att-sort]");if(so)so.onclick=()=>sortSheet(ref);
     el.querySelectorAll("[data-att-open]").forEach(b=>b.onclick=()=>{if(grid&&grid._dragged&&Date.now()-grid._dragged<500)return;openAtt(ref,b.dataset.attOpen)});
@@ -3394,6 +3449,7 @@ function kbHelp(){
 function runAction(id){
   const go=v=>{S.ui.view=v;commit()},nav=i=>{const b=document.querySelectorAll("#view .navg button")[i];if(b)b.click()};
   switch(id){
+    case"newText":return newTextFor();
     case"viewBoard":return go("board");case"viewMonth":return go("month");case"viewWeek":return go("week");case"viewDay":return go("day");case"viewReview":return go("review");
     case"prev":return nav(0);case"today":return nav(1);case"next":return nav(2);
     case"newBlock":{if(S.ui.view==="day"){const b=document.querySelector("[data-addblock]");if(b)b.click()}else if(S.ui.view==="week"){const d=S.ui.day>=S.ui.week&&S.ui.day<=iso(addDays(parse(S.ui.week),6))?S.ui.day:S.ui.week;blockModal(null,d,540)}return}
@@ -3615,6 +3671,8 @@ manual:[
 <li>+ Add Files: any file up to 15 MB. It's saved in Google Drive > Project Tracker Files: in the project's folder, in REVIEWS/2026 for files added to a Weekly or Monthly Review, or in DIARY/2026 for the Diary (by the year of that review or day). Each folder is made the first time it's needed. The original on your device is never changed.</li>
 <li>Folder and file names the tracker makes follow one rule: no spaces, words joined with "-", parts split with "_", dates as 2026.10.12. Folders are also in capitals: SING-SONG-RETAINER, REVIEWS, DIARY. Files look like Project-Tracker_Backup_2026.10.12.json. Your own file names stay as you named them.</li>
 <li>Older folders (Reviews, Diary, Sing Song Retainer) are found whatever their capitals or spaces and renamed to capitals the first time they're used, so you never need to rename them yourself, and you never get a second copy.</li>
+<li>+ New Text: a new text file you write in the tracker. Name it yourself (TXT is the default; switch to MD, or type .md), optionally Add Today's Date, then write and Save (Ctrl+S / Cmd+S). It's saved on the card and in the card's Drive folder; offline it waits like any upload. Shift+N does the same in a Notes pop-up, on the Day page (Diary) and on a Review.</li>
+<li>Save as Text File (under a Notes box with text): turns the notes into a text file on the same card, then asks whether to keep or clear the box.</li>
 <li>+ From Drive: files already in your Drive. Paste a Drive link, open your Project Tracker Files folders, or search your whole Drive by name, then tick files and tap Add. Nothing is copied or uploaded.</li>
 <li>+ Add Link: web pages, or big files in Dropbox, Drive or Proton Drive. Drive file links become normal Drive cards automatically.</li>
 <li>Offline, a new file waits on the device ("Waiting to Upload") and goes to Drive when you're back online.</li>
@@ -3775,6 +3833,7 @@ manual:[
 <tr><td><span class="k">Cmd/Ctrl+Z</span></td><td>Undo the last change</td></tr>
 <tr><td><span class="k">Shift+D</span></td><td>Light / Dark theme</td></tr>
 <tr><td><span class="k">Shift+S</span></td><td>Sync now</td></tr>
+<tr><td><span class="k">Shift+N</span></td><td>New text file (Notes pop-up, Day page or Review)</td></tr>
 <tr class="g"><td colspan="2">In Pop-Ups</td></tr>
 <tr><td><span class="k">Enter</span></td><td>Confirm (Save, Add, Create)</td></tr>
 <tr><td><span class="k">Cmd/Ctrl+Enter</span></td><td>Confirm while typing in a writing box</td></tr>
@@ -3875,6 +3934,7 @@ manual:[
 <dt>⋯ Menu</dt><dd>The three-dot button on an attachment card: Rename, Move To, Copy To, Download (or Download as PDF), Copy Link and Remove.</dd>
 <dt>Monthly Review</dt><dd>The review of a month on the Review page: focus, hours by project, wins, improvements, goals and notes.</dd>
 <dt>Naming Rule</dt><dd>How the tracker names folders and files: no spaces, words joined with "-", parts split with "_", dates as 2026.10.12. Folders are in capitals (SING-SONG-RETAINER).</dd>
+<dt>New Text File</dt><dd>A text file you create and write in the tracker with + New Text (or Shift+N), named by you, TXT by default.</dd>
 <dt>Offline Copy</dt><dd>A file saved on the device so it opens without internet. Turn on Keep All Attachments Offline to save every file.</dd>
 <dt>Open in App / Open in Browser</dt><dd>The choices for opening a non-image file: in its own app (Drive, Docs, Photoshop) or in a browser tab.</dd>
 <dt>Past Day Line</dt><dd>The thin line under the date (Viewing a Past Day, or Viewing a Past Week) with a button back to today or this week.</dd>
@@ -3943,7 +4003,7 @@ addEventListener("keydown",e=>{
 },true);
 /* Back (Android swipe, mouse back button, Alt+Left, Cmd+[) closes a pop-up instead of leaving the app */
 let histArmed=false;
-addEventListener("popstate",()=>{if(vwPop){vwPop=false;return}if(VW){closeViewer(true);return}document.getElementById("ov2")?.remove();histArmed=false;if(document.getElementById("ov"))closeModal()});
+addEventListener("popstate",()=>{if(vwPop){vwPop=false;return}if(NTE){NTE.back();return}if(VW){closeViewer(true);return}document.getElementById("ov2")?.remove();histArmed=false;if(document.getElementById("ov"))closeModal()});
 /* text boxes grow with their text. They're measured on a hidden copy, so the box never shrinks for a moment and the page doesn't jump.
    Boxes with Attachments under them stop at 60% of the screen and scroll inside; Expand shows the whole note. */
 const CAP_IDS=new Set(["nt","it-nt","diary","wr-notes","mr-notes"]),CAP_PCT=.55,capExp=new Set();let meas=null;
@@ -4123,6 +4183,7 @@ document.addEventListener("keydown",e=>{
   if(document.getElementById("ov2")){if((e.key==="Backspace"||e.key==="Delete")&&!isField(t))e.preventDefault();return}
   if(ov){
     if(e.key==="Escape"||(e.altKey&&e.key==="ArrowLeft")||(e.metaKey&&e.key==="[")){e.preventDefault();return closeModal()}
+    if(!isField(t)&&st.keys&&st.keys.newText&&comboOf(e)===st.keys.newText&&document.querySelector("#modal-root [data-attgrid]")){e.preventDefault();return newTextFor()}
     if(e.key==="Enter"&&st.kbEnter&&!e.defaultPrevented&&!e.shiftKey&&!e.altKey){
       if(t&&(/^(BUTTON|A|SELECT)$/.test(t.tagName)||t.closest("form")))return;
       if(t&&t.tagName==="TEXTAREA"&&!mod)return;
