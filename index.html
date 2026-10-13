@@ -200,8 +200,6 @@ main{padding-top:20px;display:grid;gap:18px}
 .fb{display:grid;gap:2px;border-left:3px solid var(--accent);padding:4px 10px}
 .fb .d{font-size:11.5px;color:var(--muted)}
 .chk-list,.fb-list{display:grid;gap:4px}
-.pastbar{display:flex;align-items:center;gap:8px;padding:3px 4px 3px 10px;border-radius:8px;background:var(--stat);border-left:3px solid var(--amber);font-size:13px;font-weight:600;color:var(--muted)}
-.pastbar>span{flex:1}.pastbar .btn.sm{padding:3px 10px;font-size:12px}
 .carry{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--stat);border-radius:9px;padding:8px 10px;font-size:13px}
 .opts .opt-h{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:10px 2px 2px}.opts .opt-h:first-child{padding-top:0}
 .chk-row{align-items:center}.chk-row .ct{flex:1;min-width:0;cursor:text;padding:3px 2px;border-radius:5px;overflow-wrap:anywhere}.chk-row .ct:hover{background:var(--btn)}.chk-row .ie{padding:4px 8px}
@@ -688,7 +686,7 @@ const LPAL_DEF={light:["#CEFBD0","#D5ECC2","#FAF6B7","#F2E3B3","#EDE6D8","#F7D9C
 const LIFE_ORDER=[1,7,2,11,10,5,8,6,12,9,4,3]; /* October 2026 reorder: new slot k shows old slot LIFE_ORDER[k-1] */
 const STATUSES=[["Not Started","--faint"],["In Progress","--accent"],["Submitted","--amber"],["Feedback Received","--p7"],["Revising","--act"],["Approved","--p3"],["Done","--ok"]];
 const SC=Object.fromEntries(STATUSES);
-const APP_VERSION="2026.10.13.02";
+const APP_VERSION="2026.10.13.03";
 const isDone=it=>it.status==="Done"||it.status==="Approved";
 const DEF_NAME="Blue Blaze Project Tracker";
 const appName=()=>((typeof S!=="undefined"&&S&&S.settings&&S.settings.brandName)||"").trim()||DEF_NAME;
@@ -2601,7 +2599,6 @@ function viewWeek(){
   return `<div class="row"><h2 class="grow">Week of ${short(ws)}</h2><span class="sub tot"><span class="a">${fmtH(total)}</span> of <b>${fmtH(target)}</b> Logged</span>
     <span class="navg"><button class="btn" data-wk="-7" aria-label="Previous week">←</button><button class="btn" data-wk="0">This Week</button><button class="btn" data-wk="7" aria-label="Next week">→</button>
     <button class="btn" data-rv-week="${ws}">Weekly Review</button></span></div>
-  ${we<TODAY()?pastBar("Viewing a Past Week","data-wk","Go to This Week"):""}
   <div class="row"><span class="sub grow">Pinch the Chart to Zoom the Hours. Tap a Day to Plan It in Detail.</span>
     <span class="zoombar"><button class="btn sm" data-zoom="-1" aria-label="Zoom out">−</button><button class="btn sm" data-zoom="0">Fit</button><button class="btn sm" data-zoom="1" aria-label="Zoom in">+</button></span></div>
   <div class="sched-scroll" id="wk-scroll"><div class="sched" id="wk-sched" style="${zoomW(z)}">${hoursHeader()}${rows}</div></div>
@@ -2616,8 +2613,6 @@ function viewWeek(){
       ${tasks.length?tasks.map(({ph,it})=>{const s=itemStats(it);return `<div class="task"><span class="dot" style="--c:var(--${ph.color})"></span><button style="border:0;background:none;padding:0;text-align:left" data-open-item="${it.id}"><b>${esc(it.name)}</b> <span class="sub">${esc(ph.name)}</span></button><span class="chip" style="--sc:var(${SC[it.status]})">${esc(it.status)} · ${AE(s.act,s.est)}${S.settings.weekWarn?pctTag(s.act,s.est):""}</span></div>`}).join(""):`<p class="empty">Set an item's target week to see it here.</p>`}</section>
   </div>`;
 }
-/* a thin line under the date while you're looking at a past day or week; nothing moves on its own */
-const pastBar=(t,attr,b)=>`<div class="pastbar" role="status"><span class="grow">${t}</span><button class="btn sm" ${attr}="0">${b}</button></div>`;
 function listEd(key,arr,wk){return `<div class="list-ed" data-list="${key}" data-wk="${wk||""}">${arr.map((v,i)=>`<div class="li"><span class="n${arr.length>1?" grip":""}" ${arr.length>1?`title="Drag to Reorder"`:""}>${arr.length>1?"⋮⋮ ":""}${i+1}</span><input class="inp" data-li="${i}" value="${esc(v)}" aria-label="Item ${i+1}"><button class="btn sm ghost" data-lx="${i}" aria-label="Remove">✕</button></div>`).join("")}<button class="btn sm ghost" style="justify-self:start" data-ladd>+ Add</button></div>`}
 
 /* ===================== day (vertical, fits the screen) ===================== */
@@ -2637,7 +2632,6 @@ function viewDay(){
   return `<div class="row"><h2 class="grow">${dt.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}</h2>
     <span class="navg"><button class="btn" data-dd="-1" aria-label="Previous day">←</button><button class="btn" data-dd="0">Today</button><button class="btn" data-dd="1" aria-label="Next day">→</button>
     <button class="btn primary" data-addblock="${d}">+ Block</button></span></div>
-  ${d<TODAY()?pastBar("Viewing a Past Day","data-dd","Go to Today"):""}
   <div class="day-grid">
     <div style="display:grid;gap:8px">
       <div class="row"><span class="sub grow">${(S.ui.dzoom||1)>1?"Zoomed In · Scroll for the Rest of the Day":"Whole Day on One Screen"}</span><span class="zoombar"><button class="btn sm" data-dzoom="-1" aria-label="Zoom out">−</button><button class="btn sm" data-dzoom="0">Fit</button><button class="btn sm" data-dzoom="1" aria-label="Zoom in">+</button></span></div>
@@ -3567,7 +3561,6 @@ manual:[
 <h4>Week</h4>
 [[fig:week|Week: plan above, logged time below]]
 <ul>
-<li>When you're looking at a past week, a thin line under the title says Viewing a Past Week, with Go to This Week. Nothing moves on its own.</li>
 <li>Each row is a day from Day Starts to Day Ends (5am to 10pm by default). Tap a day's name to open it.</li>
 <li>Blocks: tap empty space to add one. Project Work blocks belong to a step and take its phase color. Life Blocks (meals, walks, rest) never count toward a budget. Dashed blocks come from schedules.</li>
 <li>Hold a block, then drag to move it, even to another day. On a laptop, just drag. Drag the right edge to change its length.</li>
@@ -3578,7 +3571,7 @@ manual:[
 <h4>Day</h4>
 [[fig:day|Day: one column for the whole day]]
 <ul>
-<li>When you're looking at a past day, a thin line under the date says Viewing a Past Day, with Go to Today. The tracker remembers the date you were on, even overnight, so this line tells you when it isn't today. Nothing moves on its own.</li>
+<li>The Day page remembers the date you were on, even overnight. Press T (or tap Today) to jump back to today.</li>
 <li>+ Block adds a block at the current time. Hold a block and drag it up or down; hold its bottom edge to resize. Pinch or use − Fit + to zoom.</li>
 <li>The thin column next to the plan shows logged time. Tap a piece of it to open that step's Time Log.</li>
 <li>Planned Project Time, Logged and Daily Target sit at the top of the side column.</li>
@@ -3883,7 +3876,7 @@ manual:[
 <li>"Too Big to Download Here": Drive files over 50 MB open in the Google Drive app instead.</li>
 <li>Files named ".tracker-link-..." in Project Tracker Files > .TRACKER-TEMP: temporary copies of big Dropbox files (over 6 MB) while they come to your device in pieces. There's one per link at most; it goes to the trash when the download finishes, or after an hour if it was interrupted. They're hidden from + From Drive. Trashed files still count toward your Google storage until the trash is emptied.</li>
 <li>A file stays "Waiting to Upload": it tries again by itself every 30 seconds while you're online. Go online (VPN if needed), then tap the sync chip. If it still waits, use Copy Sync Details (below).</li>
-<li>Something added on another device doesn't show: check for the Viewing a Past Day line, then tap the sync chip. If it still doesn't show, go to Settings > Advanced > Data > Copy Sync Details on that device and paste it into a message for help.</li>
+<li>Something added on another device doesn't show: check the date at the top (press T for today), then tap the sync chip. If it still doesn't show, go to Settings > Advanced > Data > Copy Sync Details on that device and paste it into a message for help.</li>
 <li>Stuck pop-up or viewer: <span class="k">Esc</span>, the Close button, or the back gesture closes it.</li>
 <li>A date won't clear: use the ✕ next to the date box, then Save.</li>
 </ul>
@@ -3941,7 +3934,6 @@ manual:[
 <dt>New Text File</dt><dd>A text file you create and write in the tracker with + New Text (or Shift+N), named by you, TXT by default.</dd>
 <dt>Offline Copy</dt><dd>A file saved on the device so it opens without internet. Turn on Keep All Attachments Offline to save every file.</dd>
 <dt>Open in App / Open in Browser</dt><dd>The choices for opening a non-image file: in its own app (Drive, Docs, Photoshop) or in a browser tab.</dd>
-<dt>Past Day Line</dt><dd>The thin line under the date (Viewing a Past Day, or Viewing a Past Week) with a button back to today or this week.</dd>
 <dt>Phase</dt><dd>A stage of a project with its own budget, color, target date and items, such as Broad Exploration or Refinement.</dd>
 <dt>Phase Color</dt><dd>The color of a phase&#x27;s bars, blocks and target dates, picked from your Phase Colors.</dd>
 <dt>Pop-Up</dt><dd>A window that opens over the page, such as Edit Project or an item.</dd>
