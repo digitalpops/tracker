@@ -1,6 +1,6 @@
 /* Blue Blaze Project Tracker service worker: lets the app open offline and install as an app. */
-/* app 2026.10.15.02 (the app compares this with its own version to show "Update Ready" in Settings) */
-const VERSION = "bbst-202610151210";
+/* app 2026.10.16.01 (the app compares this with its own version to show "Update Ready" in Settings) */
+const VERSION = "bbst-202610160322";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
